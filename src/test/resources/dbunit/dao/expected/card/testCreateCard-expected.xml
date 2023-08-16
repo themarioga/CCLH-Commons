@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
+<dataset>
+    <T_CARD id="0" text="First" type="0" dictionary_id="0"/>
+    <T_CARD id="1" text="Test card" type="1" dictionary_id="0"/>
+</dataset>

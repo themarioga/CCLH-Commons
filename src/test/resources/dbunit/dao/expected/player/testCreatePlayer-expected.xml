@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
+<dataset>
+    <T_PLAYER ID="0" USER_ID="0" GAME_ID="0" JOIN_ORDER="0" POINTS="0"/>
+    <T_PLAYER ID="1" USER_ID="0" GAME_ID="0" JOIN_ORDER="1" POINTS="1"/>
+</dataset>

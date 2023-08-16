@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
+<dataset>
+    <T_USER id="0" name="First" active="true"/>
+    <T_USER id="1" name="Test user" active="true"/>
+</dataset>

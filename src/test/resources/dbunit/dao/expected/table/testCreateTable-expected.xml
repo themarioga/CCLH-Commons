@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
+<dataset>
+    <T_TABLE game_id="0" round_number="0" president_id="0" blackcard_id="0" />
+    <T_TABLE game_id="1" round_number="1" president_id="0" blackcard_id="0" />
+</dataset>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
+<dataset>
+    <T_ROOM id="0" name="Otro nombre" active="false" owner_id="0" />
+</dataset>
