@@ -13,8 +13,9 @@
 
         <tests.skip>true</tests.skip>
 
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>20</maven.compiler.source>
+        <maven.compiler.compiler>20</maven.compiler.compiler>
+        <maven.compiler.target>20</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -152,31 +153,31 @@
                     </execution>
                 </executions>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>org.owasp</groupId>-->
-<!--                <artifactId>dependency-check-maven</artifactId>-->
-<!--                <version>8.2.1</version>-->
-<!--                <configuration>-->
-<!--                    <failBuildOnCVSS>8</failBuildOnCVSS>-->
-<!--                    <suppressionFile>${project.basedir}/src/main/resources/supressed-cve-exceptions.xml</suppressionFile>-->
-<!--                </configuration>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <goals>-->
-<!--                            <goal>check</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>8.2.1</version>
+                <configuration>
+                    <failBuildOnCVSS>8</failBuildOnCVSS>
+                    <suppressionFile>${project.basedir}/src/main/resources/supressed-cve-exceptions.xml</suppressionFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>net.revelc.code.formatter</groupId>
                 <artifactId>formatter-maven-plugin</artifactId>
                 <version>2.22.0</version>
                 <configuration>
                     <configFile>${project.basedir}/src/main/resources/default-formatter-config.xml</configFile>
-                    <compilerSource>17</compilerSource>
-                    <compilerCompliance>17</compilerCompliance>
-                    <compilerTargetPlatform>17</compilerTargetPlatform>
+                    <compilerSource>${maven.compiler.source}</compilerSource>
+                    <compilerCompliance>${maven.compiler.compiler}</compilerCompliance>
+                    <compilerTargetPlatform>${maven.compiler.target}</compilerTargetPlatform>
                 </configuration>
                 <executions>
                     <execution>

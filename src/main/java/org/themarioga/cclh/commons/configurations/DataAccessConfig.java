@@ -1,7 +1,6 @@
 package org.themarioga.cclh.commons.configurations;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,7 +44,7 @@ public class DataAccessConfig {
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
         sessionFactoryBean.setDataSource(dataSource());
-        sessionFactoryBean.setPackagesToScan("org.themarioga.cclh.models");
+        sessionFactoryBean.setPackagesToScan("org.themarioga.cclh.commons.models");
         sessionFactoryBean.setHibernateProperties(hibernateProperties());
 
         return sessionFactoryBean;

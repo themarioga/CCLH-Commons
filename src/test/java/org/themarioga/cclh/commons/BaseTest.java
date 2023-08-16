@@ -2,7 +2,10 @@ package org.themarioga.cclh.commons;
 
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import jakarta.transaction.Transactional;
+import org.hibernate.SessionFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,5 +24,13 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 @Transactional
 @Rollback
 public class BaseTest {
+
+    @Autowired
+    SessionFactory sessionFactory;
+
+    @BeforeEach
+    public void beforeTests() {
+        sessionFactory.getCurrentSession().clear();
+    }
 
 }

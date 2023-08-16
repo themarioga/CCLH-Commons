@@ -11,7 +11,6 @@ import org.themarioga.cclh.commons.daos.intf.GameDao;
 import org.themarioga.cclh.commons.daos.intf.PlayerDao;
 import org.themarioga.cclh.commons.daos.intf.UserDao;
 import org.themarioga.cclh.commons.models.*;
-import org.themarioga.cclh.models.*;
 
 import java.util.List;
 

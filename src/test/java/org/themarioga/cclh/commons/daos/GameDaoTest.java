@@ -10,7 +10,6 @@ import org.themarioga.cclh.commons.daos.intf.*;
 import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
-import org.themarioga.cclh.models.*;
 
 import java.util.List;
 
