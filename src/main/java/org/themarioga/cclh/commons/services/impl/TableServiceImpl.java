@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.themarioga.cclh.commons.dao.intf.TableDao;
 import org.themarioga.cclh.commons.enums.CardTypeEnum;
-import org.themarioga.cclh.commons.models.Card;
-import org.themarioga.cclh.commons.models.Game;
-import org.themarioga.cclh.commons.models.Player;
-import org.themarioga.cclh.commons.models.Table;
+import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.services.intf.DictionaryService;
 import org.themarioga.cclh.commons.services.intf.GameService;
 import org.themarioga.cclh.commons.services.intf.PlayerService;
@@ -115,6 +112,13 @@ public class TableServiceImpl implements TableService {
 
             cards.removeAll(playerCards);
         }
+    }
+
+    @Override
+    public PlayedCard getMostVotedCard(Long gameId) {
+        logger.debug("Getting most voted card of the table {}", gameId);
+
+        return tableDao.getMostVotedCard(gameId);
     }
 
 }

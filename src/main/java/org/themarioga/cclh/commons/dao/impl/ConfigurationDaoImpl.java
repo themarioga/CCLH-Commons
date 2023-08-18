@@ -13,7 +13,7 @@ public class ConfigurationDaoImpl implements ConfigurationDao {
 
     @Override
     public String getConfiguration(String key) {
-        return sessionFactory.getCurrentSession().createNativeQuery("SELECT conf_value FROM t_configuration where conf_key = ?", String.class).setParameter(1, key).getSingleResult();
+        return sessionFactory.getCurrentSession().createNativeQuery("SELECT conf_value FROM t_configuration where conf_key = ?", String.class).setParameter(1, key).getSingleResultOrNull();
     }
 
 }

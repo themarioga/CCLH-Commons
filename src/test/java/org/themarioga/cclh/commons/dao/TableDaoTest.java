@@ -22,6 +22,8 @@ import java.util.List;
 class TableDaoTest extends BaseTest {
 
     @Autowired
+    private TableDao tableDao;
+    @Autowired
     private GameDao gameDao;
     @Autowired
     private UserDao userDao;
@@ -29,8 +31,6 @@ class TableDaoTest extends BaseTest {
     private RoomDao roomDao;
     @Autowired
     private CardDao cardDao;
-    @Autowired
-    private TableDao tableDao;
     @Autowired
     private PlayerDao playerDao;
     @Autowired
@@ -181,6 +181,17 @@ class TableDaoTest extends BaseTest {
         Assertions.assertNotNull(game.getTable().getPlayerVotes());
         Assertions.assertEquals(1, game.getTable().getPlayerVotes().size());
         Assertions.assertEquals("First", game.getTable().getPlayerVotes().get(0).getCard().getText());
+    }
+
+    @Test
+    @DatabaseSetup("classpath:dbunit/dao/setup/player.xml")
+    @DatabaseSetup("classpath:dbunit/dao/setup/tableplayedcards.xml")
+    @DatabaseSetup("classpath:dbunit/dao/setup/tableplayervotes.xml")
+    void testGetMostVotedCard() {
+        PlayedCard card = tableDao.getMostVotedCard(0L);
+
+        Assertions.assertNotNull(card);
+        Assertions.assertEquals(0, card.getCard().getId());
     }
 
 }

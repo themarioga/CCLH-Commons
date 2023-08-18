@@ -16,12 +16,12 @@ public class PlayerDaoImpl extends AbstractHibernateDao<Player> implements Playe
 
     @Override
     public PlayedCard findCardByPlayer(Long playerId) {
-        return getCurrentSession().createQuery("SELECT t FROM PlayedCard t where player.id=:player_id", PlayedCard.class).setParameter("player_id", playerId).getSingleResult();
+        return getCurrentSession().createQuery("SELECT t FROM PlayedCard t where player.id=:player_id", PlayedCard.class).setParameter("player_id", playerId).getSingleResultOrNull();
     }
 
     @Override
     public PlayerVote findVotesByPlayer(Long playerId) {
-        return getCurrentSession().createQuery("SELECT t FROM PlayerVote t where player.id=:player_id", PlayerVote.class).setParameter("player_id", playerId).getSingleResult();
+        return getCurrentSession().createQuery("SELECT t FROM PlayerVote t where player.id=:player_id", PlayerVote.class).setParameter("player_id", playerId).getSingleResultOrNull();
     }
 
 }

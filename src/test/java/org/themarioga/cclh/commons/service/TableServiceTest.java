@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.enums.CardTypeEnum;
+import org.themarioga.cclh.commons.models.Card;
 import org.themarioga.cclh.commons.models.Game;
+import org.themarioga.cclh.commons.models.PlayedCard;
 import org.themarioga.cclh.commons.models.Table;
 import org.themarioga.cclh.commons.services.intf.DictionaryService;
 import org.themarioga.cclh.commons.services.intf.GameService;
@@ -75,6 +77,15 @@ class TableServiceTest extends BaseTest {
         Assertions.assertEquals(game.getNumberOfPlayers(), game.getPlayers().size());
         Assertions.assertEquals(cardsPerPlayer, game.getPlayers().get(0).getDeck().size());
         Assertions.assertEquals(CardTypeEnum.WHITE, game.getPlayers().get(0).getDeck().get(0).getType());
+    }
+
+    @Test
+    @DatabaseSetup("classpath:dbunit/service/setup/tableplayedcards.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/tableplayervotes.xml")
+    void testGetMostVotedCard() {
+        PlayedCard card = tableService.getMostVotedCard(0L);
+
+        Assertions.assertNotNull(card);
     }
 
 }
