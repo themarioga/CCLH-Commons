@@ -2,9 +2,11 @@ package org.themarioga.cclh.commons.models;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity
 @jakarta.persistence.Table(name = "t_table_playervotes")
-public class PlayerVote {
+public class PlayerVote implements Serializable {
 
     @Id
     @Column(name = "game_id")

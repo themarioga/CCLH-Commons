@@ -3,13 +3,17 @@ package org.themarioga.cclh.commons.services.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.themarioga.cclh.commons.daos.intf.GameDao;
+import org.springframework.stereotype.Service;
+import org.themarioga.cclh.commons.dao.intf.GameDao;
 import org.themarioga.cclh.commons.models.Game;
 import org.themarioga.cclh.commons.services.intf.GameService;
 
+import java.util.Date;
+
+@Service
 public class GameServiceImpl implements GameService {
 
-    private Logger logger = LoggerFactory.getLogger(GameService.class);
+    private final Logger logger = LoggerFactory.getLogger(GameServiceImpl.class);
 
     @Autowired
     GameDao gameDao;
@@ -18,6 +22,7 @@ public class GameServiceImpl implements GameService {
     public Game create(Game game) {
         logger.debug("Creating game: {}", game);
 
+        game.setCreationDate(new Date());
         return gameDao.create(game);
     }
 

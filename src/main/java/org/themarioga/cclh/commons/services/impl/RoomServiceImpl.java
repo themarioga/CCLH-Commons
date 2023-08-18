@@ -3,13 +3,17 @@ package org.themarioga.cclh.commons.services.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.themarioga.cclh.commons.daos.intf.RoomDao;
+import org.springframework.stereotype.Service;
+import org.themarioga.cclh.commons.dao.intf.RoomDao;
 import org.themarioga.cclh.commons.models.Room;
 import org.themarioga.cclh.commons.services.intf.RoomService;
 
+import java.util.Date;
+
+@Service
 public class RoomServiceImpl implements RoomService {
 
-    private Logger logger = LoggerFactory.getLogger(RoomService.class);
+    private final Logger logger = LoggerFactory.getLogger(RoomServiceImpl.class);
 
     @Autowired
     RoomDao roomDao;
@@ -18,6 +22,7 @@ public class RoomServiceImpl implements RoomService {
     public Room create(Room room) {
         logger.debug("Creating room: {}", room);
 
+        room.setCreationDate(new Date());
         return roomDao.create(room);
     }
 

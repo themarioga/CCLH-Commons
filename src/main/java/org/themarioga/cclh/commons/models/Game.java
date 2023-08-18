@@ -38,6 +38,10 @@ public class Game extends Base {
     private Table table;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "t_player", joinColumns = @JoinColumn(name = "game_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "id", nullable = false))
+    private List<Player> players = new ArrayList<>(0);
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "t_game_deletionvotes", joinColumns = @JoinColumn(name = "game_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "player_id", nullable = false))
     private List<Player> deletionVotes = new ArrayList<>(0);
 
@@ -111,6 +115,14 @@ public class Game extends Base {
 
     public void setTable(Table table) {
         this.table = table;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<Player> players) {
+        this.players = players;
     }
 
     public List<Player> getDeletionVotes() {

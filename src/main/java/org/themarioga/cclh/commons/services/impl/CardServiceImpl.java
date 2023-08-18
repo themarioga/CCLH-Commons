@@ -3,13 +3,17 @@ package org.themarioga.cclh.commons.services.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.themarioga.cclh.commons.daos.intf.CardDao;
+import org.springframework.stereotype.Service;
+import org.themarioga.cclh.commons.dao.intf.CardDao;
 import org.themarioga.cclh.commons.models.Card;
 import org.themarioga.cclh.commons.services.intf.CardService;
 
+import java.util.Date;
+
+@Service
 public class CardServiceImpl implements CardService {
 
-    private Logger logger = LoggerFactory.getLogger(CardService.class);
+    private final Logger logger = LoggerFactory.getLogger(CardServiceImpl.class);
 
     @Autowired
     CardDao cardDao;
@@ -18,6 +22,7 @@ public class CardServiceImpl implements CardService {
     public Card create(Card card) {
         logger.debug("Creating card: {}", card);
 
+        card.setCreationDate(new Date());
         return cardDao.create(card);
     }
 

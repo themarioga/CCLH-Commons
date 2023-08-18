@@ -3,13 +3,17 @@ package org.themarioga.cclh.commons.services.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.themarioga.cclh.commons.daos.intf.UserDao;
+import org.springframework.stereotype.Service;
+import org.themarioga.cclh.commons.dao.intf.UserDao;
 import org.themarioga.cclh.commons.models.User;
 import org.themarioga.cclh.commons.services.intf.UserService;
 
+import java.util.Date;
+
+@Service
 public class UserServiceImpl implements UserService {
 
-    private Logger logger = LoggerFactory.getLogger(UserService.class);
+    private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     UserDao userDao;
@@ -18,6 +22,7 @@ public class UserServiceImpl implements UserService {
     public User create(User user) {
         logger.debug("Creating user: {}", user);
 
+        user.setCreationDate(new Date());
         return userDao.create(user);
     }
 

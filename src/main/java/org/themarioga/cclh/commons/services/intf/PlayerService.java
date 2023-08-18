@@ -14,4 +14,6 @@ public interface PlayerService {
 
     Player findOne(long id);
 
+    void transferCardsFromPlayerDeckToPlayerHand(Player player);
+
 }

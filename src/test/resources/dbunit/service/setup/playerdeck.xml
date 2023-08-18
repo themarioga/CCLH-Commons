@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+    <T_PLAYER_DECK PLAYER_ID="0" CARD_ID="3"/>
+    <T_PLAYER_DECK PLAYER_ID="0" CARD_ID="4"/>
+    <T_PLAYER_DECK PLAYER_ID="0" CARD_ID="5"/>
+    <T_PLAYER_DECK PLAYER_ID="1" CARD_ID="6"/>
+    <T_PLAYER_DECK PLAYER_ID="1" CARD_ID="7"/>
+    <T_PLAYER_DECK PLAYER_ID="1" CARD_ID="8"/>
+    <T_PLAYER_DECK PLAYER_ID="2" CARD_ID="9"/>
+    <T_PLAYER_DECK PLAYER_ID="2" CARD_ID="10"/>
+    <T_PLAYER_DECK PLAYER_ID="2" CARD_ID="11"/>
+</dataset>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
+<dataset>
+    <T_CARD ID="0" TEXT="First black card" TYPE="0" DICTIONARY_ID="0"/>
+    <T_CARD ID="1" TEXT="Second black card" TYPE="0" DICTIONARY_ID="0"/>
+    <T_CARD ID="2" TEXT="Third black card" TYPE="0" DICTIONARY_ID="0"/>
+    <T_CARD ID="3" TEXT="First white card" TYPE="1" DICTIONARY_ID="0"/>
+    <T_CARD ID="4" TEXT="Second white card" TYPE="1" DICTIONARY_ID="0"/>
+    <T_CARD ID="5" TEXT="Third white card" TYPE="1" DICTIONARY_ID="0"/>
+    <T_CARD ID="6" TEXT="Fourth white card" TYPE="1" DICTIONARY_ID="0"/>
+    <T_CARD ID="7" TEXT="Fifth white card" TYPE="1" DICTIONARY_ID="0"/>
+    <T_CARD ID="8" TEXT="Sixth white card" TYPE="1" DICTIONARY_ID="0"/>
+    <T_CARD ID="9" TEXT="Seventh white card" TYPE="1" DICTIONARY_ID="0"/>
+    <T_CARD ID="10" TEXT="Eighth white card" TYPE="1" DICTIONARY_ID="0"/>
+    <T_CARD ID="11" TEXT="Nineth white card" TYPE="1" DICTIONARY_ID="0"/>
+    <T_CARD ID="12" TEXT="Tenth white card" TYPE="1" DICTIONARY_ID="0"/>
+</dataset>

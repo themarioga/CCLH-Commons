@@ -3,13 +3,20 @@ package org.themarioga.cclh.commons.services.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.themarioga.cclh.commons.daos.intf.DictionaryDao;
+import org.springframework.stereotype.Service;
+import org.themarioga.cclh.commons.dao.intf.DictionaryDao;
+import org.themarioga.cclh.commons.enums.CardTypeEnum;
+import org.themarioga.cclh.commons.models.Card;
 import org.themarioga.cclh.commons.models.Dictionary;
 import org.themarioga.cclh.commons.services.intf.DictionaryService;
 
+import java.util.Date;
+import java.util.List;
+
+@Service
 public class DictionaryServiceImpl implements DictionaryService {
 
-    private Logger logger = LoggerFactory.getLogger(DictionaryService.class);
+    private final Logger logger = LoggerFactory.getLogger(DictionaryServiceImpl.class);
 
     @Autowired
     DictionaryDao dictionaryDao;
@@ -18,6 +25,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     public Dictionary create(Dictionary dictionary) {
         logger.debug("Creating dictionary: {}", dictionary);
 
+        dictionary.setCreationDate(new Date());
         return dictionaryDao.create(dictionary);
     }
 
@@ -47,5 +55,19 @@ public class DictionaryServiceImpl implements DictionaryService {
         logger.debug("Getting dictionary with ID: {}", id);
 
         return dictionaryDao.findOne(id);
+    }
+
+    @Override
+    public List<Card> findCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
+        logger.debug("Getting cards by dictionary {} and type {}", dictionary, cardTypeEnum);
+
+        return dictionaryDao.findCardsByDictionaryIdAndType(dictionary, cardTypeEnum);
+    }
+
+    @Override
+    public long countCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
+        logger.debug("Counting cards by dictionary {} and type {}", dictionary, cardTypeEnum);
+
+        return dictionaryDao.countCardsByDictionaryIdAndType(dictionary, cardTypeEnum);
     }
 }

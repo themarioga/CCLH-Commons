@@ -2,9 +2,11 @@ package org.themarioga.cclh.commons.models;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity
 @jakarta.persistence.Table(name = "t_dictionary_collaborators")
-public class DictionaryCollaborator {
+public class DictionaryCollaborator implements Serializable {
 
     @Id
     @Column(name = "dictionary_id")

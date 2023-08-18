@@ -37,7 +37,7 @@ DROP TABLE IF EXISTS t_table;
 CREATE TABLE IF NOT EXISTS t_table
 (
     game_id      INTEGER NOT NULL,
-    round_number INTEGER DEFAULT 0,
+    round_number INTEGER NOT NULL DEFAULT 0,
     blackcard_id INTEGER,
     president_id INTEGER,
     PRIMARY KEY (game_id),
