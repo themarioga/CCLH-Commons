@@ -1,4 +1,6 @@
 package org.themarioga.cclh.commons.exceptions.player;
 
-public class PlayerAlreadyVotedDeleteException extends Exception {
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
+
+public class PlayerAlreadyVotedDeleteException extends ApplicationException {
 }

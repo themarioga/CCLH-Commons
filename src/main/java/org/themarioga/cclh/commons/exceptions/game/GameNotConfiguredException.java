@@ -1,4 +1,6 @@
 package org.themarioga.cclh.commons.exceptions.game;
 
-public class GameNotConfiguredException extends Exception {
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
+
+public class GameNotConfiguredException extends ApplicationException {
 }

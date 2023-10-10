@@ -1,4 +1,6 @@
 package org.themarioga.cclh.commons.exceptions.card;
 
-public class CardExcededLength extends Exception {
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
+
+public class CardExcededLength extends ApplicationException {
 }

@@ -1,4 +1,4 @@
 package org.themarioga.cclh.commons.exceptions;
 
-public class ApplicationException extends Exception {
+public abstract class ApplicationException extends RuntimeException {
 }

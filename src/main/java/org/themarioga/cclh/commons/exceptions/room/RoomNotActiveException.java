@@ -1,4 +1,6 @@
 package org.themarioga.cclh.commons.exceptions.room;
 
-public class RoomNotActiveException extends Exception {
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
+
+public class RoomNotActiveException extends ApplicationException {
 }

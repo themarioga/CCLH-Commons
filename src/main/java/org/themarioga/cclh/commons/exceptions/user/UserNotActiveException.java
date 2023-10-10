@@ -1,4 +1,6 @@
 package org.themarioga.cclh.commons.exceptions.user;
 
-public class UserNotActiveException extends Exception {
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
+
+public class UserNotActiveException extends ApplicationException {
 }

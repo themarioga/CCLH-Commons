@@ -1,4 +1,6 @@
 package org.themarioga.cclh.commons.exceptions.card;
 
-public class CardAlreadyUsedException extends Exception {
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
+
+public class CardAlreadyUsedException extends ApplicationException {
 }

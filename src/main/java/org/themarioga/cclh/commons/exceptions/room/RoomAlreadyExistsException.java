@@ -1,4 +1,6 @@
 package org.themarioga.cclh.commons.exceptions.room;
 
-public class RoomAlreadyExistsException extends Exception {
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
+
+public class RoomAlreadyExistsException extends ApplicationException {
 }

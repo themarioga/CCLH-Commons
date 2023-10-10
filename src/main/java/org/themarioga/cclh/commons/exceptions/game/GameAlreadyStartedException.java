@@ -1,4 +1,6 @@
 package org.themarioga.cclh.commons.exceptions.game;
 
-public class GameAlreadyStartedException extends Exception {
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
+
+public class GameAlreadyStartedException extends ApplicationException {
 }

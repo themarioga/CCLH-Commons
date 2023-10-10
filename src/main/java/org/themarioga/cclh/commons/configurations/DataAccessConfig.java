@@ -1,6 +1,7 @@
 package org.themarioga.cclh.commons.configurations;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +13,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-import java.beans.PropertyVetoException;
 import java.util.Properties;
 
 @Configuration
@@ -52,17 +52,13 @@ public class DataAccessConfig {
 
     @Bean
     public DataSource dataSource() {
-        ComboPooledDataSource dataSource = new ComboPooledDataSource();
-        try {
-            dataSource.setDriverClass(dbJdbcDriver);
-        } catch (PropertyVetoException e) {
-            throw new RuntimeException(e);
-        }
-        dataSource.setJdbcUrl(dbJdbcURL);
-        dataSource.setUser(dbUsername);
-        dataSource.setPassword(dbPassword);
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(dbJdbcURL);
+        config.setUsername(dbUsername);
+        config.setPassword(dbPassword);
+        config.setDriverClassName(dbJdbcDriver);
 
-        return dataSource;
+        return new HikariDataSource(config);
     }
 
     private Properties hibernateProperties() {

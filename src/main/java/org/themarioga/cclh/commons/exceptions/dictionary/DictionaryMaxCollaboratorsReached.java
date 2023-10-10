@@ -1,4 +1,6 @@
 package org.themarioga.cclh.commons.exceptions.dictionary;
 
-public class DictionaryMaxCollaboratorsReached extends Exception {
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
+
+public class DictionaryMaxCollaboratorsReached extends ApplicationException {
 }

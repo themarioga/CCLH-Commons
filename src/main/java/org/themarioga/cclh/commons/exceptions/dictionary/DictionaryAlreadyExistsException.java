@@ -1,4 +1,6 @@
 package org.themarioga.cclh.commons.exceptions.dictionary;
 
-public class DictionaryAlreadyExistsException extends Exception {
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
+
+public class DictionaryAlreadyExistsException extends ApplicationException {
 }

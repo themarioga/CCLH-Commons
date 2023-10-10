@@ -1,4 +1,6 @@
 package org.themarioga.cclh.commons.exceptions.user;
 
-public class UserAlreadyExistsException extends Exception {
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
+
+public class UserAlreadyExistsException extends ApplicationException {
 }
