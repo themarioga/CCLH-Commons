@@ -38,6 +38,10 @@ public class Game extends Base {
     private Table table;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "t_table_deck", joinColumns = @JoinColumn(name = "game_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "card_id", nullable = false))
+    private List<Card> deck = new ArrayList<>(0);
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "t_player", joinColumns = @JoinColumn(name = "game_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "id", nullable = false))
     private List<Player> players = new ArrayList<>(0);
 
@@ -115,6 +119,14 @@ public class Game extends Base {
 
     public void setTable(Table table) {
         this.table = table;
+    }
+
+    public List<Card> getDeck() {
+        return deck;
+    }
+
+    public void setDeck(List<Card> deck) {
+        this.deck = deck;
     }
 
     public List<Player> getPlayers() {

@@ -5,53 +5,190 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.themarioga.cclh.commons.dao.intf.GameDao;
-import org.themarioga.cclh.commons.models.Game;
-import org.themarioga.cclh.commons.services.intf.GameService;
+import org.themarioga.cclh.commons.enums.CardTypeEnum;
+import org.themarioga.cclh.commons.enums.ErrorEnum;
+import org.themarioga.cclh.commons.enums.GameStatusEnum;
+import org.themarioga.cclh.commons.enums.GameTypeEnum;
+import org.themarioga.cclh.commons.exceptions.game.*;
+import org.themarioga.cclh.commons.models.*;
+import org.themarioga.cclh.commons.services.intf.*;
+import org.themarioga.cclh.commons.util.Assert;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class GameServiceImpl implements GameService {
 
     private final Logger logger = LoggerFactory.getLogger(GameServiceImpl.class);
 
+    private final GameDao gameDao;
+    private final UserService userService;
+    private final RoomService roomService;
+    private final TableService tableService;
+    private final PlayerService playerService;
+    private final DictionaryService dictionaryService;
+    private final ConfigurationService configurationService;
+
     @Autowired
-    GameDao gameDao;
+    public GameServiceImpl(GameDao gameDao, UserService userService, RoomService roomService, PlayerService playerService, TableService tableService, DictionaryService dictionaryService, ConfigurationService configurationService) {
+        this.gameDao = gameDao;
+        this.userService = userService;
+        this.roomService = roomService;
+        this.playerService = playerService;
+        this.tableService = tableService;
+        this.dictionaryService = dictionaryService;
+        this.configurationService = configurationService;
+    }
 
     @Override
-    public Game create(Game game) {
-        logger.debug("Creating game: {}", game);
+    public Game create(long roomId, String roomName, long ownerId, long creatorId) {
+        logger.debug("Creating game in room: {}({})", roomId, roomName);
 
-        game.setCreationDate(new Date());
+        // Create or load room
+        Room room = roomService.createOrReactivate(roomId, roomName, ownerId);
+
+        // Create game
+        Game game = new Game();
+        game.setRoom(room);
+        game.setCreator(userService.getById(creatorId));
+
         return gameDao.create(game);
     }
 
     @Override
-    public Game update(Game game) {
-        logger.debug("Updating game: {}", game);
+    public Game setType(Game game, GameTypeEnum type) {
+        logger.debug("Setting type {} to game {}", type, game);
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check if this query has already been done
+        if (game.getType() != null) throw new GameAlreadyConfiguredException(game.getId());
+
+        // Set the type to game
+        game.setType(type);
 
         return gameDao.update(game);
     }
 
     @Override
-    public void delete(Game game) {
-        logger.debug("Delete game: {}", game);
+    public Game setNumberOfCardsToWin(Game game, int numberOfCards) {
+        logger.debug("Setting number of cards {} to game {}", numberOfCards, game);
 
-        gameDao.delete(game);
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check if this query has already been done
+        if (game.getNumberOfCardsToWin() != null) throw new GameAlreadyConfiguredException(game.getId());
+
+        // Set the type to game
+        game.setNumberOfCardsToWin(numberOfCards);
+
+        return gameDao.update(game);
     }
 
     @Override
-    public void deleteById(long id) {
-        logger.debug("Delete game by ID: {}", id);
+    public Game setDictionary(Game game, long dictionaryId) {
+        logger.debug("Setting dictionary {} to game {}", dictionaryId, game);
 
-        gameDao.deleteById(id);
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check if this query has already been done
+        Dictionary dictionary = dictionaryService.findOne(dictionaryId);
+        if (dictionary == null) throw new GameAlreadyConfiguredException(game.getId());
+
+        // Set the type to game
+        game.setDictionary(dictionary);
+
+        return gameDao.update(game);
     }
 
     @Override
-    public Game findOne(long id) {
+    public Game startGame(Game game) {
+        logger.debug("Starting game {}", game);
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check the status of the game
+        if (game.getStatus() == GameStatusEnum.CREATED) throw new GameNotConfiguredException(game.getId());
+        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException(game.getId());
+
+        // Check the number of players in the game
+        if (game.getPlayers().size() < Integer.parseInt(configurationService.getConfiguration("game_min_number_of_players")))
+            throw new GameNotFilledException(game.getId());
+
+        // Change game status
+        game.setStatus(GameStatusEnum.STARTED);
+
+        // Set game number of players
+        game.setNumberOfPlayers(game.getPlayers().size());
+
+        // Create table
+        game.setTable(tableService.create(game));
+
+        // Add cards to table and players
+        addBlackCardsToTableDeck(game);
+        addWhiteCardsToPlayersDecks(game);
+
+        return gameDao.update(game);
+    }
+
+    @Override
+    public Game startRound(Game game) {
+        logger.debug("Starting round for game {}", game);
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Add cards to player decks
+        addWhiteCardsToPlayersDecks(game);
+
+        // Set table for new round
+        tableService.startRound(game);
+
+        return gameDao.update(game);
+    }
+
+    @Override
+    public Game getByRoomId(long id) {
         logger.debug("Getting game with ID: {}", id);
 
-        return gameDao.findOne(id);
+        return gameDao.getByRoomId(id);
+    }
+
+    private void addBlackCardsToTableDeck(Game game) {
+        logger.debug("Adding black cards to table in the game {}", game);
+
+        List<Card> cards = new ArrayList<>(dictionaryService.findCardsByDictionaryIdAndType(game.getDictionary(), CardTypeEnum.BLACK));
+
+        Collections.shuffle(cards);
+
+        game.getDeck().addAll(cards);
+
+        gameDao.update(game);
+    }
+
+    private void addWhiteCardsToPlayersDecks(Game game) {
+        logger.debug("Adding white cards to players in the game {}", game);
+
+        List<Card> cards = new ArrayList<>(dictionaryService.findCardsByDictionaryIdAndType(game.getDictionary(), CardTypeEnum.WHITE));
+
+        Collections.shuffle(cards);
+
+        int cardsPerPlayer = Math.floorDiv(cards.size(), game.getNumberOfPlayers());
+
+        for (Player player : game.getPlayers()) {
+            List<Card> playerCards = cards.subList(0, cardsPerPlayer);
+
+            player.getDeck().addAll(playerCards);
+            playerService.update(player);
+
+            cards.removeAll(playerCards);
+        }
     }
 
 }

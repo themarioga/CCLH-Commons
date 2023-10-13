@@ -6,10 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.themarioga.cclh.commons.dao.intf.UserDao;
+import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.exceptions.user.UserAlreadyExistsException;
 import org.themarioga.cclh.commons.exceptions.user.UserDoesntExistsException;
+import org.themarioga.cclh.commons.exceptions.user.UserNotActiveException;
 import org.themarioga.cclh.commons.models.User;
 import org.themarioga.cclh.commons.services.intf.UserService;
+import org.themarioga.cclh.commons.util.Assert;
 
 import java.util.Date;
 
@@ -18,53 +21,55 @@ public class UserServiceImpl implements UserService {
 
     private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
+    private final UserDao userDao;
+
     @Autowired
-    UserDao userDao;
+    public UserServiceImpl(UserDao userDao) {
+        this.userDao = userDao;
+    }
 
     @Override
-    public User create(User user) {
-        logger.debug("Creating user: {}", user);
+    public User createOrReactivate(long id, String name) {
+        logger.debug("Creating or reactivating user: {} ({})", id, name);
 
-        try {
+        Assert.assertNotNull(id, ErrorEnum.USER_ID_EMPTY);
+        Assert.assertNotEmpty(name, ErrorEnum.USER_NAME_EMPTY);
+
+        User userFromBd = userDao.findOne(id);
+        if (userFromBd == null) {
+            User user = new User();
+            user.setId(id);
+            user.setName(name);
+            user.setActive(true);
             user.setCreationDate(new Date());
             return userDao.create(user);
-        } catch (DuplicateKeyException e) {
-            throw new UserAlreadyExistsException();
+        } else {
+            if (Boolean.FALSE.equals(userFromBd.getActive())) {
+                userFromBd.setName(name);
+                userFromBd.setActive(true);
+                return userDao.update(userFromBd);
+            } else {
+                logger.error("Error trying to create user {} ({}): Already exists", id, name);
+                throw new UserAlreadyExistsException(id);
+            }
         }
     }
 
     @Override
-    public User update(User user) {
-        logger.debug("Updating user: {}", user);
-
-        if (findOne(user.getId()) == null) throw new UserDoesntExistsException();
-
-        return userDao.update(user);
-    }
-
-    @Override
-    public void delete(User user) {
-        logger.debug("Delete user: {}", user);
-
-        if (findOne(user.getId()) == null) throw new UserDoesntExistsException();
-
-        userDao.delete(user);
-    }
-
-    @Override
-    public void deleteById(long id) {
-        logger.debug("Delete user by ID: {}", id);
-
-        if (findOne(id) == null) throw new UserDoesntExistsException();
-
-        userDao.deleteById(id);
-    }
-
-    @Override
-    public User findOne(long id) {
+    public User getById(long id) {
         logger.debug("Getting user with ID: {}", id);
 
-        return userDao.findOne(id);
+        User user = userDao.findOne(id);
+        if (user == null) {
+            logger.error("Error getting user with id {}: Doesn't exists.", id);
+            throw new UserDoesntExistsException(id);
+        }
+        if (Boolean.FALSE.equals(user.getActive())) {
+            logger.error("Error getting user with id {}: Not active.", id);
+            throw new UserNotActiveException(id);
+        }
+
+        return user;
     }
 
 }

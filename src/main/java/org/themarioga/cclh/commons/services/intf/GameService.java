@@ -1,17 +1,22 @@
 package org.themarioga.cclh.commons.services.intf;
 
+import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.models.Game;
 
 public interface GameService {
 
-    Game create(Game game);
+    Game create(long roomId, String roomName, long ownerId, long creatorId);
 
-    Game update(Game game);
+    Game setType(Game game, GameTypeEnum type);
 
-    void delete(Game game);
+    Game setNumberOfCardsToWin(Game game, int numberOfCards);
 
-    void deleteById(long id);
+    Game setDictionary(Game game, long dictionaryId);
 
-    Game findOne(long id);
+    Game startGame(Game game);
+
+    Game startRound(Game game);
+
+    Game getByRoomId(long id);
 
 }

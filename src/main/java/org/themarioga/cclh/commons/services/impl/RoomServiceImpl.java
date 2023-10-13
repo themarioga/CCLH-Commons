@@ -6,12 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.themarioga.cclh.commons.dao.intf.RoomDao;
+import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.exceptions.room.RoomAlreadyExistsException;
 import org.themarioga.cclh.commons.exceptions.room.RoomDoesntExistsException;
+import org.themarioga.cclh.commons.exceptions.room.RoomNotActiveException;
 import org.themarioga.cclh.commons.exceptions.user.UserAlreadyExistsException;
 import org.themarioga.cclh.commons.exceptions.user.UserDoesntExistsException;
+import org.themarioga.cclh.commons.exceptions.user.UserNotActiveException;
 import org.themarioga.cclh.commons.models.Room;
+import org.themarioga.cclh.commons.models.User;
 import org.themarioga.cclh.commons.services.intf.RoomService;
+import org.themarioga.cclh.commons.services.intf.UserService;
+import org.themarioga.cclh.commons.util.Assert;
 
 import java.util.Date;
 
@@ -20,53 +26,59 @@ public class RoomServiceImpl implements RoomService {
 
     private final Logger logger = LoggerFactory.getLogger(RoomServiceImpl.class);
 
+    private final RoomDao roomDao;
+    private final UserService userService;
+
     @Autowired
-    RoomDao roomDao;
+    public RoomServiceImpl(RoomDao roomDao, UserService userService) {
+        this.roomDao = roomDao;
+        this.userService = userService;
+    }
 
     @Override
-    public Room create(Room room) {
-        logger.debug("Creating room: {}", room);
+    public Room createOrReactivate(long id, String name, long ownerId) {
+        logger.debug("Creating or reactivating room: {} ({})", id, name);
 
-        try {
+        Assert.assertNotNull(id, ErrorEnum.ROOM_ID_EMPTY);
+        Assert.assertNotEmpty(name, ErrorEnum.ROOM_NAME_EMPTY);
+
+        Room roomFromBd = roomDao.findOne(id);
+        if (roomFromBd == null) {
+            Room room = new Room();
+            room.setId(id);
+            room.setName(name);
+            room.setActive(true);
+            room.setOwner(userService.getById(ownerId));
             room.setCreationDate(new Date());
+
             return roomDao.create(room);
-        } catch (DuplicateKeyException e) {
-            throw new RoomAlreadyExistsException();
+        } else {
+            if (Boolean.FALSE.equals(roomFromBd.getActive())) {
+                roomFromBd.setName(name);
+                roomFromBd.setActive(true);
+                roomFromBd.setOwner(userService.getById(ownerId));
+                return roomDao.update(roomFromBd);
+            } else {
+                return roomFromBd;
+            }
         }
     }
 
     @Override
-    public Room update(Room room) {
-        logger.debug("Updating room: {}", room);
-
-        if (findOne(room.getId()) == null) throw new RoomDoesntExistsException();
-
-        return roomDao.update(room);
-    }
-
-    @Override
-    public void delete(Room room) {
-        logger.debug("Delete room: {}", room);
-
-        if (findOne(room.getId()) == null) throw new RoomDoesntExistsException();
-
-        roomDao.delete(room);
-    }
-
-    @Override
-    public void deleteById(long id) {
-        logger.debug("Delete room by ID: {}", id);
-
-        if (findOne(id) == null) throw new RoomDoesntExistsException();
-
-        roomDao.deleteById(id);
-    }
-
-    @Override
-    public Room findOne(long id) {
+    public Room getById(long id) {
         logger.debug("Getting room with ID: {}", id);
 
-        return roomDao.findOne(id);
+        Room room = roomDao.findOne(id);
+        if (room == null) {
+            logger.error("Error getting room with id {}: Doesn't exists.", id);
+            throw new RoomDoesntExistsException(id);
+        }
+        if (Boolean.FALSE.equals(room.getActive())) {
+            logger.error("Error getting room with id {}: Not active.", id);
+            throw new RoomNotActiveException(id);
+        }
+
+        return room;
     }
 
 }

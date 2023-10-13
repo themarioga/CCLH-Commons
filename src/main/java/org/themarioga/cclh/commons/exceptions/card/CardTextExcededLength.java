@@ -3,10 +3,10 @@ package org.themarioga.cclh.commons.exceptions.card;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
 
-public class CardAlreadyExistsException extends ApplicationException {
+public class CardTextExcededLength extends ApplicationException {
 
-    public CardAlreadyExistsException() {
-        super(ErrorEnum.CARD_ALREADY_EXISTS);
+    public CardTextExcededLength() {
+        super(ErrorEnum.CARD_TEXT_TOO_LONG);
     }
 
 }

@@ -3,12 +3,12 @@ package org.themarioga.cclh.commons.exceptions.game;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
 
-public class GameDoesntExistsException extends ApplicationException {
+public class GameAlreadyConfiguredException extends ApplicationException {
 
     private final long id;
 
-    public GameDoesntExistsException(long id) {
-        super(ErrorEnum.GAME_NOT_FOUND);
+    public GameAlreadyConfiguredException(long id) {
+        super(ErrorEnum.GAME_ALREADY_CONFIGURED);
 
         this.id = id;
     }

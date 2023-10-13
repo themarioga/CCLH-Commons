@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.dao.intf.*;
+import org.themarioga.cclh.commons.enums.CardTypeEnum;
 import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
@@ -121,7 +122,7 @@ class GameDaoTest extends BaseTest {
         Game game = gameDao.findOne(0L);
         Card card = cardDao.findOne(0L);
 
-        game.getTable().getDeck().add(card);
+        game.getDeck().add(card);
 
         gameDao.update(game);
         gameDao.getCurrentSession().flush();
@@ -158,6 +159,17 @@ class GameDaoTest extends BaseTest {
         Game game = gameDao.findOne(0L);
 
         Assertions.assertEquals(1, game.getPlayers().size());
+    }
+
+    @Test
+    @DatabaseSetup("classpath:dbunit/dao/setup/tabledeck.xml")
+    void getDeck() {
+        Game game = gameDao.findOne(0L);
+
+        Assertions.assertEquals(0L, game.getId());
+
+        Assertions.assertNotNull(game.getDeck());
+        Assertions.assertEquals(1, game.getDeck().size());
     }
 
 }

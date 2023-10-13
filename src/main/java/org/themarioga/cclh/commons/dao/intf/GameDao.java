@@ -5,4 +5,6 @@ import org.themarioga.cclh.commons.models.Game;
 
 public interface GameDao extends InterfaceHibernateDao<Game> {
 
+    Game getByRoomId(long roomId);
+
 }

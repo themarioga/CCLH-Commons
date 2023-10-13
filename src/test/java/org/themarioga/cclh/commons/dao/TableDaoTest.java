@@ -113,17 +113,6 @@ class TableDaoTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/dao/setup/tabledeck.xml")
-    void getTableDeck() {
-        Game game = gameDao.findOne(0L);
-
-        Assertions.assertEquals(0L, game.getId());
-
-        Assertions.assertNotNull(game.getTable().getDeck());
-        Assertions.assertEquals(1, game.getTable().getDeck().size());
-    }
-
-    @Test
     @DatabaseSetup("classpath:dbunit/dao/setup/player.xml")
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/table/testCreatePlayedCard-expected.xml", table = "t_table_playedcards")
     void addTablePlayedCard() {

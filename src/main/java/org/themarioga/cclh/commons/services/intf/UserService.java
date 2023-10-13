@@ -4,14 +4,7 @@ import org.themarioga.cclh.commons.models.User;
 
 public interface UserService {
 
-    User create(User user);
+    User createOrReactivate(long id, String name);
 
-    User update(User user);
-
-    void delete(User user);
-
-    void deleteById(long id);
-
-    User findOne(long id);
-
+    User getById(long id);
 }

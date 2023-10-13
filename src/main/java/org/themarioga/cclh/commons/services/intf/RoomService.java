@@ -4,14 +4,8 @@ import org.themarioga.cclh.commons.models.Room;
 
 public interface RoomService {
 
-    Room create(Room room);
+    Room createOrReactivate(long id, String name, long ownerId);
 
-    Room update(Room room);
-
-    void delete(Room room);
-
-    void deleteById(long id);
-
-    Room findOne(long id);
+    Room getById(long id);
 
 }

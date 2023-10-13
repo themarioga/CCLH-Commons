@@ -1,4 +1,21 @@
 package org.themarioga.cclh.commons.exceptions;
 
-public abstract class ApplicationException extends RuntimeException {
+import org.themarioga.cclh.commons.enums.ErrorEnum;
+
+public class ApplicationException extends RuntimeException {
+
+    private ErrorEnum error;
+
+    public ApplicationException(ErrorEnum error) {
+        this.error = error;
+    }
+
+    public ErrorEnum getErrorEnum() {
+        return error;
+    }
+
+    @Override
+    public String getMessage() {
+        return error.getErrorDesc();
+    }
 }
