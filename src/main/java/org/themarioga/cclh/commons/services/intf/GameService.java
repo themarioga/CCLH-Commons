@@ -4,6 +4,7 @@ import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.models.Game;
 import org.themarioga.cclh.commons.models.Player;
 import org.themarioga.cclh.commons.models.Room;
+import org.themarioga.cclh.commons.models.User;
 
 public interface GameService {
 
@@ -18,6 +19,8 @@ public interface GameService {
     Game setMaxNumberOfPlayers(Game game, int maxNumberOfPlayers);
 
     Game setDictionary(Game game, long dictionaryId);
+
+    Game addPlayer(Game game, User user);
 
     Game startGame(Game game);
 

@@ -130,6 +130,25 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
+    public Game addPlayer(Game game, User user) {
+        logger.debug("Creating player from user {} in game {}", user, game);
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check user exists
+        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+
+        // Create player
+        Player player = playerService.create(game, user);
+
+        // Add player to game
+        game.getPlayers().add(player);
+
+        return gameDao.update(game);
+    }
+
+    @Override
     public Game startGame(Game game) {
         logger.debug("Starting game {}", game);
 
@@ -232,8 +251,7 @@ public class GameServiceImpl implements GameService {
         for (Player player : game.getPlayers()) {
             List<Card> playerCards = cards.subList(0, cardsPerPlayer);
 
-            player.getDeck().addAll(playerCards);
-            playerService.update(player);
+            playerService.addCardsToPlayerDeck(player, playerCards);
 
             cards.removeAll(playerCards);
         }

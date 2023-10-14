@@ -5,8 +5,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
+import org.themarioga.cclh.commons.models.Game;
 import org.themarioga.cclh.commons.models.Player;
+import org.themarioga.cclh.commons.models.User;
+import org.themarioga.cclh.commons.services.intf.GameService;
 import org.themarioga.cclh.commons.services.intf.PlayerService;
+import org.themarioga.cclh.commons.services.intf.RoomService;
+import org.themarioga.cclh.commons.services.intf.UserService;
 
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/room.xml")
@@ -17,7 +22,37 @@ import org.themarioga.cclh.commons.services.intf.PlayerService;
 class PlayerServiceTest extends BaseTest {
 
     @Autowired
+    UserService userService;
+    @Autowired
+    RoomService roomService;
+    @Autowired
+    GameService gameService;
+    @Autowired
     PlayerService playerService;
+
+    @Test
+    void testCreate() {
+        Game game = gameService.getByRoomId(roomService.getById(0L));
+        User user = userService.getById(0L);
+
+        Player player = playerService.create(game, user);
+
+        Assertions.assertNotNull(player);
+    }
+
+    @Test
+    void testFindPlayer() {
+        Player player = playerService.findOne(10L);
+
+        Assertions.assertEquals(10L, player.getGame().getId());
+        Assertions.assertEquals(0L, player.getUser().getId());
+    }
+
+    @Test
+    void testAddCardsToPlayerDeck() {
+        Player player = playerService.findOne(10L);
+        // ToDo
+    }
 
     @Test
     @DatabaseSetup("classpath:dbunit/service/setup/playerdeck.xml")
