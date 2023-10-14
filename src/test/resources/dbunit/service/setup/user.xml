@@ -4,4 +4,5 @@
     <T_USER ID="0" NAME="First" ACTIVE="true"/>
     <T_USER ID="1" NAME="Second" ACTIVE="true"/>
     <T_USER ID="2" NAME="Third" ACTIVE="true"/>
+    <T_USER ID="3" NAME="Fourth" ACTIVE="false"/>
 </dataset>

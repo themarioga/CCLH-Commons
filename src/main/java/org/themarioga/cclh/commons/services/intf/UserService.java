@@ -7,4 +7,5 @@ public interface UserService {
     User createOrReactivate(long id, String name);
 
     User getById(long id);
+
 }
