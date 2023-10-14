@@ -56,14 +56,14 @@ class GameServiceTest extends BaseTest {
 //    void testAddWhiteCardsToPlayersDecks() {
 //        Game game = gameService.getByRoomId(0);
 //
-//        Assertions.assertEquals(game.getNumberOfPlayers(), game.getPlayers().size());
+//        Assertions.assertEquals(game.getmaxnumberofplayers(), game.getPlayers().size());
 //        Assertions.assertEquals(0, game.getPlayers().get(0).getDeck().size());
 //
 //        gameService.addWhiteCardsToPlayersDecks(game);
 //
-//        long cardsPerPlayer = Math.floorDiv(dictionaryService.countCardsByDictionaryIdAndType(game.getDictionary(), CardTypeEnum.WHITE), game.getNumberOfPlayers());
+//        long cardsPerPlayer = Math.floorDiv(dictionaryService.countCardsByDictionaryIdAndType(game.getDictionary(), CardTypeEnum.WHITE), game.getmaxnumberofplayers());
 //
-//        Assertions.assertEquals(game.getNumberOfPlayers(), game.getPlayers().size());
+//        Assertions.assertEquals(game.getmaxnumberofplayers(), game.getPlayers().size());
 //        Assertions.assertEquals(cardsPerPlayer, game.getPlayers().get(0).getDeck().size());
 //        Assertions.assertEquals(CardTypeEnum.WHITE, game.getPlayers().get(0).getDeck().get(0).getType());
 //    }

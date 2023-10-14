@@ -16,8 +16,8 @@ public class Game extends Base {
     private Long id;
     @Column(name = "type", nullable = false)
     private GameTypeEnum type;
-    @Column(name = "numberofplayers", nullable = false)
-    private Integer numberOfPlayers;
+    @Column(name = "maxnumberofplayers", nullable = false)
+    private Integer maxNumberOfPlayers;
     @Column(name = "numberofcardstowin", nullable = false)
     private Integer numberOfCardsToWin;
     @Column(name = "status", nullable = false)
@@ -65,12 +65,12 @@ public class Game extends Base {
         this.type = type;
     }
 
-    public Integer getNumberOfPlayers() {
-        return numberOfPlayers;
+    public Integer getMaxNumberOfPlayers() {
+        return maxNumberOfPlayers;
     }
 
-    public void setNumberOfPlayers(Integer numberOfPlayers) {
-        this.numberOfPlayers = numberOfPlayers;
+    public void setMaxNumberOfPlayers(Integer maxNumberOfPlayers) {
+        this.maxNumberOfPlayers = maxNumberOfPlayers;
     }
 
     public Integer getNumberOfCardsToWin() {
@@ -147,7 +147,7 @@ public class Game extends Base {
 
     @Override
     public String toString() {
-        return "Game{" + "id=" + id + ", type=" + type + ", numberOfPlayers=" + numberOfPlayers + ", numberOfCardsToWin=" + numberOfCardsToWin + ", status=" + status + "}";
+        return "Game{" + "id=" + id + ", type=" + type + ", maxNumberOfPlayers=" + maxNumberOfPlayers + ", numberOfCardsToWin=" + numberOfCardsToWin + ", status=" + status + "}";
     }
 
 }

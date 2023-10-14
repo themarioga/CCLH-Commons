@@ -47,7 +47,7 @@ class TableDaoTest extends BaseTest {
 
         Game game = new Game();
         game.setType(GameTypeEnum.DICTATORSHIP);
-        game.setNumberOfPlayers(5);
+        game.setMaxNumberOfPlayers(5);
         game.setNumberOfCardsToWin(5);
         game.setStatus(GameStatusEnum.CONFIGURED);
         game.setRoom(room);
@@ -77,7 +77,7 @@ class TableDaoTest extends BaseTest {
 
         Game game = gameDao.findOne(0L);
         game.setType(GameTypeEnum.DICTATORSHIP);
-        game.setNumberOfPlayers(5);
+        game.setMaxNumberOfPlayers(5);
         game.setNumberOfCardsToWin(5);
         game.setStatus(GameStatusEnum.CONFIGURED);
         game.getTable().setCurrentRoundNumber(1);

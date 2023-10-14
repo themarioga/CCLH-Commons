@@ -48,7 +48,7 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public Table startRound(Game game) {
-        logger.debug("Refreshing table for game {}", game);
+        logger.debug("Starting round for the game {}", game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
@@ -67,6 +67,25 @@ public class TableServiceImpl implements TableService {
         if (game.getType() == GameTypeEnum.CLASSIC) {
             selectPlayerForRoundPresident(game);
         }
+
+        return tableDao.update(table);
+    }
+
+    @Override
+    public Table endRound(Game game) {
+        logger.debug("Ending round for the game {}", game);
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check table exists
+        Table table = game.getTable();
+        Assert.assertNotNull(table, ErrorEnum.GAME_NOT_FOUND);
+
+        // Empty table
+        table.getPlayerVotes().clear();
+        table.getPlayedCards().clear();
+        table.setCurrentBlackCard(null);
 
         return tableDao.update(table);
     }
@@ -91,7 +110,7 @@ public class TableServiceImpl implements TableService {
     private void selectPlayerForRoundPresident(Game game) {
         int playerIndex = getCurrentPresidentIndex(game);
 
-        if (playerIndex + 1 < game.getNumberOfPlayers()) {
+        if (playerIndex + 1 < game.getPlayers().size()) {
             game.getTable().setCurrentPresident(game.getPlayers().get(playerIndex + 1).getUser());
         } else {
             game.getTable().setCurrentPresident(game.getPlayers().get(0).getUser());

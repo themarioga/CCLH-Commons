@@ -11,6 +11,6 @@ public interface DictionaryDao extends InterfaceHibernateDao<Dictionary> {
 
     List<Card> findCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum);
 
-    long countCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum);
+    int countCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum);
 
 }

@@ -58,6 +58,13 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
+    public void delete(Game game) {
+        logger.debug("Deleting game: {}", game);
+
+        gameDao.delete(game);
+    }
+
+    @Override
     public Game setType(Game game, GameTypeEnum type) {
         logger.debug("Setting type {} to game {}", type, game);
 
@@ -83,8 +90,24 @@ public class GameServiceImpl implements GameService {
         // Check if this query has already been done
         if (game.getNumberOfCardsToWin() != null) throw new GameAlreadyConfiguredException(game.getId());
 
-        // Set the type to game
+        // Set the number of cards to win
         game.setNumberOfCardsToWin(numberOfCards);
+
+        return gameDao.update(game);
+    }
+
+    @Override
+    public Game setMaxNumberOfPlayers(Game game, int maxNumberOfPlayers) {
+        logger.debug("Setting max number of players {} to game {}", maxNumberOfPlayers, game);
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check if this query has already been done
+        if (game.getMaxNumberOfPlayers() != null) throw new GameAlreadyConfiguredException(game.getId());
+
+        // Set the max number of players
+        game.setMaxNumberOfPlayers(maxNumberOfPlayers);
 
         return gameDao.update(game);
     }
@@ -100,7 +123,7 @@ public class GameServiceImpl implements GameService {
         Dictionary dictionary = dictionaryService.findOne(dictionaryId);
         if (dictionary == null) throw new GameAlreadyConfiguredException(game.getId());
 
-        // Set the type to game
+        // Set the dictionary
         game.setDictionary(dictionary);
 
         return gameDao.update(game);
@@ -124,9 +147,6 @@ public class GameServiceImpl implements GameService {
         // Change game status
         game.setStatus(GameStatusEnum.STARTED);
 
-        // Set game number of players
-        game.setNumberOfPlayers(game.getPlayers().size());
-
         // Create table
         game.setTable(tableService.create(game));
 
@@ -144,8 +164,10 @@ public class GameServiceImpl implements GameService {
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
-        // Add cards to player decks
-        addWhiteCardsToPlayersDecks(game);
+        // Add cards to player hands
+        for (Player player : game.getPlayers()) {
+            playerService.transferCardsFromPlayerDeckToPlayerHand(player);
+        }
 
         // Set table for new round
         tableService.startRound(game);
@@ -154,10 +176,36 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Game getByRoomId(long id) {
-        logger.debug("Getting game with ID: {}", id);
+    public Game endRound(Game game) {
+        logger.debug("Ending round for game {}", game);
 
-        return gameDao.getByRoomId(id);
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // End table round
+        tableService.endRound(game);
+
+        return gameDao.update(game);
+    }
+
+    @Override
+    public void voteForDeletion(Game game, Player player) {
+        logger.debug("Player {} vote for the deletion of the game {}", player, game);
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check player exists
+        Assert.assertNotNull(player, ErrorEnum.GAME_NOT_FOUND);
+
+
+    }
+
+    @Override
+    public Game getByRoomId(Room room) {
+        logger.debug("Getting game with room: {}", room);
+
+        return gameDao.getByRoomId(room);
     }
 
     private void addBlackCardsToTableDeck(Game game) {
@@ -179,7 +227,7 @@ public class GameServiceImpl implements GameService {
 
         Collections.shuffle(cards);
 
-        int cardsPerPlayer = Math.floorDiv(cards.size(), game.getNumberOfPlayers());
+        int cardsPerPlayer = Math.floorDiv(cards.size(), game.getPlayers().size());
 
         for (Player player : game.getPlayers()) {
             List<Card> playerCards = cards.subList(0, cardsPerPlayer);

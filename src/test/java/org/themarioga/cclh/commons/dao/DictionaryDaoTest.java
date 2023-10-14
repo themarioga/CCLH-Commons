@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.dao.intf.DictionaryDao;
 import org.themarioga.cclh.commons.dao.intf.UserDao;
+import org.themarioga.cclh.commons.enums.CardTypeEnum;
+import org.themarioga.cclh.commons.models.Card;
 import org.themarioga.cclh.commons.models.Dictionary;
 import org.themarioga.cclh.commons.models.DictionaryCollaborator;
 import org.themarioga.cclh.commons.models.User;
@@ -131,6 +133,19 @@ class DictionaryDaoTest extends BaseTest {
         Dictionary dictionary = dictionaryDao.findOne(0L);
 
         Assertions.assertEquals(1, dictionary.getCards().size());
+    }
+
+    @Test
+    @DatabaseSetup("classpath:dbunit/dao/setup/card.xml")
+    void testFindCardsByDictionaryIdAndType() {
+        Dictionary dictionary = dictionaryDao.findOne(0L);
+
+        List<Card> cards = dictionaryDao.findCardsByDictionaryIdAndType(dictionary, CardTypeEnum.BLACK);
+        int cardNumber = dictionaryDao.countCardsByDictionaryIdAndType(dictionary, CardTypeEnum.BLACK);
+
+        Assertions.assertEquals(1L, cards.size());
+        Assertions.assertEquals(1L, cardNumber);
+        Assertions.assertEquals(cardNumber, cards.size());
     }
 
 }

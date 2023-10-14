@@ -22,8 +22,8 @@ public class DictionaryDaoImpl extends AbstractHibernateDao<Dictionary> implemen
     }
 
     @Override
-    public long countCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
-        return getCurrentSession().createQuery("SELECT count(*) FROM Card t where t.dictionary=:dictionary and t.type=:type", Long.class).setParameter("dictionary", dictionary).setParameter("type", cardTypeEnum).getSingleResultOrNull();
+    public int countCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
+        return getCurrentSession().createQuery("SELECT count(*) FROM Card t where t.dictionary=:dictionary and t.type=:type", Long.class).setParameter("dictionary", dictionary).setParameter("type", cardTypeEnum).getSingleResultOrNull().intValue();
     }
 
 }

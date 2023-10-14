@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.dao.intf.*;
-import org.themarioga.cclh.commons.enums.CardTypeEnum;
 import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
@@ -44,7 +43,7 @@ class GameDaoTest extends BaseTest {
 
         Game game = new Game();
         game.setType(GameTypeEnum.DICTATORSHIP);
-        game.setNumberOfPlayers(5);
+        game.setMaxNumberOfPlayers(5);
         game.setNumberOfCardsToWin(5);
         game.setStatus(GameStatusEnum.CONFIGURED);
         game.setRoom(room);
@@ -60,7 +59,7 @@ class GameDaoTest extends BaseTest {
     void updateGame() {
         Game game = gameDao.findOne(0L);
         game.setType(GameTypeEnum.DICTATORSHIP);
-        game.setNumberOfPlayers(5);
+        game.setMaxNumberOfPlayers(5);
         game.setNumberOfCardsToWin(5);
 
         gameDao.update(game);
@@ -85,7 +84,21 @@ class GameDaoTest extends BaseTest {
 
         Assertions.assertEquals(0L, game.getId());
         Assertions.assertEquals(0, game.getNumberOfCardsToWin());
-        Assertions.assertEquals(0, game.getNumberOfPlayers());
+        Assertions.assertEquals(0, game.getMaxNumberOfPlayers());
+        Assertions.assertEquals(0, game.getRoom().getId());
+        Assertions.assertEquals(0, game.getCreator().getId());
+        Assertions.assertEquals(0, game.getDictionary().getId());
+        Assertions.assertEquals(GameTypeEnum.DEMOCRACY, game.getType());
+        Assertions.assertEquals(GameStatusEnum.CONFIGURED, game.getStatus());
+    }
+
+    @Test
+    void getByRoomId() {
+        Game game = gameDao.getByRoomId(roomDao.findOne(0L));
+
+        Assertions.assertEquals(0L, game.getId());
+        Assertions.assertEquals(0, game.getNumberOfCardsToWin());
+        Assertions.assertEquals(0, game.getMaxNumberOfPlayers());
         Assertions.assertEquals(0, game.getRoom().getId());
         Assertions.assertEquals(0, game.getCreator().getId());
         Assertions.assertEquals(0, game.getDictionary().getId());
@@ -101,7 +114,7 @@ class GameDaoTest extends BaseTest {
 
         Assertions.assertEquals(0L, games.get(0).getId());
         Assertions.assertEquals(0, games.get(0).getNumberOfCardsToWin());
-        Assertions.assertEquals(0, games.get(0).getNumberOfPlayers());
+        Assertions.assertEquals(0, games.get(0).getMaxNumberOfPlayers());
         Assertions.assertEquals(0, games.get(0).getRoom().getId());
         Assertions.assertEquals(0, games.get(0).getCreator().getId());
         Assertions.assertEquals(0, games.get(0).getDictionary().getId());

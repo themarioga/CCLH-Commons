@@ -10,5 +10,8 @@ public interface TableService {
 
     Table startRound(Game game);
 
+    Table endRound(Game game);
+
     PlayedCard getMostVotedCard(Long gameId);
+
 }
