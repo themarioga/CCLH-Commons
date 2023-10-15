@@ -1,17 +1,20 @@
 package org.themarioga.cclh.commons.service;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.github.springtestdbunit.annotation.ExpectedDatabase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
+import org.themarioga.cclh.commons.dao.intf.PlayerDao;
+import org.themarioga.cclh.commons.enums.CardTypeEnum;
+import org.themarioga.cclh.commons.models.Card;
 import org.themarioga.cclh.commons.models.Game;
 import org.themarioga.cclh.commons.models.Player;
 import org.themarioga.cclh.commons.models.User;
-import org.themarioga.cclh.commons.services.intf.GameService;
-import org.themarioga.cclh.commons.services.intf.PlayerService;
-import org.themarioga.cclh.commons.services.intf.RoomService;
-import org.themarioga.cclh.commons.services.intf.UserService;
+import org.themarioga.cclh.commons.services.intf.*;
+
+import java.util.List;
 
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/room.xml")
@@ -22,6 +25,8 @@ import org.themarioga.cclh.commons.services.intf.UserService;
 class PlayerServiceTest extends BaseTest {
 
     @Autowired
+    PlayerDao playerDao;
+    @Autowired
     UserService userService;
     @Autowired
     RoomService roomService;
@@ -29,6 +34,8 @@ class PlayerServiceTest extends BaseTest {
     GameService gameService;
     @Autowired
     PlayerService playerService;
+    @Autowired
+    DictionaryService dictionaryService;
 
     @Test
     void testCreate() {
@@ -49,9 +56,17 @@ class PlayerServiceTest extends BaseTest {
     }
 
     @Test
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdatePlayersDeck-expected.xml", table = "T_PLAYER_DECK")
     void testAddCardsToPlayerDeck() {
         Player player = playerService.findOne(10L);
-        // ToDo
+
+        List<Card> cards = dictionaryService.findCardsByDictionaryIdAndType(dictionaryService.findOne(0L), CardTypeEnum.WHITE);
+        List<Card> card = cards.subList(0, 1);
+
+        playerService.addCardsToPlayerDeck(player, card);
+        playerDao.getCurrentSession().flush();
+
+        Assertions.assertEquals(3L, card.get(0).getId());
     }
 
     @Test
