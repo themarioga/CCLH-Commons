@@ -11,10 +11,12 @@ public interface PlayerService {
 
     Player create(Game game, User user);
 
-    Player findOne(long id);
-
     void addCardsToPlayerDeck(Player player, List<Card> playerCards);
 
     void transferCardsFromPlayerDeckToPlayerHand(Player player);
+
+    Player findByUser(User user);
+
+    Player findByUserId(long id);
 
 }

@@ -39,7 +39,7 @@ class PlayerServiceTest extends BaseTest {
 
     @Test
     void testCreate() {
-        Game game = gameService.getByRoomId(roomService.getById(0L));
+        Game game = gameService.getByRoom(roomService.getById(0L));
         User user = userService.getById(0L);
 
         Player player = playerService.create(game, user);
@@ -48,8 +48,16 @@ class PlayerServiceTest extends BaseTest {
     }
 
     @Test
-    void testFindPlayer() {
-        Player player = playerService.findOne(10L);
+    void testFindPlayerByUser() {
+        Player player = playerService.findByUser(userService.getById(0L));
+
+        Assertions.assertEquals(10L, player.getGame().getId());
+        Assertions.assertEquals(0L, player.getUser().getId());
+    }
+
+    @Test
+    void testFindPlayerByUserId() {
+        Player player = playerService.findByUserId(0L);
 
         Assertions.assertEquals(10L, player.getGame().getId());
         Assertions.assertEquals(0L, player.getUser().getId());
@@ -58,7 +66,7 @@ class PlayerServiceTest extends BaseTest {
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdatePlayersDeck-expected.xml", table = "T_PLAYER_DECK")
     void testAddCardsToPlayerDeck() {
-        Player player = playerService.findOne(10L);
+        Player player = playerService.findByUserId(0L);
 
         List<Card> cards = dictionaryService.findCardsByDictionaryIdAndType(dictionaryService.findOne(0L), CardTypeEnum.WHITE);
         List<Card> card = cards.subList(0, 1);
@@ -72,7 +80,7 @@ class PlayerServiceTest extends BaseTest {
     @Test
     @DatabaseSetup("classpath:dbunit/service/setup/playerdeck.xml")
     void testTransferCardsFromPlayerDeckToPlayerHand() {
-        Player player = playerService.findOne(0L);
+        Player player = playerService.findByUserId(0L);
 
         Assertions.assertEquals(3, player.getDeck().size());
         Assertions.assertEquals("First white card", player.getDeck().get(0).getText());

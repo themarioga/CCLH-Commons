@@ -18,8 +18,8 @@ import org.themarioga.cclh.commons.services.intf.TableService;
 @DatabaseSetup("classpath:dbunit/service/setup/dictionary.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/game.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/table.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/player.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/table.xml")
 class TableServiceTest extends BaseTest {
 
     @Autowired

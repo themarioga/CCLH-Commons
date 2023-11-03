@@ -5,11 +5,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
-import org.themarioga.cclh.commons.enums.CardTypeEnum;
+import org.themarioga.cclh.commons.dao.intf.GameDao;
+import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.models.Game;
-import org.themarioga.cclh.commons.models.PlayedCard;
 import org.themarioga.cclh.commons.services.intf.GameService;
-import org.themarioga.cclh.commons.services.intf.TableService;
 
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/room.xml")
@@ -21,8 +20,36 @@ import org.themarioga.cclh.commons.services.intf.TableService;
 class GameServiceTest extends BaseTest {
 
     @Autowired
+    GameDao gameDao;
+
+    @Autowired
     GameService gameService;
-//
+
+    @Test
+    void testCreateGame() {
+        Game game = gameService.create(0L, "Room 1", 0L, 0L);
+
+        Assertions.assertNotNull(game);
+        Assertions.assertNotNull(game.getId());
+        Assertions.assertNotNull(game.getRoom().getId());
+        Assertions.assertNotNull(game.getCreator().getId());
+
+        Assertions.assertEquals(0L, game.getRoom().getId());
+        Assertions.assertEquals(0L, game.getCreator().getId());
+        Assertions.assertEquals(GameStatusEnum.CREATED, game.getStatus());
+    }
+
+    @Test
+    void testDeleteGame() {
+        gameService.delete(0L);
+
+        gameDao.getCurrentSession().flush();
+
+        Game game = gameService.getByRoomId(0L);
+
+        Assertions.assertNull(game);
+    }
+
 //    @Test
 //    void testAddBlackCardsToTableDeck() {
 //        Game game = gameService.getByRoomId(0);

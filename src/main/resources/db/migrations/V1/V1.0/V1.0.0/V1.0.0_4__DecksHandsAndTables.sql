@@ -41,7 +41,8 @@ CREATE TABLE IF NOT EXISTS t_table
     blackcard_id INTEGER,
     president_id INTEGER,
     PRIMARY KEY (game_id),
-    FOREIGN KEY (game_id) REFERENCES t_game (id)
+    FOREIGN KEY (game_id) REFERENCES t_game (id),
+    FOREIGN KEY (president_id) REFERENCES t_player (id)
 );
 
 DROP TABLE IF EXISTS t_table_deck;

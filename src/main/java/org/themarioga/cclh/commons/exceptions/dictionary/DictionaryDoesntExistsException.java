@@ -5,8 +5,12 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 
 public class DictionaryDoesntExistsException extends ApplicationException {
 
-    public DictionaryDoesntExistsException() {
+    private Long dictionaryId;
+
+    public DictionaryDoesntExistsException(Long dictionaryId) {
         super(ErrorEnum.DICTIONARY_NOT_FOUND);
+
+        this.dictionaryId = dictionaryId;
     }
 
 }

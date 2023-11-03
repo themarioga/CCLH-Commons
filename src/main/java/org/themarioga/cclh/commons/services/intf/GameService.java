@@ -8,9 +8,9 @@ import org.themarioga.cclh.commons.models.User;
 
 public interface GameService {
 
-    Game create(long roomId, String roomName, long ownerId, long creatorId);
+    Game create(long roomId, String roomName, long roomOwnerId, long creatorId);
 
-    void delete(Game game);
+    void delete(long roomId);
 
     Game setType(Game game, GameTypeEnum type);
 
@@ -30,6 +30,8 @@ public interface GameService {
 
     void voteForDeletion(Game game, Player player);
 
-    Game getByRoomId(Room room);
+    Game getByRoom(Room room);
+
+    Game getByRoomId(long roomId);
 
 }

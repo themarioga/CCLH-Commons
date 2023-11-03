@@ -14,14 +14,14 @@ public class Game extends Base {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "type", nullable = false)
-    private GameTypeEnum type;
-    @Column(name = "maxnumberofplayers", nullable = false)
-    private Integer maxNumberOfPlayers;
-    @Column(name = "numberofcardstowin", nullable = false)
-    private Integer numberOfCardsToWin;
     @Column(name = "status", nullable = false)
     private GameStatusEnum status;
+    @Column(name = "type")
+    private GameTypeEnum type;
+    @Column(name = "maxnumberofplayers")
+    private Integer maxNumberOfPlayers;
+    @Column(name = "numberofcardstowin")
+    private Integer numberOfCardsToWin;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", referencedColumnName = "id")
@@ -37,13 +37,12 @@ public class Game extends Base {
     @JoinColumn(name = "id", referencedColumnName = "game_id")
     private Table table;
 
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Player> players = new ArrayList<>(0);
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "t_table_deck", joinColumns = @JoinColumn(name = "game_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "card_id", nullable = false))
     private List<Card> deck = new ArrayList<>(0);
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "t_player", joinColumns = @JoinColumn(name = "game_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "id", nullable = false))
-    private List<Player> players = new ArrayList<>(0);
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "t_game_deletionvotes", joinColumns = @JoinColumn(name = "game_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "player_id", nullable = false))

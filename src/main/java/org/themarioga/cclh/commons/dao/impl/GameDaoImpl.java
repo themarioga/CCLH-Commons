@@ -15,7 +15,7 @@ public class GameDaoImpl extends AbstractHibernateDao<Game> implements GameDao {
     }
 
     @Override
-    public Game getByRoomId(Room room) {
+    public Game getByRoom(Room room) {
         return getCurrentSession().createQuery("SELECT t FROM Game t where t.room=:room", Game.class).setParameter("room", room).getSingleResultOrNull();
     }
 

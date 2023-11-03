@@ -1,5 +1,6 @@
 package org.themarioga.cclh.commons.services.impl;
 
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.themarioga.cclh.commons.dao.intf.UserDao;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.exceptions.user.UserAlreadyExistsException;
 import org.themarioga.cclh.commons.exceptions.user.UserDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.user.UserNotActiveException;
@@ -29,6 +31,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
     public User createOrReactivate(long id, String name) {
         logger.debug("Creating or reactivating user: {} ({})", id, name);
 
@@ -56,6 +59,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
     public User getById(long id) {
         logger.debug("Getting user with ID: {}", id);
 

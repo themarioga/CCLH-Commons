@@ -18,6 +18,7 @@ import java.util.List;
 @DatabaseSetup("classpath:dbunit/dao/setup/dictionary.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/card.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/game.xml")
+@DatabaseSetup("classpath:dbunit/dao/setup/player.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/table.xml")
 class TableDaoTest extends BaseTest {
 
@@ -49,7 +50,7 @@ class TableDaoTest extends BaseTest {
         game.setType(GameTypeEnum.DICTATORSHIP);
         game.setMaxNumberOfPlayers(5);
         game.setNumberOfCardsToWin(5);
-        game.setStatus(GameStatusEnum.CONFIGURED);
+        game.setStatus(GameStatusEnum.CREATED);
         game.setRoom(room);
         game.setCreator(creator);
         game.setDictionary(dictionary);
@@ -59,7 +60,7 @@ class TableDaoTest extends BaseTest {
         Table table = new Table();
         table.setGameId(game.getId());
         table.setCurrentRoundNumber(1);
-        table.setCurrentPresident(creator);
+        table.setCurrentPresident(playerDao.findPlayerByUser(creator));
         table.setCurrentBlackCard(card);
         game.setTable(table);
 
@@ -79,9 +80,9 @@ class TableDaoTest extends BaseTest {
         game.setType(GameTypeEnum.DICTATORSHIP);
         game.setMaxNumberOfPlayers(5);
         game.setNumberOfCardsToWin(5);
-        game.setStatus(GameStatusEnum.CONFIGURED);
+        game.setStatus(GameStatusEnum.CREATED);
         game.getTable().setCurrentRoundNumber(1);
-        game.getTable().setCurrentPresident(president);
+        game.getTable().setCurrentPresident(playerDao.findPlayerByUser(president));
         game.getTable().setCurrentBlackCard(card);
 
         gameDao.update(game);
@@ -113,7 +114,6 @@ class TableDaoTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/dao/setup/player.xml")
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/table/testCreatePlayedCard-expected.xml", table = "t_table_playedcards")
     void addTablePlayedCard() {
         Table table = tableDao.findOne(0L);
@@ -130,7 +130,6 @@ class TableDaoTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/dao/setup/player.xml")
     @DatabaseSetup("classpath:dbunit/dao/setup/tableplayedcards.xml")
     void getTablePlayedCards() {
         Game game = gameDao.findOne(0L);
@@ -143,7 +142,6 @@ class TableDaoTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/dao/setup/player.xml")
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/table/testCreatePlayerVote-expected.xml", table = "t_table_playervotes")
     void addTablePlayerVote() {
         Table table = tableDao.findOne(0L);
@@ -160,7 +158,6 @@ class TableDaoTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/dao/setup/player.xml")
     @DatabaseSetup("classpath:dbunit/dao/setup/tableplayervotes.xml")
     void getTablePlayerVotes() {
         Game game = gameDao.findOne(0L);
@@ -173,7 +170,6 @@ class TableDaoTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/dao/setup/player.xml")
     @DatabaseSetup("classpath:dbunit/dao/setup/tableplayedcards.xml")
     @DatabaseSetup("classpath:dbunit/dao/setup/tableplayervotes.xml")
     void testGetMostVotedCard() {

@@ -21,7 +21,7 @@ public class Table implements Serializable {
     private Card currentBlackCard;
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "president_id", referencedColumnName = "id")
-    private User currentPresident;
+    private Player currentPresident;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id", referencedColumnName = "game_id")
@@ -55,11 +55,11 @@ public class Table implements Serializable {
         this.currentBlackCard = currentBlackCard;
     }
 
-    public User getCurrentPresident() {
+    public Player getCurrentPresident() {
         return currentPresident;
     }
 
-    public void setCurrentPresident(User currentPresident) {
+    public void setCurrentPresident(Player currentPresident) {
         this.currentPresident = currentPresident;
     }
 

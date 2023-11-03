@@ -1,16 +1,20 @@
 package org.themarioga.cclh.commons.services.impl;
 
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.themarioga.cclh.commons.dao.intf.PlayerDao;
 import org.themarioga.cclh.commons.dao.intf.TableDao;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.models.Card;
 import org.themarioga.cclh.commons.models.Game;
 import org.themarioga.cclh.commons.models.PlayedCard;
 import org.themarioga.cclh.commons.models.Table;
+import org.themarioga.cclh.commons.services.intf.PlayerService;
 import org.themarioga.cclh.commons.services.intf.TableService;
 import org.themarioga.cclh.commons.util.Assert;
 
@@ -20,13 +24,16 @@ public class TableServiceImpl implements TableService {
     private final Logger logger = LoggerFactory.getLogger(TableServiceImpl.class);
 
     private final TableDao tableDao;
+    private final PlayerService playerService;
 
     @Autowired
-    public TableServiceImpl(TableDao tableDao) {
+    public TableServiceImpl(TableDao tableDao, PlayerService playerService) {
         this.tableDao = tableDao;
+        this.playerService = playerService;
     }
 
     @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
     public Table create(Game game) {
         logger.debug("Creating table for game {}", game);
 
@@ -40,13 +47,14 @@ public class TableServiceImpl implements TableService {
 
         // Set dictator if needed
         if (game.getType() == GameTypeEnum.CLASSIC || game.getType() == GameTypeEnum.DICTATORSHIP) {
-            table.setCurrentPresident(game.getCreator());
+            table.setCurrentPresident(playerService.findByUser(game.getCreator()));
         }
 
         return tableDao.create(table);
     }
 
     @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
     public Table startRound(Game game) {
         logger.debug("Starting round for the game {}", game);
 
@@ -72,6 +80,7 @@ public class TableServiceImpl implements TableService {
     }
 
     @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
     public Table endRound(Game game) {
         logger.debug("Ending round for the game {}", game);
 
@@ -91,6 +100,7 @@ public class TableServiceImpl implements TableService {
     }
 
     @Override
+    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
     public PlayedCard getMostVotedCard(Long gameId) {
         logger.debug("Getting most voted card of the table of the game {}", gameId);
 
@@ -111,10 +121,12 @@ public class TableServiceImpl implements TableService {
         int playerIndex = getCurrentPresidentIndex(game);
 
         if (playerIndex + 1 < game.getPlayers().size()) {
-            game.getTable().setCurrentPresident(game.getPlayers().get(playerIndex + 1).getUser());
+            playerIndex += 1;
         } else {
-            game.getTable().setCurrentPresident(game.getPlayers().get(0).getUser());
+            playerIndex = 0;
         }
+
+        game.getTable().setCurrentPresident(game.getPlayers().get(playerIndex));
     }
 
     private int getCurrentPresidentIndex(Game game) {

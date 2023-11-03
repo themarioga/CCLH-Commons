@@ -18,6 +18,7 @@ import java.util.List;
 @DatabaseSetup("classpath:dbunit/dao/setup/dictionary.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/card.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/game.xml")
+@DatabaseSetup("classpath:dbunit/dao/setup/player.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/table.xml")
 class GameDaoTest extends BaseTest {
 
@@ -45,7 +46,7 @@ class GameDaoTest extends BaseTest {
         game.setType(GameTypeEnum.DICTATORSHIP);
         game.setMaxNumberOfPlayers(5);
         game.setNumberOfCardsToWin(5);
-        game.setStatus(GameStatusEnum.CONFIGURED);
+        game.setStatus(GameStatusEnum.CREATED);
         game.setRoom(room);
         game.setCreator(creator);
         game.setDictionary(dictionary);
@@ -89,12 +90,12 @@ class GameDaoTest extends BaseTest {
         Assertions.assertEquals(0, game.getCreator().getId());
         Assertions.assertEquals(0, game.getDictionary().getId());
         Assertions.assertEquals(GameTypeEnum.DEMOCRACY, game.getType());
-        Assertions.assertEquals(GameStatusEnum.CONFIGURED, game.getStatus());
+        Assertions.assertEquals(GameStatusEnum.CREATED, game.getStatus());
     }
 
     @Test
     void getByRoomId() {
-        Game game = gameDao.getByRoomId(roomDao.findOne(0L));
+        Game game = gameDao.getByRoom(roomDao.findOne(0L));
 
         Assertions.assertEquals(0L, game.getId());
         Assertions.assertEquals(0, game.getNumberOfCardsToWin());
@@ -103,7 +104,7 @@ class GameDaoTest extends BaseTest {
         Assertions.assertEquals(0, game.getCreator().getId());
         Assertions.assertEquals(0, game.getDictionary().getId());
         Assertions.assertEquals(GameTypeEnum.DEMOCRACY, game.getType());
-        Assertions.assertEquals(GameStatusEnum.CONFIGURED, game.getStatus());
+        Assertions.assertEquals(GameStatusEnum.CREATED, game.getStatus());
     }
 
     @Test
@@ -119,7 +120,7 @@ class GameDaoTest extends BaseTest {
         Assertions.assertEquals(0, games.get(0).getCreator().getId());
         Assertions.assertEquals(0, games.get(0).getDictionary().getId());
         Assertions.assertEquals(GameTypeEnum.DEMOCRACY, games.get(0).getType());
-        Assertions.assertEquals(GameStatusEnum.CONFIGURED, games.get(0).getStatus());
+        Assertions.assertEquals(GameStatusEnum.CREATED, games.get(0).getStatus());
     }
 
     @Test
@@ -142,7 +143,6 @@ class GameDaoTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/dao/setup/player.xml")
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testUpdateGameDeletionVotes-expected.xml", table = "T_GAME_DELETIONVOTES")
     void addDeletionVoteToTable() {
         Game game = gameDao.findOne(0L);
@@ -155,7 +155,6 @@ class GameDaoTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/dao/setup/player.xml")
     @DatabaseSetup("classpath:dbunit/dao/setup/tabledeletionvotes.xml")
     void getTableDeletionVotes() {
         Game game = gameDao.findOne(0L);
@@ -167,7 +166,6 @@ class GameDaoTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/dao/setup/player.xml")
     void findPlayersInGame() {
         Game game = gameDao.findOne(0L);
 

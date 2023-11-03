@@ -1,5 +1,6 @@
 package org.themarioga.cclh.commons.services.impl;
 
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.themarioga.cclh.commons.dao.intf.RoomDao;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.exceptions.room.RoomAlreadyExistsException;
 import org.themarioga.cclh.commons.exceptions.room.RoomDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.room.RoomNotActiveException;
@@ -36,6 +38,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
     public Room createOrReactivate(long id, String name, long ownerId) {
         logger.debug("Creating or reactivating room: {} ({})", id, name);
 
@@ -65,6 +68,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
     public Room getById(long id) {
         logger.debug("Getting room with ID: {}", id);
 

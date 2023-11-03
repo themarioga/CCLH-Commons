@@ -6,12 +6,18 @@ import org.themarioga.cclh.commons.dao.intf.PlayerDao;
 import org.themarioga.cclh.commons.models.PlayedCard;
 import org.themarioga.cclh.commons.models.Player;
 import org.themarioga.cclh.commons.models.PlayerVote;
+import org.themarioga.cclh.commons.models.User;
 
 @Repository
 public class PlayerDaoImpl extends AbstractHibernateDao<Player> implements PlayerDao {
 
     public PlayerDaoImpl() {
         setClazz(Player.class);
+    }
+
+    @Override
+    public Player findPlayerByUser(User user) {
+        return getCurrentSession().createQuery("SELECT t FROM Player t where user=:user", Player.class).setParameter("user", user).getSingleResultOrNull();
     }
 
     @Override

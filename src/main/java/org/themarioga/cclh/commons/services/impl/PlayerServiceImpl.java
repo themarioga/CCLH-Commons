@@ -1,14 +1,17 @@
 package org.themarioga.cclh.commons.services.impl;
 
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.themarioga.cclh.commons.dao.intf.PlayerDao;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.services.intf.ConfigurationService;
 import org.themarioga.cclh.commons.services.intf.PlayerService;
+import org.themarioga.cclh.commons.services.intf.UserService;
 import org.themarioga.cclh.commons.util.Assert;
 
 import java.util.Date;
@@ -20,15 +23,18 @@ public class PlayerServiceImpl implements PlayerService {
     private final Logger logger = LoggerFactory.getLogger(PlayerServiceImpl.class);
 
     private final PlayerDao playerDao;
+    private final UserService userService;
     private final ConfigurationService configurationService;
 
     @Autowired
-    public PlayerServiceImpl(PlayerDao playerDao, ConfigurationService configurationService) {
+    public PlayerServiceImpl(PlayerDao playerDao, UserService userService, ConfigurationService configurationService) {
         this.playerDao = playerDao;
+        this.userService = userService;
         this.configurationService = configurationService;
     }
 
     @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
     public Player create(Game game, User user) {
         logger.debug("Creating player from user {} in game {}", user, game);
 
@@ -49,13 +55,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public Player findOne(long id) {
-        logger.debug("Getting player with ID: {}", id);
-
-        return playerDao.findOne(id);
-    }
-
-    @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
     public void addCardsToPlayerDeck(Player player, List<Card> playerCards) {
         logger.debug("Adding cards to player {}", player);
 
@@ -64,6 +64,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
     public void transferCardsFromPlayerDeckToPlayerHand(Player player) {
         logger.debug("Transferring white cards from deck to hand from player {}", player);
 
@@ -76,6 +77,20 @@ public class PlayerServiceImpl implements PlayerService {
             player.getDeck().removeAll(cardsToTransfer);
             playerDao.update(player);
         }
+    }
+
+    @Override
+    public Player findByUser(User user) {
+        logger.debug("Getting player with user: {}", user);
+
+        return playerDao.findPlayerByUser(user);
+    }
+
+    @Override
+    public Player findByUserId(long id) {
+        logger.debug("Getting player with user ID: {}", id);
+
+        return playerDao.findPlayerByUser(userService.getById(id));
     }
 
 }
