@@ -41,7 +41,7 @@ class TableDaoTest extends BaseTest {
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testCreateGame-expected.xml", table = "T_GAME")
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/table/testCreateTable-expected.xml", table = "T_TABLE")
     void createGameAndTable() {
-        Room room = roomDao.findOne(0);
+        Room room = roomDao.findOne(1);
         User creator = userDao.findOne(0);
         Dictionary dictionary = dictionaryDao.findOne(0);
         Card card = cardDao.findOne(0);

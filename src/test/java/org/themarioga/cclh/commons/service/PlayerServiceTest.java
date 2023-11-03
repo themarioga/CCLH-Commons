@@ -40,7 +40,7 @@ class PlayerServiceTest extends BaseTest {
     @Test
     void testCreate() {
         Game game = gameService.getByRoom(roomService.getById(0L));
-        User user = userService.getById(0L);
+        User user = userService.getById(3L);
 
         Player player = playerService.create(game, user);
 

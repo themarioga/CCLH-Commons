@@ -30,18 +30,18 @@ class UserServiceTest extends BaseTest {
 
     @Test
     void testCreateOrReactivate_Reactivate() {
-        User user = userService.createOrReactivate(3L, "Fourth");
+        User user = userService.createOrReactivate(2L, "Third");
 
         Assertions.assertNotNull(user);
-        Assertions.assertEquals(3L, user.getId());
-        Assertions.assertEquals("Fourth", user.getName());
+        Assertions.assertEquals(2L, user.getId());
+        Assertions.assertEquals("Third", user.getName());
         Assertions.assertEquals(true, user.getActive());
     }
 
     @Test
     void testCreateOrReactivate_AlreadyExists() {
         Assertions.assertThrows(UserAlreadyExistsException.class, () -> {
-            userService.createOrReactivate(2L, "Third");
+            userService.createOrReactivate(1L, "Second");
 
             Assertions.fail();
         });

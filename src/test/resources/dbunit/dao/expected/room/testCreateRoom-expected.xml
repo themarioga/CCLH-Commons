@@ -2,5 +2,6 @@
 <!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
 <dataset>
     <T_ROOM id="0" name="First" active="true" owner_id="0"/>
-    <T_ROOM id="1" name="Test room" active="true" owner_id="0"/>
+    <T_ROOM id="1" name="Second" active="true" owner_id="1"/>
+    <T_ROOM id="2" name="Test room" active="true" owner_id="0"/>
 </dataset>

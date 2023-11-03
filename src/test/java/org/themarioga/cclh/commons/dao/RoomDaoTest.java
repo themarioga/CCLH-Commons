@@ -28,7 +28,7 @@ class RoomDaoTest extends BaseTest {
         User user = userDao.findOne(0);
 
         Room room = new Room();
-        room.setId(1L);
+        room.setId(2L);
         room.setName("Test room");
         room.setActive(true);
         room.setOwner(user);
@@ -57,7 +57,7 @@ class RoomDaoTest extends BaseTest {
 
         long total = roomDao.countAll();
 
-        Assertions.assertEquals(0, total);
+        Assertions.assertEquals(1, total);
     }
 
     @Test
@@ -73,7 +73,7 @@ class RoomDaoTest extends BaseTest {
     void findAllRooms() {
         List<Room> rooms = roomDao.findAll();
 
-        Assertions.assertEquals(1, rooms.size());
+        Assertions.assertEquals(2, rooms.size());
 
         Assertions.assertEquals(0L, rooms.get(0).getId());
         Assertions.assertEquals("First", rooms.get(0).getName());
@@ -84,7 +84,7 @@ class RoomDaoTest extends BaseTest {
     void countAllRooms() {
         long total = roomDao.countAll();
 
-        Assertions.assertEquals(1, total);
+        Assertions.assertEquals(2, total);
     }
 
 }

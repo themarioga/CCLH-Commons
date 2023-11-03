@@ -33,12 +33,12 @@ class PlayerDaoTest extends BaseTest {
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/player/testCreatePlayer-expected.xml", table = "T_PLAYER")
     void createPlayer() {
-        User user = userDao.findOne(0);
         Game game = gameDao.findOne(0);
+        User user = userDao.findOne(1);
 
         Player player = new Player();
-        player.setUser(user);
         player.setGame(game);
+        player.setUser(user);
         player.setPoints(1);
         player.setJoinOrder(1);
 

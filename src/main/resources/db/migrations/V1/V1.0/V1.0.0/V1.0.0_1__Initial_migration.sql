@@ -83,7 +83,8 @@ CREATE TABLE IF NOT EXISTS t_game
     PRIMARY KEY (id),
     FOREIGN KEY (room_id) REFERENCES t_room (id),
     FOREIGN KEY (creator_id) REFERENCES t_user (id),
-    FOREIGN KEY (dictionary_id) REFERENCES t_dictionary (id)
+    FOREIGN KEY (dictionary_id) REFERENCES t_dictionary (id),
+    UNIQUE (room_id)
 );
 
 CREATE INDEX game_idx_id ON t_game (id);
@@ -100,7 +101,8 @@ CREATE TABLE IF NOT EXISTS t_player
     points     INTEGER DEFAULT 0,
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES t_user (id),
-    FOREIGN KEY (game_id) REFERENCES t_game (id)
+    FOREIGN KEY (game_id) REFERENCES t_game (id),
+    UNIQUE (user_id)
 );
 
 CREATE INDEX player_idx_id ON t_player (id);

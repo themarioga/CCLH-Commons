@@ -27,14 +27,14 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testCreateGame() {
-        Game game = gameService.create(0L, "Room 1", 0L, 0L);
+        Game game = gameService.create(1L, "Room 1", 0L, 0L);
 
         Assertions.assertNotNull(game);
         Assertions.assertNotNull(game.getId());
         Assertions.assertNotNull(game.getRoom().getId());
         Assertions.assertNotNull(game.getCreator().getId());
 
-        Assertions.assertEquals(0L, game.getRoom().getId());
+        Assertions.assertEquals(1L, game.getRoom().getId());
         Assertions.assertEquals(0L, game.getCreator().getId());
         Assertions.assertEquals(GameStatusEnum.CREATED, game.getStatus());
     }
@@ -48,6 +48,26 @@ class GameServiceTest extends BaseTest {
         Game game = gameService.getByRoomId(0L);
 
         Assertions.assertNull(game);
+    }
+
+    @Test
+    void testSetType() {
+        Game game = gameService.getByRoomId(0L);
+    }
+
+    @Test
+    void testSetNumberOfCardsToWin() {
+
+    }
+
+    @Test
+    void testSetMaxNumberOfPlayers() {
+
+    }
+
+    @Test
+    void testSetDictionary() {
+
     }
 
 //    @Test

@@ -21,7 +21,7 @@ class UserDaoTest extends BaseTest {
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/user/testCreateUser-expected.xml", table = "T_USER")
     void createUser() {
         User user = new User();
-        user.setId(1L);
+        user.setId(2L);
         user.setName("Test user");
         user.setActive(true);
 
@@ -49,7 +49,7 @@ class UserDaoTest extends BaseTest {
 
         long total = userDao.countAll();
 
-        Assertions.assertEquals(0, total);
+        Assertions.assertEquals(1, total);
     }
 
     @Test
@@ -65,7 +65,7 @@ class UserDaoTest extends BaseTest {
     void findAllUsers() {
         List<User> users = userDao.findAll();
 
-        Assertions.assertEquals(1, users.size());
+        Assertions.assertEquals(2, users.size());
 
         Assertions.assertEquals(0L, users.get(0).getId());
         Assertions.assertEquals("First", users.get(0).getName());
@@ -76,7 +76,7 @@ class UserDaoTest extends BaseTest {
     void countAllUsers() {
         long total = userDao.countAll();
 
-        Assertions.assertEquals(1, total);
+        Assertions.assertEquals(2, total);
     }
 
 }
