@@ -7,6 +7,8 @@ import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.exceptions.user.UserAlreadyExistsException;
+import org.themarioga.cclh.commons.exceptions.user.UserDoesntExistsException;
+import org.themarioga.cclh.commons.exceptions.user.UserNotActiveException;
 import org.themarioga.cclh.commons.models.PlayedCard;
 import org.themarioga.cclh.commons.models.User;
 import org.themarioga.cclh.commons.services.intf.TableService;
@@ -39,6 +41,15 @@ class UserServiceTest extends BaseTest {
     }
 
     @Test
+    void testCreateOrReactivate_AlreadyActive() {
+        Assertions.assertThrows(UserAlreadyExistsException.class, () -> {
+            userService.createOrReactivate(0L, "First");
+
+            Assertions.fail();
+        });
+    }
+
+    @Test
     void testCreateOrReactivate_AlreadyExists() {
         Assertions.assertThrows(UserAlreadyExistsException.class, () -> {
             userService.createOrReactivate(1L, "Second");
@@ -55,6 +66,16 @@ class UserServiceTest extends BaseTest {
         Assertions.assertEquals(0L, user.getId());
         Assertions.assertEquals("First", user.getName());
         Assertions.assertEquals(true, user.getActive());
+    }
+
+    @Test
+    void testGetById_NonExistant() {
+        Assertions.assertThrows(UserDoesntExistsException.class, () -> userService.getById(10L));
+    }
+
+    @Test
+    void testGetById_NotActive() {
+        Assertions.assertThrows(UserNotActiveException.class, () -> userService.getById(2L));
     }
 
 }

@@ -1,13 +1,17 @@
 package org.themarioga.cclh.commons.service;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.github.springtestdbunit.annotation.ExpectedDatabase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.dao.intf.GameDao;
 import org.themarioga.cclh.commons.enums.GameStatusEnum;
+import org.themarioga.cclh.commons.enums.GameTypeEnum;
+import org.themarioga.cclh.commons.models.Dictionary;
 import org.themarioga.cclh.commons.models.Game;
+import org.themarioga.cclh.commons.services.intf.DictionaryService;
 import org.themarioga.cclh.commons.services.intf.GameService;
 
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")
@@ -25,21 +29,28 @@ class GameServiceTest extends BaseTest {
     @Autowired
     GameService gameService;
 
+    @Autowired
+    DictionaryService dictionaryService;
+
     @Test
-    void testCreateGame() {
-        Game game = gameService.create(1L, "Room 1", 0L, 0L);
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testCreateGame-expected.xml", table = "T_GAME")
+    void testCreateGame_CreateRoom() {
+        Game game = gameService.create(2L, "Room 3", 0L, 0L);
+
+        gameDao.getCurrentSession().flush();
 
         Assertions.assertNotNull(game);
         Assertions.assertNotNull(game.getId());
         Assertions.assertNotNull(game.getRoom().getId());
         Assertions.assertNotNull(game.getCreator().getId());
 
-        Assertions.assertEquals(1L, game.getRoom().getId());
+        Assertions.assertEquals(2L, game.getRoom().getId());
         Assertions.assertEquals(0L, game.getCreator().getId());
         Assertions.assertEquals(GameStatusEnum.CREATED, game.getStatus());
     }
 
     @Test
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testDeleteGame-expected.xml", table = "T_GAME")
     void testDeleteGame() {
         gameService.delete(0L);
 
@@ -51,68 +62,51 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameType-expected.xml", table = "T_GAME")
     void testSetType() {
         Game game = gameService.getByRoomId(0L);
+
+        game = gameService.setType(game, GameTypeEnum.DICTATORSHIP);
+
+        gameDao.getCurrentSession().flush();
+
+        Assertions.assertEquals(GameTypeEnum.DICTATORSHIP, game.getType());
     }
 
     @Test
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameNumberCards-expected.xml", table = "T_GAME")
     void testSetNumberOfCardsToWin() {
+        Game game = gameService.getByRoomId(0L);
 
+        game = gameService.setNumberOfCardsToWin(game, 5);
+
+        gameDao.getCurrentSession().flush();
+
+        Assertions.assertEquals(5, game.getNumberOfCardsToWin());
     }
 
     @Test
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameNumberPlayers-expected.xml", table = "T_GAME")
     void testSetMaxNumberOfPlayers() {
+        Game game = gameService.getByRoomId(0L);
 
+        game = gameService.setMaxNumberOfPlayers(game, 5);
+
+        gameDao.getCurrentSession().flush();
+
+        Assertions.assertEquals(5, game.getMaxNumberOfPlayers());
     }
 
     @Test
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameDictionary-expected.xml", table = "T_GAME")
     void testSetDictionary() {
+        Game game = gameService.getByRoomId(0L);
 
+        game = gameService.setDictionary(game, 1L);
+
+        gameDao.getCurrentSession().flush();
+
+        Assertions.assertEquals(dictionaryService.findOne(1L), game.getDictionary());
     }
-
-//    @Test
-//    void testAddBlackCardsToTableDeck() {
-//        Game game = gameService.getByRoomId(0);
-//
-//        Assertions.assertEquals(0, game.getDeck().size());
-//
-//        gameService.addBlackCardsToTableDeck(game);
-//
-//        Assertions.assertEquals(3, game.getDeck().size());
-//        Assertions.assertEquals(CardTypeEnum.BLACK, game.getDeck().get(0).getType());
-//    }
-//
-//    @Test
-//    @DatabaseSetup("classpath:dbunit/service/setup/tabledeck.xml")
-//    void testTransferCardFromDeckToTable() {
-//        Game game = gameService.findOne(0);
-//
-//        Assertions.assertEquals(3, game.getDeck().size());
-//        Assertions.assertEquals(CardTypeEnum.BLACK, game.getDeck().get(0).getType());
-//        Assertions.assertNull(game.getCurrentBlackCard());
-//
-//        gameService.transferCardFromDeckToTable(game);
-//
-//        Assertions.assertEquals(2, game.getDeck().size());
-//        Assertions.assertEquals(CardTypeEnum.BLACK, game.getDeck().get(0).getType());
-//        Assertions.assertNotNull(game.getCurrentBlackCard());
-//        Assertions.assertEquals(CardTypeEnum.BLACK, game.getCurrentBlackCard().getType());
-//    }
-//
-//    @Test
-//    void testAddWhiteCardsToPlayersDecks() {
-//        Game game = gameService.getByRoomId(0);
-//
-//        Assertions.assertEquals(game.getmaxnumberofplayers(), game.getPlayers().size());
-//        Assertions.assertEquals(0, game.getPlayers().get(0).getDeck().size());
-//
-//        gameService.addWhiteCardsToPlayersDecks(game);
-//
-//        long cardsPerPlayer = Math.floorDiv(dictionaryService.countCardsByDictionaryIdAndType(game.getDictionary(), CardTypeEnum.WHITE), game.getmaxnumberofplayers());
-//
-//        Assertions.assertEquals(game.getmaxnumberofplayers(), game.getPlayers().size());
-//        Assertions.assertEquals(cardsPerPlayer, game.getPlayers().get(0).getDeck().size());
-//        Assertions.assertEquals(CardTypeEnum.WHITE, game.getPlayers().get(0).getDeck().get(0).getType());
-//    }
 
 }

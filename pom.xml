@@ -160,6 +160,16 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.openclover</groupId>
+                <artifactId>clover-maven-plugin</artifactId>
+                <version>4.5.1</version>
+                <configuration>
+                    <includes>
+                        <include>**/services/**/*.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
                 <version>8.4.0</version>
