@@ -208,7 +208,7 @@ class GameServiceTest extends BaseTest {
         Assertions.assertEquals(3, game.getPlayers().size());
         Assertions.assertEquals(3, game.getPlayers().get(0).getHand().size());
         Assertions.assertEquals(1, game.getTable().getCurrentRoundNumber());
-        Assertions.assertEquals(0L, game.getTable().getCurrentBlackCard().getId());
+        Assertions.assertNotNull(game.getTable().getCurrentBlackCard());
     }
 
     @Test
@@ -224,6 +224,24 @@ class GameServiceTest extends BaseTest {
     @Test
     void testStartRound_GameNotStarted() {
         Assertions.assertThrows(GameNotStartedException.class, () -> gameService.startRound(0L));
+    }
+
+    @Test
+    void testEndRound() {
+        gameService.startGame(0L);
+        Game game = gameService.startRound(0L);
+
+        Assertions.assertEquals(0L, game.getRoom().getId());
+        Assertions.assertEquals(3, game.getPlayers().size());
+        Assertions.assertEquals(3, game.getPlayers().get(0).getHand().size());
+        Assertions.assertEquals(1, game.getTable().getCurrentRoundNumber());
+        Assertions.assertNotNull(game.getTable().getCurrentBlackCard());
+
+        gameService.endRound(0L);
+
+        Assertions.assertNull(game.getTable().getCurrentBlackCard());
+        Assertions.assertEquals(0, game.getTable().getPlayedCards().size());
+        Assertions.assertEquals(0, game.getTable().getPlayerVotes().size());
     }
 
 }
