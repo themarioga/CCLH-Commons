@@ -244,4 +244,9 @@ class GameServiceTest extends BaseTest {
         Assertions.assertEquals(0, game.getTable().getPlayerVotes().size());
     }
 
+    @Test
+    void testVoteDeletion() {
+        // ToDo: create test
+    }
+
 }

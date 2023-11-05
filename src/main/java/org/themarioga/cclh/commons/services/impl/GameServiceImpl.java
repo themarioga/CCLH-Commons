@@ -14,6 +14,7 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.game.*;
 import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyExistsException;
+import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyVotedDeleteException;
 import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.services.intf.*;
 import org.themarioga.cclh.commons.util.Assert;
@@ -278,7 +279,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public void voteForDeletion(long roomId, long userId) {
+    public Game voteForDeletion(long roomId, long userId) {
         logger.debug("Player {} vote for the deletion of the game in room {}", userId, roomId);
 
         // Get the game
@@ -299,12 +300,19 @@ public class GameServiceImpl implements GameService {
         // Check player exists
         Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
 
-        // ToDo: make this
+        // Check player not voted already
+        if (game.getDeletionVotes().contains(player))
+            throw new PlayerAlreadyVotedDeleteException();
+
+        // Add deletion votes
+        game.getDeletionVotes().add(player);
+
+        return gameDao.update(game);
     }
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public void playCard(long roomId, long userId, long cardId) {
+    public Game playCard(long roomId, long userId, long cardId) {
         logger.debug("Player {} used the card {} of the game in room {}", userId, cardId, roomId);
 
         // Get the game
@@ -332,11 +340,13 @@ public class GameServiceImpl implements GameService {
         Assert.assertNotNull(card, ErrorEnum.CARD_NOT_FOUND);
 
         // ToDo: make this
+
+        return null;
     }
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public void voteForCard(long roomId, long userId, long cardId) {
+    public Game voteForCard(long roomId, long userId, long cardId) {
         logger.debug("Player {} vote for the card {} of the game in room {}", userId, cardId, roomId);
 
         // Get the game
@@ -364,6 +374,8 @@ public class GameServiceImpl implements GameService {
         Assert.assertNotNull(card, ErrorEnum.CARD_NOT_FOUND);
 
         // ToDo: make this
+
+        return null;
     }
 
     @Override

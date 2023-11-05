@@ -28,13 +28,11 @@ public interface GameService {
 
     Game endRound(long roomId);
 
-    void voteForDeletion(long roomId, long userId);
+    Game voteForDeletion(long roomId, long userId);
 
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    void playCard(long roomId, long userId, long cardId);
+    Game playCard(long roomId, long userId, long cardId);
 
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    void voteForCard(long roomId, long userId, long cardId);
+    Game voteForCard(long roomId, long userId, long cardId);
 
     Game getByRoom(Room room);
 
