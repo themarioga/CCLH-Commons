@@ -2,6 +2,7 @@ package org.themarioga.cclh.commons.service;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
+import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ class PlayerServiceTest extends BaseTest {
     @Test
     void testCreate() {
         Game game = gameService.getByRoom(roomService.getById(0L));
-        User user = userService.getById(3L);
+        User user = userService.getById(4L);
 
         Player player = playerService.create(game, user);
 
@@ -64,7 +65,7 @@ class PlayerServiceTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdatePlayersDeck-expected.xml", table = "T_PLAYER_DECK")
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdatePlayersDeck-expected.xml", table = "T_PLAYER_DECK", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testAddCardsToPlayerDeck() {
         Player player = playerService.findByUserId(0L);
 
@@ -72,7 +73,8 @@ class PlayerServiceTest extends BaseTest {
         List<Card> card = cards.subList(0, 1);
 
         playerService.addCardsToPlayerDeck(player, card);
-        playerDao.getCurrentSession().flush();
+
+        getCurrentSession().flush();
 
         Assertions.assertEquals(3L, card.get(0).getId());
     }

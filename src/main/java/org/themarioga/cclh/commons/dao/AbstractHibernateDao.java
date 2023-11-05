@@ -1,5 +1,6 @@
 package org.themarioga.cclh.commons.dao;
 
+import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ public abstract class AbstractHibernateDao<T extends Serializable> implements In
     private Class<T> clazz;
 
     @Autowired
-    protected SessionFactory sessionFactory;
+    protected EntityManager entityManager;
 
     public final void setClazz(final Class<T> clazzToSet) {
         clazz = Objects.requireNonNull(clazzToSet);
@@ -64,7 +65,7 @@ public abstract class AbstractHibernateDao<T extends Serializable> implements In
 
     @Override
     public Session getCurrentSession() {
-        return sessionFactory.getCurrentSession();
+        return entityManager.unwrap(Session.class);
     }
 
 }

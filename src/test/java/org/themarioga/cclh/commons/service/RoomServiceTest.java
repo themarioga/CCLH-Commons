@@ -25,10 +25,10 @@ class RoomServiceTest extends BaseTest {
 
     @Test
     void testCreateOrReactivate() {
-        Room room = roomService.createOrReactivate(4L, "Test", 0L);
+        Room room = roomService.createOrReactivate(5L, "Test", 0L);
 
         Assertions.assertNotNull(room);
-        Assertions.assertEquals(4L, room.getId());
+        Assertions.assertEquals(5L, room.getId());
         Assertions.assertEquals("Test", room.getName());
         Assertions.assertEquals(true, room.getActive());
     }

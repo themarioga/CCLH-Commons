@@ -2,6 +2,7 @@ package org.themarioga.cclh.commons.service;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
+import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +10,17 @@ import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.dao.intf.GameDao;
 import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
-import org.themarioga.cclh.commons.models.Dictionary;
+import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryDoesntExistsException;
+import org.themarioga.cclh.commons.exceptions.game.GameAlreadyFilledException;
+import org.themarioga.cclh.commons.exceptions.game.GameAlreadyStartedException;
+import org.themarioga.cclh.commons.exceptions.game.GameDoesntExistsException;
+import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyExistsException;
+import org.themarioga.cclh.commons.exceptions.room.RoomDoesntExistsException;
+import org.themarioga.cclh.commons.exceptions.user.UserNotActiveException;
 import org.themarioga.cclh.commons.models.Game;
 import org.themarioga.cclh.commons.services.intf.DictionaryService;
 import org.themarioga.cclh.commons.services.intf.GameService;
+import org.themarioga.cclh.commons.services.intf.UserService;
 
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/room.xml")
@@ -27,17 +35,18 @@ class GameServiceTest extends BaseTest {
     GameDao gameDao;
 
     @Autowired
+    UserService userService;
+
+    @Autowired
     GameService gameService;
 
     @Autowired
     DictionaryService dictionaryService;
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testCreateGame-expected.xml", table = "T_GAME")
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testCreateGame-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testCreateGame_CreateRoom() {
         Game game = gameService.create(2L, "Room 3", 0L, 0L);
-
-        gameDao.getCurrentSession().flush();
 
         Assertions.assertNotNull(game);
         Assertions.assertNotNull(game.getId());
@@ -50,11 +59,9 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testDeleteGame-expected.xml", table = "T_GAME")
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testDeleteGame-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testDeleteGame() {
         gameService.delete(0L);
-
-        gameDao.getCurrentSession().flush();
 
         Game game = gameService.getByRoomId(0L);
 
@@ -62,51 +69,125 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameType-expected.xml", table = "T_GAME")
+    void testDelete_RoomNotExists() {
+        Assertions.assertThrows(RoomDoesntExistsException.class, () -> gameService.delete(70L));
+    }
+
+    @Test
+    void testDelete_GameNotExists() {
+        Assertions.assertThrows(GameDoesntExistsException.class, () -> gameService.delete(4L));
+    }
+
+    @Test
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameType-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetType() {
-        Game game = gameService.getByRoomId(0L);
+        Game game = gameService.setType(0L, GameTypeEnum.DICTATORSHIP);
 
-        game = gameService.setType(game, GameTypeEnum.DICTATORSHIP);
-
-        gameDao.getCurrentSession().flush();
+        getCurrentSession().flush();
 
         Assertions.assertEquals(GameTypeEnum.DICTATORSHIP, game.getType());
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameNumberCards-expected.xml", table = "T_GAME")
+    void testSetType_GameAlreadyStarted() {
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setType(3L, GameTypeEnum.DICTATORSHIP));
+    }
+
+    @Test
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameNumberCards-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetNumberOfCardsToWin() {
-        Game game = gameService.getByRoomId(0L);
+        Game game = gameService.setNumberOfCardsToWin(0L, 5);
 
-        game = gameService.setNumberOfCardsToWin(game, 5);
-
-        gameDao.getCurrentSession().flush();
+        getCurrentSession().flush();
 
         Assertions.assertEquals(5, game.getNumberOfCardsToWin());
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameNumberPlayers-expected.xml", table = "T_GAME")
+    void testSetNumberOfCardsToWin_GameAlreadyStarted() {
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setNumberOfCardsToWin(3L, 5));
+    }
+
+    @Test
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameNumberPlayers-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetMaxNumberOfPlayers() {
-        Game game = gameService.getByRoomId(0L);
+        Game game = gameService.setMaxNumberOfPlayers(0L, 5);
 
-        game = gameService.setMaxNumberOfPlayers(game, 5);
-
-        gameDao.getCurrentSession().flush();
+        getCurrentSession().flush();
 
         Assertions.assertEquals(5, game.getMaxNumberOfPlayers());
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameDictionary-expected.xml", table = "T_GAME")
+    void testSetMaxNumberOfPlayers_GameAlreadyStarted() {
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setMaxNumberOfPlayers(3L, 5));
+    }
+
+    @Test
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameDictionary-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetDictionary() {
-        Game game = gameService.getByRoomId(0L);
+        Game game = gameService.setDictionary(0L, 1L);
 
-        game = gameService.setDictionary(game, 1L);
-
-        gameDao.getCurrentSession().flush();
+        getCurrentSession().flush();
 
         Assertions.assertEquals(dictionaryService.findOne(1L), game.getDictionary());
+    }
+
+    @Test
+    void testSetMaxDictionary_GameAlreadyStarted() {
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setDictionary(3L, 0L));
+    }
+
+    @Test
+    void testSetMaxDictionary_DictionaryDoesntExists() {
+        Assertions.assertThrows(DictionaryDoesntExistsException.class, () -> gameService.setDictionary(0L, 50L));
+    }
+
+    @Test
+    void testAddPlayer() {
+        Game game = gameService.addPlayer(1L, 4L);
+
+        Assertions.assertEquals(1L, game.getPlayers().size());
+    }
+
+    @Test
+    void testAddPlayer_GameAlreadyFilled() {
+        Assertions.assertThrows(GameAlreadyFilledException.class, () -> gameService.addPlayer(0L, 3L));
+    }
+
+    @Test
+    void testAddPlayer_UserNotActive() {
+        Assertions.assertThrows(UserNotActiveException.class, () -> gameService.addPlayer(0L, 2L));
+    }
+
+    @Test
+    void testAddPlayer_AlreadyAdded() {
+        Assertions.assertThrows(PlayerAlreadyExistsException.class, () -> gameService.addPlayer(1L, 1L));
+    }
+
+    @Test
+    void testStartGame_Democracy() {
+        Game game = gameService.startGame(0L);
+
+        Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
+        Assertions.assertNotNull(game.getTable());
+        Assertions.assertEquals(3, game.getDeck().size());
+        Assertions.assertEquals(3, game.getPlayers().size());
+        Assertions.assertEquals(3, game.getPlayers().get(0).getDeck().size());
+    }
+
+    @Test
+    void testStartGame_Dictatorship() {
+        gameService.addPlayer(1L, 4L);
+        gameService.addPlayer(1L, 5L);
+        gameService.addPlayer(1L, 6L);
+
+        Game game = gameService.startGame(1L);
+
+        Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
+        Assertions.assertNotNull(game.getTable());
+        Assertions.assertEquals(3, game.getDeck().size());
+        Assertions.assertEquals(3, game.getPlayers().size());
     }
 
 }

@@ -22,10 +22,10 @@ class UserServiceTest extends BaseTest {
 
     @Test
     void testCreateOrReactivate() {
-        User user = userService.createOrReactivate(4L, "Test");
+        User user = userService.createOrReactivate(10L, "Test");
 
         Assertions.assertNotNull(user);
-        Assertions.assertEquals(4L, user.getId());
+        Assertions.assertEquals(10L, user.getId());
         Assertions.assertEquals("Test", user.getName());
         Assertions.assertEquals(true, user.getActive());
     }

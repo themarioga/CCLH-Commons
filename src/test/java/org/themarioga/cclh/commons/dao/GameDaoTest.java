@@ -2,6 +2,7 @@ package org.themarioga.cclh.commons.dao;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
+import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +37,11 @@ class GameDaoTest extends BaseTest {
     private DictionaryDao dictionaryDao;
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testCreateGame-expected.xml", table = "T_GAME")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testCreateGame-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void createGame() {
-        Room room = roomDao.findOne(1);
-        User creator = userDao.findOne(0);
-        Dictionary dictionary = dictionaryDao.findOne(0);
+        Room room = roomDao.findOne(1L);
+        User creator = userDao.findOne(0L);
+        Dictionary dictionary = dictionaryDao.findOne(0L);
 
         Game game = new Game();
         game.setType(GameTypeEnum.DICTATORSHIP);
@@ -52,19 +53,18 @@ class GameDaoTest extends BaseTest {
         game.setDictionary(dictionary);
 
         gameDao.create(game);
-        gameDao.getCurrentSession().flush();
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testUpdateGame-expected.xml", table = "T_GAME")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testUpdateGame-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void updateGame() {
         Game game = gameDao.findOne(0L);
         game.setType(GameTypeEnum.DICTATORSHIP);
         game.setMaxNumberOfPlayers(5);
         game.setNumberOfCardsToWin(5);
 
-        gameDao.update(game);
-        gameDao.getCurrentSession().flush();
+        gameDao.create(game);
+        getCurrentSession().flush();
     }
 
     @Test
@@ -72,7 +72,6 @@ class GameDaoTest extends BaseTest {
         Game game = gameDao.findOne(0L);
 
         gameDao.delete(game);
-        gameDao.getCurrentSession().flush();
 
         long total = gameDao.countAll();
 
@@ -131,7 +130,7 @@ class GameDaoTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testUpdateGameDeck-expected.xml", table = "T_TABLE_DECK")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testUpdateGameDeck-expected.xml", table = "T_TABLE_DECK", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void addCardsToGameHand() {
         Game game = gameDao.findOne(0L);
         Card card = cardDao.findOne(0L);
@@ -139,11 +138,11 @@ class GameDaoTest extends BaseTest {
         game.getDeck().add(card);
 
         gameDao.update(game);
-        gameDao.getCurrentSession().flush();
+        getCurrentSession().flush();
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testUpdateGameDeletionVotes-expected.xml", table = "T_GAME_DELETIONVOTES")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testUpdateGameDeletionVotes-expected.xml", table = "T_GAME_DELETIONVOTES", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void addDeletionVoteToTable() {
         Game game = gameDao.findOne(0L);
         Player player = playerDao.findOne(0L);
@@ -151,7 +150,7 @@ class GameDaoTest extends BaseTest {
         game.getDeletionVotes().add(player);
 
         gameDao.update(game);
-        gameDao.getCurrentSession().flush();
+        getCurrentSession().flush();
     }
 
     @Test

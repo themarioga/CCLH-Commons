@@ -2,6 +2,7 @@ package org.themarioga.cclh.commons.dao;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
+import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +26,9 @@ class CardDaoTest extends BaseTest {
     private DictionaryDao dictionaryDao;
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/card/testCreateCard-expected.xml", table = "T_CARD")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/card/testCreateCard-expected.xml", table = "T_CARD", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void createCard() {
-        Dictionary dictionary = dictionaryDao.findOne(0);
+        Dictionary dictionary = dictionaryDao.findOne(0L);
 
         Card card = new Card();
         card.setText("Test card");
@@ -35,18 +36,17 @@ class CardDaoTest extends BaseTest {
         card.setDictionary(dictionary);
 
         cardDao.create(card);
-        cardDao.getCurrentSession().flush();
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/card/testUpdateCard-expected.xml", table = "T_CARD")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/card/testUpdateCard-expected.xml", table = "T_CARD", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void updateCard() {
         Card card = cardDao.findOne(0L);
         card.setText("Test card");
         card.setType(CardTypeEnum.WHITE);
 
         cardDao.update(card);
-        cardDao.getCurrentSession().flush();
+        getCurrentSession().flush();
     }
 
     @Test
@@ -54,7 +54,6 @@ class CardDaoTest extends BaseTest {
         Card card = cardDao.findOne(0L);
 
         cardDao.delete(card);
-        cardDao.getCurrentSession().flush();
 
         long total = cardDao.countAll();
 

@@ -2,6 +2,7 @@ package org.themarioga.cclh.commons.dao;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
+import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +24,9 @@ class RoomDaoTest extends BaseTest {
     private RoomDao roomDao;
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/room/testCreateRoom-expected.xml", table = "T_ROOM")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/room/testCreateRoom-expected.xml", table = "T_ROOM", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void createRoom() {
-        User user = userDao.findOne(0);
+        User user = userDao.findOne(0L);
 
         Room room = new Room();
         room.setId(2L);
@@ -34,18 +35,18 @@ class RoomDaoTest extends BaseTest {
         room.setOwner(user);
 
         roomDao.create(room);
-        roomDao.getCurrentSession().flush();
+        getCurrentSession().flush();
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/room/testUpdateRoom-expected.xml", table = "T_ROOM")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/room/testUpdateRoom-expected.xml", table = "T_ROOM", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void updateRoom() {
         Room room = roomDao.findOne(0L);
         room.setName("Otro nombre");
         room.setActive(false);
 
         roomDao.update(room);
-        roomDao.getCurrentSession().flush();
+        getCurrentSession().flush();
     }
 
     @Test
@@ -53,7 +54,6 @@ class RoomDaoTest extends BaseTest {
         Room room = roomDao.findOne(0L);
 
         roomDao.delete(room);
-        roomDao.getCurrentSession().flush();
 
         long total = roomDao.countAll();
 

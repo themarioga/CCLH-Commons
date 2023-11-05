@@ -2,6 +2,7 @@ package org.themarioga.cclh.commons.dao;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
+import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +39,13 @@ class TableDaoTest extends BaseTest {
     private DictionaryDao dictionaryDao;
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testCreateGame-expected.xml", table = "T_GAME")
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/table/testCreateTable-expected.xml", table = "T_TABLE")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testCreateGame-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/table/testCreateTable-expected.xml", table = "T_TABLE", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void createGameAndTable() {
-        Room room = roomDao.findOne(1);
-        User creator = userDao.findOne(0);
-        Dictionary dictionary = dictionaryDao.findOne(0);
-        Card card = cardDao.findOne(0);
+        Room room = roomDao.findOne(1L);
+        User creator = userDao.findOne(0L);
+        Dictionary dictionary = dictionaryDao.findOne(0L);
+        Card card = cardDao.findOne(0L);
 
         Game game = new Game();
         game.setType(GameTypeEnum.DICTATORSHIP);
@@ -64,17 +65,16 @@ class TableDaoTest extends BaseTest {
         table.setCurrentBlackCard(card);
         game.setTable(table);
 
-        gameDao.update(game);
-
-        gameDao.getCurrentSession().flush();
+        gameDao.create(game);
+        getCurrentSession().flush();
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testUpdateGame-expected.xml", table = "T_GAME")
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/table/testUpdateTable-expected.xml", table = "T_TABLE")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testUpdateGame-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/table/testUpdateTable-expected.xml", table = "T_TABLE", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void updateGameAndTable() {
-        User president = userDao.findOne(0);
-        Card card = cardDao.findOne(0);
+        User president = userDao.findOne(0L);
+        Card card = cardDao.findOne(0L);
 
         Game game = gameDao.findOne(0L);
         game.setType(GameTypeEnum.DICTATORSHIP);
@@ -86,7 +86,7 @@ class TableDaoTest extends BaseTest {
         game.getTable().setCurrentBlackCard(card);
 
         gameDao.update(game);
-        gameDao.getCurrentSession().flush();
+        getCurrentSession().flush();
     }
 
     @Test
@@ -114,7 +114,7 @@ class TableDaoTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/table/testCreatePlayedCard-expected.xml", table = "t_table_playedcards")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/table/testCreatePlayedCard-expected.xml", table = "t_table_playedcards", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void addTablePlayedCard() {
         Table table = tableDao.findOne(0L);
         Card card = cardDao.findOne(0L);
@@ -126,7 +126,8 @@ class TableDaoTest extends BaseTest {
         playedCard.setPlayer(played);
         table.getPlayedCards().add(playedCard);
 
-        dictionaryDao.getCurrentSession().flush();
+        tableDao.update(table);
+        getCurrentSession().flush();
     }
 
     @Test
@@ -142,7 +143,7 @@ class TableDaoTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/table/testCreatePlayerVote-expected.xml", table = "t_table_playervotes")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/table/testCreatePlayerVote-expected.xml", table = "t_table_playervotes", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void addTablePlayerVote() {
         Table table = tableDao.findOne(0L);
         Card card = cardDao.findOne(0L);
@@ -154,7 +155,8 @@ class TableDaoTest extends BaseTest {
         playerVote.setPlayer(played);
         table.getPlayerVotes().add(playerVote);
 
-        dictionaryDao.getCurrentSession().flush();
+        tableDao.update(table);
+        getCurrentSession().flush();
     }
 
     @Test

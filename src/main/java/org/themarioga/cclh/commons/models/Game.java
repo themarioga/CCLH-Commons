@@ -16,12 +16,12 @@ public class Game extends Base {
     private Long id;
     @Column(name = "status", nullable = false)
     private GameStatusEnum status;
-    @Column(name = "type")
+    @Column(name = "type", nullable = false)
     private GameTypeEnum type;
-    @Column(name = "maxnumberofplayers")
-    private Integer maxNumberOfPlayers;
-    @Column(name = "numberofcardstowin")
+    @Column(name = "n_cards_to_win", nullable = false)
     private Integer numberOfCardsToWin;
+    @Column(name = "n_players")
+    private Integer maxNumberOfPlayers;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", referencedColumnName = "id", nullable = false)
@@ -30,7 +30,7 @@ public class Game extends Base {
     @JoinColumn(name = "creator_id", referencedColumnName = "id", nullable = false)
     private User creator;
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "dictionary_id", referencedColumnName = "id")
+    @JoinColumn(name = "dictionary_id", referencedColumnName = "id", nullable = false)
     private Dictionary dictionary;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -2,9 +2,7 @@ package org.themarioga.cclh.commons.services.intf;
 
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.models.Game;
-import org.themarioga.cclh.commons.models.Player;
 import org.themarioga.cclh.commons.models.Room;
-import org.themarioga.cclh.commons.models.User;
 
 public interface GameService {
 
@@ -12,23 +10,23 @@ public interface GameService {
 
     void delete(long roomId);
 
-    Game setType(Game game, GameTypeEnum type);
+    Game setType(long roomId, GameTypeEnum type);
 
-    Game setNumberOfCardsToWin(Game game, int numberOfCards);
+    Game setNumberOfCardsToWin(long roomId, int numberOfCards);
 
-    Game setMaxNumberOfPlayers(Game game, int maxNumberOfPlayers);
+    Game setMaxNumberOfPlayers(long roomId, int N_PLAYERS);
 
-    Game setDictionary(Game game, long dictionaryId);
+    Game setDictionary(long roomId, long dictionaryId);
 
-    Game addPlayer(Game game, User user);
+    Game addPlayer(long roomId, long userId);
 
-    Game startGame(Game game);
+    Game startGame(long roomId);
 
-    Game startRound(Game game);
+    Game startRound(long roomId);
 
-    Game endRound(Game game);
+    Game endRound(long roomId);
 
-    void voteForDeletion(Game game, Player player);
+    void voteForDeletion(long roomId, long userId);
 
     Game getByRoom(Room room);
 

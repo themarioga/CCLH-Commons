@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
 <dataset>
-    <T_GAME id="0" type="0" maxnumberofplayers="0" status="0" numberofcardstowin="0" room_id="0" creator_id="0" dictionary_id="0"/>
-    <T_GAME ID="1" TYPE="2" maxnumberofplayers="5" STATUS="0" NUMBEROFCARDSTOWIN="5" ROOM_ID="1" CREATOR_ID="0" DICTIONARY_ID="0"/>
+    <T_GAME ID="0" TYPE="0" N_PLAYERS="0" STATUS="0" N_CARDS_TO_WIN="0" ROOM_ID="0" CREATOR_ID="0" DICTIONARY_ID="0"/>
+    <T_GAME ID="1" TYPE="2" N_PLAYERS="5" STATUS="0" N_CARDS_TO_WIN="5" ROOM_ID="1" CREATOR_ID="0" DICTIONARY_ID="0"/>
 </dataset>

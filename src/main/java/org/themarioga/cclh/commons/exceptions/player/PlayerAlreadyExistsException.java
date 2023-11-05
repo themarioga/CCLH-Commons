@@ -5,8 +5,15 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 
 public class PlayerAlreadyExistsException extends ApplicationException {
 
-    public PlayerAlreadyExistsException() {
+    private long userId;
+
+    public PlayerAlreadyExistsException(long userId) {
         super(ErrorEnum.PLAYER_ALREADY_EXISTS);
+
+        this.userId = userId;
     }
 
+    public long getUserId() {
+        return userId;
+    }
 }

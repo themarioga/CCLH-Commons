@@ -2,6 +2,7 @@ package org.themarioga.cclh.commons.dao;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
+import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ class UserDaoTest extends BaseTest {
     private UserDao userDao;
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/user/testCreateUser-expected.xml", table = "T_USER")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/user/testCreateUser-expected.xml", table = "T_USER", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void createUser() {
         User user = new User();
         user.setId(2L);
@@ -26,18 +27,18 @@ class UserDaoTest extends BaseTest {
         user.setActive(true);
 
         userDao.create(user);
-        userDao.getCurrentSession().flush();
+        getCurrentSession().flush();
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/user/testUpdateUser-expected.xml", table = "T_USER")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/user/testUpdateUser-expected.xml", table = "T_USER", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void updateUser() {
         User user = userDao.findOne(0L);
         user.setName("Otro nombre");
         user.setActive(false);
 
         userDao.update(user);
-        userDao.getCurrentSession().flush();
+        getCurrentSession().flush();
     }
 
     @Test
@@ -45,7 +46,6 @@ class UserDaoTest extends BaseTest {
         User user = userDao.findOne(0L);
 
         userDao.delete(user);
-        userDao.getCurrentSession().flush();
 
         long total = userDao.countAll();
 

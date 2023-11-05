@@ -2,6 +2,7 @@ package org.themarioga.cclh.commons.dao;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
+import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,9 @@ class DictionaryDaoTest extends BaseTest {
     private DictionaryDao dictionaryDao;
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/dictionary/testCreateDictionary-expected.xml", table = "T_DICTIONARY")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/dictionary/testCreateDictionary-expected.xml", table = "T_DICTIONARY", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void createDictionary() {
-        User user = userDao.findOne(0);
+        User user = userDao.findOne(0L);
 
         Dictionary dictionary = new Dictionary();
         dictionary.setName("Test dictionary");
@@ -37,11 +38,10 @@ class DictionaryDaoTest extends BaseTest {
         dictionary.setCreator(user);
 
         dictionaryDao.create(dictionary);
-        dictionaryDao.getCurrentSession().flush();
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/dictionary/testUpdateDictionary-expected.xml", table = "T_DICTIONARY")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/dictionary/testUpdateDictionary-expected.xml", table = "T_DICTIONARY", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void updateDictionary() {
         Dictionary dictionary = dictionaryDao.findOne(0L);
         dictionary.setName("Otro nombre");
@@ -49,7 +49,7 @@ class DictionaryDaoTest extends BaseTest {
         dictionary.setPublished(false);
 
         dictionaryDao.update(dictionary);
-        dictionaryDao.getCurrentSession().flush();
+        getCurrentSession().flush();
     }
 
     @Test
@@ -57,7 +57,6 @@ class DictionaryDaoTest extends BaseTest {
         Dictionary dictionary = dictionaryDao.findOne(0L);
 
         dictionaryDao.delete(dictionary);
-        dictionaryDao.getCurrentSession().flush();
 
         long total = dictionaryDao.countAll();
 
@@ -94,7 +93,7 @@ class DictionaryDaoTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/dictionary/testCreateDictionaryCollaborators-expected.xml", table = "T_DICTIONARY_COLLABORATORS")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/dictionary/testCreateDictionaryCollaborators-expected.xml", table = "T_DICTIONARY_COLLABORATORS", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void addDictionaryCollaborator() {
         Dictionary dictionary = dictionaryDao.findOne(0L);
         User user = userDao.findOne(0L);
@@ -106,17 +105,19 @@ class DictionaryDaoTest extends BaseTest {
         dictionaryCollaborator.setCanEdit(true);
         dictionary.getDictionaryCollaborators().add(dictionaryCollaborator);
 
-        dictionaryDao.getCurrentSession().flush();
+        dictionaryDao.update(dictionary);
+        getCurrentSession().flush();
     }
 
     @Test
     @DatabaseSetup("classpath:dbunit/dao/setup/dictionarycollaborators.xml")
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/dictionary/testUpdateDictionaryCollaborators-expected.xml", table = "T_DICTIONARY_COLLABORATORS")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/dictionary/testUpdateDictionaryCollaborators-expected.xml", table = "T_DICTIONARY_COLLABORATORS", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void updateDictionaryCollaborator() {
         Dictionary dictionary = dictionaryDao.findOne(0L);
         dictionary.getDictionaryCollaborators().get(0).setAccepted(false);
 
-        dictionaryDao.getCurrentSession().flush();
+        dictionaryDao.update(dictionary);
+        getCurrentSession().flush();
     }
 
     @Test

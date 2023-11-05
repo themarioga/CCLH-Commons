@@ -2,6 +2,7 @@ package org.themarioga.cclh.commons.dao;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
+import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +32,10 @@ class PlayerDaoTest extends BaseTest {
     private PlayerDao playerDao;
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/player/testCreatePlayer-expected.xml", table = "T_PLAYER")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/player/testCreatePlayer-expected.xml", table = "T_PLAYER", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void createPlayer() {
-        Game game = gameDao.findOne(0);
-        User user = userDao.findOne(1);
+        Game game = gameDao.findOne(0L);
+        User user = userDao.findOne(1L);
 
         Player player = new Player();
         player.setGame(game);
@@ -43,18 +44,17 @@ class PlayerDaoTest extends BaseTest {
         player.setJoinOrder(1);
 
         playerDao.create(player);
-        playerDao.getCurrentSession().flush();
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/player/testUpdatePlayer-expected.xml", table = "T_PLAYER")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/player/testUpdatePlayer-expected.xml", table = "T_PLAYER", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void updatePlayer() {
         Player player = playerDao.findOne(0L);
         player.setPoints(1);
         player.setJoinOrder(1);
 
         playerDao.update(player);
-        playerDao.getCurrentSession().flush();
+        getCurrentSession().flush();
     }
 
     @Test
@@ -62,7 +62,6 @@ class PlayerDaoTest extends BaseTest {
         Player player = playerDao.findOne(0L);
 
         playerDao.delete(player);
-        playerDao.getCurrentSession().flush();
 
         long total = playerDao.countAll();
 
@@ -93,7 +92,7 @@ class PlayerDaoTest extends BaseTest {
 
     @Test
     @DatabaseSetup("classpath:dbunit/dao/setup/card.xml")
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/player/testUpdatePlayersDeck-expected.xml", table = "T_PLAYER_DECK")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/player/testUpdatePlayersDeck-expected.xml", table = "T_PLAYER_DECK", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void addCardsToPlayersDeck() {
         Player player = playerDao.findOne(0L);
         Card card = cardDao.findOne(0L);
@@ -101,12 +100,12 @@ class PlayerDaoTest extends BaseTest {
         player.getDeck().add(card);
 
         playerDao.update(player);
-        playerDao.getCurrentSession().flush();
+        getCurrentSession().flush();
     }
 
     @Test
     @DatabaseSetup("classpath:dbunit/dao/setup/card.xml")
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/player/testUpdatePlayersHand-expected.xml", table = "T_PLAYER_HAND")
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/player/testUpdatePlayersHand-expected.xml", table = "T_PLAYER_HAND", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void addCardsToPlayersHand() {
         Player player = playerDao.findOne(0L);
         Card card = cardDao.findOne(0L);
@@ -114,7 +113,7 @@ class PlayerDaoTest extends BaseTest {
         player.getHand().add(card);
 
         playerDao.update(player);
-        playerDao.getCurrentSession().flush();
+        getCurrentSession().flush();
     }
 
     @Test

@@ -4,4 +4,6 @@
     <T_ROOM ID="0" NAME="First" ACTIVE="true" OWNER_ID="0"/>
     <T_ROOM ID="1" NAME="Second" ACTIVE="true" OWNER_ID="1"/>
     <T_ROOM ID="2" NAME="Third" ACTIVE="false" OWNER_ID="1"/>
+    <T_ROOM ID="3" NAME="Fourth" ACTIVE="true" OWNER_ID="1"/>
+    <T_ROOM ID="4" NAME="Fifth" ACTIVE="true" OWNER_ID="1"/>
 </dataset>

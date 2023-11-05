@@ -22,4 +22,5 @@ public interface DictionaryService {
 
     long countCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum);
 
+    Dictionary getDefaultDictionary();
 }

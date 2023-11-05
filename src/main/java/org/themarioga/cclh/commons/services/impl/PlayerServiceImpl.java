@@ -80,6 +80,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
     public Player findByUser(User user) {
         logger.debug("Getting player with user: {}", user);
 
@@ -87,6 +88,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
     public Player findByUserId(long id) {
         logger.debug("Getting player with user ID: {}", id);
 
