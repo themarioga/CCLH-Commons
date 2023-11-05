@@ -11,9 +11,7 @@ import org.themarioga.cclh.commons.dao.intf.GameDao;
 import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryDoesntExistsException;
-import org.themarioga.cclh.commons.exceptions.game.GameAlreadyFilledException;
-import org.themarioga.cclh.commons.exceptions.game.GameAlreadyStartedException;
-import org.themarioga.cclh.commons.exceptions.game.GameDoesntExistsException;
+import org.themarioga.cclh.commons.exceptions.game.*;
 import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyExistsException;
 import org.themarioga.cclh.commons.exceptions.room.RoomDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.user.UserNotActiveException;
@@ -188,6 +186,44 @@ class GameServiceTest extends BaseTest {
         Assertions.assertNotNull(game.getTable());
         Assertions.assertEquals(3, game.getDeck().size());
         Assertions.assertEquals(3, game.getPlayers().size());
+        Assertions.assertEquals(10L, game.getTable().getCurrentPresident().getId());
+    }
+
+    @Test
+    void testStartGame_GameAlreadyStarted() {
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.startGame(3L));
+    }
+
+    @Test
+    void testStartGame_GameNotFilled() {
+        Assertions.assertThrows(GameNotFilledException.class, () -> gameService.startGame(1L));
+    }
+
+    @Test
+    void testStartRound() {
+        gameService.startGame(0L);
+        Game game = gameService.startRound(0L);
+
+        Assertions.assertEquals(0L, game.getRoom().getId());
+        Assertions.assertEquals(3, game.getPlayers().size());
+        Assertions.assertEquals(3, game.getPlayers().get(0).getHand().size());
+        Assertions.assertEquals(1, game.getTable().getCurrentRoundNumber());
+        Assertions.assertEquals(0L, game.getTable().getCurrentBlackCard().getId());
+    }
+
+    @Test
+    void testStartRound_Classic() {
+        gameService.setType(0L, GameTypeEnum.CLASSIC);
+        gameService.startGame(0L);
+        Game game = gameService.startRound(0L);
+
+        Assertions.assertEquals(0L, game.getRoom().getId());
+        Assertions.assertEquals(11L, game.getTable().getCurrentPresident().getId());
+    }
+
+    @Test
+    void testStartRound_GameNotStarted() {
+        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.startRound(0L));
     }
 
 }

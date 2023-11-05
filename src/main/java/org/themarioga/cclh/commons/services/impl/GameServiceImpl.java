@@ -242,6 +242,10 @@ public class GameServiceImpl implements GameService {
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
+        // Check if game is started
+        if (game.getStatus() != GameStatusEnum.STARTED)
+            throw new GameNotStartedException(roomId);
+
         // Add cards to player hands
         for (Player player : game.getPlayers()) {
             playerService.transferCardsFromPlayerDeckToPlayerHand(player);
