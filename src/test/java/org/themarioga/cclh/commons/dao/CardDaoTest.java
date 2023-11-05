@@ -36,6 +36,8 @@ class CardDaoTest extends BaseTest {
         card.setDictionary(dictionary);
 
         cardDao.create(card);
+
+        Assertions.assertEquals(1L, card.getId());
     }
 
     @Test
@@ -47,6 +49,8 @@ class CardDaoTest extends BaseTest {
 
         cardDao.update(card);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(0L, card.getId());
     }
 
     @Test

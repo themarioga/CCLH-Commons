@@ -38,6 +38,9 @@ class DictionaryDaoTest extends BaseTest {
         dictionary.setCreator(user);
 
         dictionaryDao.create(dictionary);
+        getCurrentSession().flush();
+
+        Assertions.assertEquals(1L, dictionary.getId());
     }
 
     @Test
@@ -50,6 +53,8 @@ class DictionaryDaoTest extends BaseTest {
 
         dictionaryDao.update(dictionary);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(0L, dictionary.getId());
     }
 
     @Test
@@ -103,10 +108,12 @@ class DictionaryDaoTest extends BaseTest {
         dictionaryCollaborator.setUser(user);
         dictionaryCollaborator.setAccepted(true);
         dictionaryCollaborator.setCanEdit(true);
-        dictionary.getDictionaryCollaborators().add(dictionaryCollaborator);
+        dictionary.getCollaborators().add(dictionaryCollaborator);
 
         dictionaryDao.update(dictionary);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(1, dictionary.getCollaborators().size());
     }
 
     @Test
@@ -114,10 +121,12 @@ class DictionaryDaoTest extends BaseTest {
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/dictionary/testUpdateDictionaryCollaborators-expected.xml", table = "T_DICTIONARY_COLLABORATORS", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void updateDictionaryCollaborator() {
         Dictionary dictionary = dictionaryDao.findOne(0L);
-        dictionary.getDictionaryCollaborators().get(0).setAccepted(false);
+        dictionary.getCollaborators().get(0).setAccepted(false);
 
         dictionaryDao.update(dictionary);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(1, dictionary.getCollaborators().size());
     }
 
     @Test
@@ -125,7 +134,7 @@ class DictionaryDaoTest extends BaseTest {
     void getDictionaryCollaborators() {
         Dictionary dictionary = dictionaryDao.findOne(0L);
 
-        Assertions.assertEquals(true, dictionary.getDictionaryCollaborators().get(0).getAccepted());
+        Assertions.assertEquals(true, dictionary.getCollaborators().get(0).getAccepted());
     }
 
     @Test

@@ -44,6 +44,8 @@ class PlayerDaoTest extends BaseTest {
         player.setJoinOrder(1);
 
         playerDao.create(player);
+
+        Assertions.assertEquals(1L, player.getId());
     }
 
     @Test
@@ -55,6 +57,8 @@ class PlayerDaoTest extends BaseTest {
 
         playerDao.update(player);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(0L, player.getId());
     }
 
     @Test
@@ -101,6 +105,8 @@ class PlayerDaoTest extends BaseTest {
 
         playerDao.update(player);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(1, player.getDeck().size());
     }
 
     @Test
@@ -114,6 +120,8 @@ class PlayerDaoTest extends BaseTest {
 
         playerDao.update(player);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(1, player.getHand().size());
     }
 
     @Test

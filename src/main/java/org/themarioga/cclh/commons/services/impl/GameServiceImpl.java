@@ -31,16 +31,18 @@ public class GameServiceImpl implements GameService {
     private final GameDao gameDao;
     private final UserService userService;
     private final RoomService roomService;
+    private final CardService cardService;
     private final TableService tableService;
     private final PlayerService playerService;
     private final DictionaryService dictionaryService;
     private final ConfigurationService configurationService;
 
     @Autowired
-    public GameServiceImpl(GameDao gameDao, UserService userService, RoomService roomService, PlayerService playerService, TableService tableService, DictionaryService dictionaryService, ConfigurationService configurationService) {
+    public GameServiceImpl(GameDao gameDao, UserService userService, RoomService roomService, CardService cardService, PlayerService playerService, TableService tableService, DictionaryService dictionaryService, ConfigurationService configurationService) {
         this.gameDao = gameDao;
         this.userService = userService;
         this.roomService = roomService;
+        this.cardService = cardService;
         this.playerService = playerService;
         this.tableService = tableService;
         this.dictionaryService = dictionaryService;
@@ -291,7 +293,75 @@ public class GameServiceImpl implements GameService {
         // Check user exists
         Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
 
-        // ToDo: get the player
+        // Get the player
+        Player player = playerService.findByUserId(userId);
+
+        // Check player exists
+        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+
+        // ToDo: make this
+    }
+
+    @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    public void playCard(long roomId, long userId, long cardId) {
+        logger.debug("Player {} used the card {} of the game in room {}", userId, cardId, roomId);
+
+        // Get the game
+        Game game = gameDao.getByRoom(roomService.getById(roomId));
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Get the user
+        User user = userService.getById(userId);
+
+        // Check user exists
+        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+
+        // Get the player
+        Player player = playerService.findByUserId(userId);
+
+        // Check player exists
+        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+
+        // Get the card
+        Card card = cardService.findOne(cardId);
+
+        // Check user exists
+        Assert.assertNotNull(card, ErrorEnum.CARD_NOT_FOUND);
+
+        // ToDo: make this
+    }
+
+    @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    public void voteForCard(long roomId, long userId, long cardId) {
+        logger.debug("Player {} vote for the card {} of the game in room {}", userId, cardId, roomId);
+
+        // Get the game
+        Game game = gameDao.getByRoom(roomService.getById(roomId));
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Get the user
+        User user = userService.getById(userId);
+
+        // Check user exists
+        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+
+        // Get the player
+        Player player = playerService.findByUserId(userId);
+
+        // Check player exists
+        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+
+        // Get the carc
+        Card card = cardService.findOne(cardId);
+
+        // Check user exists
+        Assert.assertNotNull(card, ErrorEnum.CARD_NOT_FOUND);
 
         // ToDo: make this
     }

@@ -2,7 +2,6 @@ package org.themarioga.cclh.commons.dao;
 
 import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 

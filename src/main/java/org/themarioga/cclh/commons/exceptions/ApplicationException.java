@@ -4,7 +4,7 @@ import org.themarioga.cclh.commons.enums.ErrorEnum;
 
 public class ApplicationException extends RuntimeException {
 
-    private ErrorEnum error;
+    private final ErrorEnum error;
 
     public ApplicationException(ErrorEnum error) {
         this.error = error;

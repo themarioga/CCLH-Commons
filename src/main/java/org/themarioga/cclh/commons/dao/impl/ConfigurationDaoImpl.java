@@ -2,7 +2,6 @@ package org.themarioga.cclh.commons.dao.impl;
 
 import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.themarioga.cclh.commons.dao.intf.ConfigurationDao;
@@ -10,8 +9,12 @@ import org.themarioga.cclh.commons.dao.intf.ConfigurationDao;
 @Repository
 public class ConfigurationDaoImpl implements ConfigurationDao {
 
+    private final EntityManager entityManager;
+
     @Autowired
-    protected EntityManager entityManager;
+    public ConfigurationDaoImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     public String getConfiguration(String key) {

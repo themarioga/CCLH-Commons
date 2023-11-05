@@ -5,6 +5,10 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 
 public class Assert {
 
+    private Assert() {
+        // Nothing
+    }
+
     public static void assertNotNull(Object object, ErrorEnum error) {
         if (object == null) throw new ApplicationException(error);
     }

@@ -53,6 +53,8 @@ class GameDaoTest extends BaseTest {
         game.setDictionary(dictionary);
 
         gameDao.create(game);
+
+        Assertions.assertEquals(1L, game.getId());
     }
 
     @Test
@@ -65,6 +67,8 @@ class GameDaoTest extends BaseTest {
 
         gameDao.create(game);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(0L, game.getId());
     }
 
     @Test
@@ -139,6 +143,8 @@ class GameDaoTest extends BaseTest {
 
         gameDao.update(game);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(1, game.getDeck().size());
     }
 
     @Test
@@ -151,6 +157,8 @@ class GameDaoTest extends BaseTest {
 
         gameDao.update(game);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(1, game.getDeletionVotes().size());
     }
 
     @Test

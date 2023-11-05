@@ -29,7 +29,7 @@ public class Dictionary extends Base {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "dictionary_id", referencedColumnName = "id")
-    private List<DictionaryCollaborator> dictionaryCollaborators = new ArrayList<>(0);
+    private List<DictionaryCollaborator> collaborators = new ArrayList<>(0);
 
     public Long getId() {
         return id;
@@ -79,12 +79,12 @@ public class Dictionary extends Base {
         this.cards = cards;
     }
 
-    public List<DictionaryCollaborator> getDictionaryCollaborators() {
-        return dictionaryCollaborators;
+    public List<DictionaryCollaborator> getCollaborators() {
+        return collaborators;
     }
 
-    public void setDictionaryCollaborators(List<DictionaryCollaborator> dictionaryCollaborators) {
-        this.dictionaryCollaborators = dictionaryCollaborators;
+    public void setCollaborators(List<DictionaryCollaborator> dictionaryCollaborators) {
+        this.collaborators = dictionaryCollaborators;
     }
 
     @Override

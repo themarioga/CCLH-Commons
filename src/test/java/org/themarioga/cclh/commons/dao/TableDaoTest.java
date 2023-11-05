@@ -67,6 +67,8 @@ class TableDaoTest extends BaseTest {
 
         gameDao.create(game);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(game.getId(), table.getGameId());
     }
 
     @Test
@@ -87,6 +89,8 @@ class TableDaoTest extends BaseTest {
 
         gameDao.update(game);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(game.getId(), game.getTable().getGameId());
     }
 
     @Test
@@ -128,6 +132,8 @@ class TableDaoTest extends BaseTest {
 
         tableDao.update(table);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(1, table.getPlayedCards().size());
     }
 
     @Test
@@ -157,6 +163,8 @@ class TableDaoTest extends BaseTest {
 
         tableDao.update(table);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(1, table.getPlayerVotes().size());
     }
 
     @Test

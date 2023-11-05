@@ -28,6 +28,8 @@ class UserDaoTest extends BaseTest {
 
         userDao.create(user);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(2L, user.getId());
     }
 
     @Test
@@ -39,6 +41,8 @@ class UserDaoTest extends BaseTest {
 
         userDao.update(user);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(0L, user.getId());
     }
 
     @Test

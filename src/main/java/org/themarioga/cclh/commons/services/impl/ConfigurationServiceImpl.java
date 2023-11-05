@@ -14,8 +14,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     private final Logger logger = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
 
+    private final ConfigurationDao configurationDao;
+
     @Autowired
-    private ConfigurationDao configurationDao;
+    public ConfigurationServiceImpl(ConfigurationDao configurationDao) {
+        this.configurationDao = configurationDao;
+    }
 
     @Override
     @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)

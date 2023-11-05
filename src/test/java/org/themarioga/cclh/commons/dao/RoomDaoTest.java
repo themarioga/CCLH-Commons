@@ -36,6 +36,8 @@ class RoomDaoTest extends BaseTest {
 
         roomDao.create(room);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(2L, room.getId());
     }
 
     @Test
@@ -47,6 +49,8 @@ class RoomDaoTest extends BaseTest {
 
         roomDao.update(room);
         getCurrentSession().flush();
+
+        Assertions.assertEquals(0L, room.getId());
     }
 
     @Test
