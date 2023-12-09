@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @jakarta.persistence.Table(name = "t_player", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id"})})
@@ -86,6 +87,19 @@ public class Player extends Base {
 
     public void setHand(List<Card> hand) {
         this.hand = hand;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Player card = (Player) object;
+        return Objects.equals(id, card.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @jakarta.persistence.Table(name = "t_dictionary")
@@ -85,6 +86,19 @@ public class Dictionary extends Base {
 
     public void setCollaborators(List<DictionaryCollaborator> dictionaryCollaborators) {
         this.collaborators = dictionaryCollaborators;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Dictionary card = (Dictionary) object;
+        return Objects.equals(id, card.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

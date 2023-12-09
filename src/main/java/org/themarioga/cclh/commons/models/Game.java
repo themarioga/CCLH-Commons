@@ -6,6 +6,7 @@ import org.themarioga.cclh.commons.enums.GameTypeEnum;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @jakarta.persistence.Table(name = "t_game", uniqueConstraints = {@UniqueConstraint(columnNames = {"room_id"})})
@@ -142,6 +143,19 @@ public class Game extends Base {
 
     public void setDeletionVotes(List<Player> deletionVotes) {
         this.deletionVotes = deletionVotes;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Game card = (Game) object;
+        return Objects.equals(id, card.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

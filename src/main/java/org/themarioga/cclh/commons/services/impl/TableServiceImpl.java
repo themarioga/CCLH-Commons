@@ -9,10 +9,7 @@ import org.themarioga.cclh.commons.dao.intf.TableDao;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
-import org.themarioga.cclh.commons.models.Card;
-import org.themarioga.cclh.commons.models.Game;
-import org.themarioga.cclh.commons.models.PlayedCard;
-import org.themarioga.cclh.commons.models.Table;
+import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.services.intf.PlayerService;
 import org.themarioga.cclh.commons.services.intf.TableService;
 import org.themarioga.cclh.commons.util.Assert;
@@ -94,6 +91,40 @@ public class TableServiceImpl implements TableService {
         table.getPlayerVotes().clear();
         table.getPlayedCards().clear();
         table.setCurrentBlackCard(null);
+
+        return tableDao.update(table);
+    }
+
+    @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    public Table playCard(Game game, Player player, Card card) {
+        logger.debug("Player {} playing card {} for the game {}", player, card, game);
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check table exists
+        Table table = game.getTable();
+        Assert.assertNotNull(table, ErrorEnum.GAME_NOT_FOUND);
+
+        // ToDo: play card
+
+        return tableDao.update(table);
+    }
+
+    @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    public Table voteCard(Game game, Player player, Card card) {
+        logger.debug("Player {} voting card {} for the game {}", player, card, game);
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check table exists
+        Table table = game.getTable();
+        Assert.assertNotNull(table, ErrorEnum.GAME_NOT_FOUND);
+
+        // ToDo: play card
 
         return tableDao.update(table);
     }

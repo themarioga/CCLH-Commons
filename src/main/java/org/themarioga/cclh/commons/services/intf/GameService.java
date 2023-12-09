@@ -10,7 +10,7 @@ public interface GameService {
 
     Game create(long roomId, String roomName, long roomOwnerId, long creatorId);
 
-    void delete(long roomId);
+    Game delete(long roomId);
 
     Game setType(long roomId, GameTypeEnum type);
 
@@ -21,6 +21,9 @@ public interface GameService {
     Game setDictionary(long roomId, long dictionaryId);
 
     Game addPlayer(long roomId, long userId);
+
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    Game leaveGame(long roomId, long userId);
 
     Game startGame(long roomId);
 

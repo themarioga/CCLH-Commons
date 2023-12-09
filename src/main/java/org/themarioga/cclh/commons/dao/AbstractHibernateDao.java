@@ -42,7 +42,6 @@ public abstract class AbstractHibernateDao<T extends Serializable> implements In
 
     @Override
     public void deleteById(final long entityId) {
-        Assert.notNull(entityId, "No puede ser null");
         final T entity = findOne(entityId);
         delete(entity);
     }

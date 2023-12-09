@@ -15,6 +15,7 @@ import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryDoesntExistsE
 import org.themarioga.cclh.commons.exceptions.game.*;
 import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyExistsException;
 import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyVotedDeleteException;
+import org.themarioga.cclh.commons.exceptions.player.PlayerDoesntExistsException;
 import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.services.intf.*;
 import org.themarioga.cclh.commons.util.Assert;
@@ -73,7 +74,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public void delete(long roomId) {
+    public Game delete(long roomId) {
         logger.debug("Deleting game in room: {}", roomId);
 
         Game game = gameDao.getByRoom(roomService.getById(roomId));
@@ -81,6 +82,10 @@ public class GameServiceImpl implements GameService {
         if (game == null) throw new GameDoesntExistsException(roomId);
 
         gameDao.delete(game);
+
+        game.setStatus(GameStatusEnum.DELETED);
+
+        return game;
     }
 
     @Override
@@ -205,6 +210,36 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    public Game leaveGame(long roomId, long userId) {
+        logger.debug("Removing player from user {} in game in room {}", userId, roomId);
+
+        // Get the game
+        Game game = gameDao.getByRoom(roomService.getById(roomId));
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check the status of the game
+        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException(game.getId());
+
+        // Game creator cannor leave
+        if (game.getCreator().getId() == userId) throw new GameCreatorCannotLeaveException(game.getId());
+
+        // Get the player
+        Player player = playerService.findByUserId(userId);
+
+        // Check if the user is not playing
+        if (player == null)
+            throw new PlayerDoesntExistsException(userId);
+
+        // Remove a player
+        game.getPlayers().remove(player);
+
+        return gameDao.update(game);
+    }
+
+    @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
     public Game startGame(long roomId) {
         logger.debug("Starting game in room {}", roomId);
 
@@ -288,11 +323,9 @@ public class GameServiceImpl implements GameService {
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
-        // Get the user
-        User user = userService.getById(userId);
-
-        // Check user exists
-        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+        // Check if game is started
+        if (game.getStatus() != GameStatusEnum.STARTED)
+            throw new GameNotStartedException(roomId);
 
         // Get the player
         Player player = playerService.findByUserId(userId);
@@ -307,7 +340,12 @@ public class GameServiceImpl implements GameService {
         // Add deletion votes
         game.getDeletionVotes().add(player);
 
-        return gameDao.update(game);
+        // If more than half of the game players vote to delete the game...
+        if (game.getStatus().equals(GameStatusEnum.STARTED) && game.getDeletionVotes().size() >= ((game.getPlayers().size() / 2) + 1)) {
+            return delete(roomId);
+        } else {
+            return gameDao.update(game);
+        }
     }
 
     @Override
@@ -321,11 +359,9 @@ public class GameServiceImpl implements GameService {
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
-        // Get the user
-        User user = userService.getById(userId);
-
-        // Check user exists
-        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+        // Check if game is started
+        if (game.getStatus() != GameStatusEnum.STARTED)
+            throw new GameNotStartedException(roomId);
 
         // Get the player
         Player player = playerService.findByUserId(userId);
@@ -339,9 +375,10 @@ public class GameServiceImpl implements GameService {
         // Check user exists
         Assert.assertNotNull(card, ErrorEnum.CARD_NOT_FOUND);
 
-        // ToDo: make this
+        // Let the table finish the job
+        tableService.playCard(game, player, card);
 
-        return null;
+        return gameDao.update(game);
     }
 
     @Override
@@ -355,11 +392,9 @@ public class GameServiceImpl implements GameService {
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
-        // Get the user
-        User user = userService.getById(userId);
-
-        // Check user exists
-        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+        // Check if game is started
+        if (game.getStatus() != GameStatusEnum.STARTED)
+            throw new GameNotStartedException(roomId);
 
         // Get the player
         Player player = playerService.findByUserId(userId);
@@ -373,9 +408,10 @@ public class GameServiceImpl implements GameService {
         // Check user exists
         Assert.assertNotNull(card, ErrorEnum.CARD_NOT_FOUND);
 
-        // ToDo: make this
+        // Let the table finish the job
+        tableService.voteCard(game, player, card);
 
-        return null;
+        return gameDao.update(game);
     }
 
     @Override

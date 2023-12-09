@@ -1,8 +1,8 @@
 package org.themarioga.cclh.commons.services.intf;
 
-import org.themarioga.cclh.commons.models.Game;
-import org.themarioga.cclh.commons.models.PlayedCard;
-import org.themarioga.cclh.commons.models.Table;
+import jakarta.transaction.Transactional;
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
+import org.themarioga.cclh.commons.models.*;
 
 public interface TableService {
 
@@ -11,6 +11,10 @@ public interface TableService {
     Table startRound(Game game);
 
     Table endRound(Game game);
+
+    Table playCard(Game game, Player player, Card card);
+
+    Table voteCard(Game game, Player player, Card card);
 
     PlayedCard getMostVotedCard(Long gameId);
 

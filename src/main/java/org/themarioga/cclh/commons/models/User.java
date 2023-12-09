@@ -2,6 +2,8 @@ package org.themarioga.cclh.commons.models;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @jakarta.persistence.Table(name = "t_user")
 public class User extends Base {
@@ -35,6 +37,19 @@ public class User extends Base {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        User card = (User) object;
+        return Objects.equals(id, card.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

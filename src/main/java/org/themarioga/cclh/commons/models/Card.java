@@ -3,6 +3,8 @@ package org.themarioga.cclh.commons.models;
 import jakarta.persistence.*;
 import org.themarioga.cclh.commons.enums.CardTypeEnum;
 
+import java.util.Objects;
+
 @Entity
 @jakarta.persistence.Table(name = "t_card")
 public class Card extends Base {
@@ -49,6 +51,19 @@ public class Card extends Base {
 
     public void setDictionary(Dictionary dictionary) {
         this.dictionary = dictionary;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Card card = (Card) object;
+        return Objects.equals(id, card.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

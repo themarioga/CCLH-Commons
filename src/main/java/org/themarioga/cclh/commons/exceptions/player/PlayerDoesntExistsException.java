@@ -5,8 +5,16 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 
 public class PlayerDoesntExistsException extends ApplicationException {
 
-    public PlayerDoesntExistsException() {
+    private final Long userId;
+
+    public PlayerDoesntExistsException(long userId) {
         super(ErrorEnum.PLAYER_NOT_FOUND);
+
+        this.userId = userId;
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 
 }

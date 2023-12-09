@@ -13,6 +13,8 @@ import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.game.*;
 import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyExistsException;
+import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyVotedDeleteException;
+import org.themarioga.cclh.commons.exceptions.player.PlayerDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.room.RoomDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.user.UserNotActiveException;
 import org.themarioga.cclh.commons.models.Game;
@@ -164,6 +166,28 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
+    void testLeaveGame() {
+        Game game = gameService.leaveGame(0L, 1L);
+
+        Assertions.assertEquals(2L, game.getPlayers().size());
+    }
+
+    @Test
+    void testLeaveGame_GameAlreadyStarted() {
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.leaveGame(3L, 0L));
+    }
+
+    @Test
+    void testLeaveGame_CreatorLeave() {
+        Assertions.assertThrows(GameCreatorCannotLeaveException.class, () -> gameService.leaveGame(0L, 0L));
+    }
+
+    @Test
+    void testLeaveGame_PlayerNotInGame() {
+        Assertions.assertThrows(PlayerDoesntExistsException.class, () -> gameService.leaveGame(0L, 5L));
+    }
+
+    @Test
     void testStartGame_Democracy() {
         Game game = gameService.startGame(0L);
 
@@ -245,8 +269,64 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    void testVoteDeletion() {
-        // ToDo: create test
+    void testVoteDeletion_vote() {
+        gameService.startGame(0L);
+        Game game = gameService.voteForDeletion(0L, 0L);
+
+        Assertions.assertNotNull(game);
+        Assertions.assertNotNull(game.getDeletionVotes().get(0));
+        Assertions.assertEquals(10L, game.getDeletionVotes().get(0).getId());
+    }
+
+    @Test
+    void testVoteDeletion_delete() {
+        gameService.startGame(0L);
+        gameService.voteForDeletion(0L, 1L);
+        Game game = gameService.voteForDeletion(0L, 0L);
+
+        Assertions.assertNotNull(game);
+        Assertions.assertNotNull(game.getDeletionVotes().get(0));
+        Assertions.assertEquals(11L, game.getDeletionVotes().get(0).getId());
+        Assertions.assertEquals(GameStatusEnum.DELETED, game.getStatus());
+    }
+
+    @Test
+    void testLeaveGame_GameNotStarted() {
+        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.voteForDeletion(0L, 0L));
+    }
+
+    @Test
+    void testVoteDeletion_PlayerAlreadyVoted() {
+        gameService.startGame(0L);
+        gameService.voteForDeletion(0L, 1L);
+
+        Assertions.assertThrows(PlayerAlreadyVotedDeleteException.class, () -> gameService.voteForDeletion(0L, 1L));
+    }
+
+    @Test
+    void testPlayCard() {
+        gameService.startGame(0L);
+        Game game = gameService.playCard(0L, 0L, 0L);
+
+        Assertions.assertEquals(1, game.getTable().getPlayedCards().size());
+    }
+
+    @Test
+    void testPlayCard_GameNotStarted() {
+        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.playCard(0L, 0L, 0L));
+    }
+
+    @Test
+    void testVoteCard() {
+        gameService.startGame(0L);
+        Game game = gameService.voteForCard(0L, 0L, 0L);
+
+        Assertions.assertEquals(1, game.getTable().getPlayerVotes().size());
+    }
+
+    @Test
+    void testVoteCard_GameNotStarted() {
+        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.voteForCard(0L, 0L, 0L));
     }
 
 }
