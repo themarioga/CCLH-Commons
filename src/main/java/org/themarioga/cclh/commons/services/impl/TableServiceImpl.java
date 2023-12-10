@@ -19,8 +19,6 @@ import org.themarioga.cclh.commons.services.intf.PlayerService;
 import org.themarioga.cclh.commons.services.intf.TableService;
 import org.themarioga.cclh.commons.util.Assert;
 
-import java.util.function.Predicate;
-
 @Service
 public class TableServiceImpl implements TableService {
 
@@ -122,6 +120,9 @@ public class TableServiceImpl implements TableService {
         if (table.getPlayedCards().stream().anyMatch(playedCard -> playedCard.getCard().getId().equals(card.getId())))
             throw new CardAlreadyPlayedException();
 
+        // Remove the card from the player hand
+        playerService.removeCardFromHand(player, card);
+
         // Set the played card
         PlayedCard playedCard = new PlayedCard();
         playedCard.setGameId(game.getId());
@@ -147,10 +148,6 @@ public class TableServiceImpl implements TableService {
         // Check if the player already voted
         if (table.getPlayerVotes().stream().anyMatch(votedCard -> votedCard.getPlayer().getId().equals(player.getId())))
             throw new PlayerAlreadyVotedCardException();
-
-        // Check if the card was already voted
-        if (table.getPlayerVotes().stream().anyMatch(votedCard -> votedCard.getCard().getId().equals(card.getId())))
-            throw new CardAlreadyVotedException();
 
         // Check if the player can vote
         if ((game.getType().equals(GameTypeEnum.DICTATORSHIP) || game.getType().equals(GameTypeEnum.CLASSIC)) && !player.equals(table.getCurrentPresident()))

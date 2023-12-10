@@ -32,11 +32,12 @@ public enum ErrorEnum {
     DICTIONARY_ALREADY_FILLED(29L, "Diccionario ya completado"),
     PLAYER_NOT_FOUND(30L, "Jugador no encontrado"),
     PLAYER_ALREADY_EXISTS(31L, "Jugador ya existente"),
-    PLAYER_ALREADY_VOTED_DELETION(32L, "El jugador ya ha votado"),
-    PLAYER_ALREADY_PLAYED_CARD(33L, "El jugador ya ha jugado"),
-    PLAYER_ALREADY_VOTED_CARD(34L, "El jugador ya ha votado"),
-    PLAYER_CANNOT_VOTE_CARD(35L, "El jugador no puede votar"),
-    PLAYER_CANNOT_VOTE_DELETION(36L, "El jugador no puede votar");
+    PLAYER_ALREADY_PLAYED_CARD(32L, "El jugador ya ha jugado"),
+    PLAYER_ALREADY_VOTED_CARD(33L, "El jugador ya ha votado"),
+    PLAYER_ALREADY_VOTED_DELETION(34L, "El jugador ya ha votado"),
+    PLAYER_CANNOT_PLAY_CARD(35L, "El jugador no puede jugar esa carta"),
+    PLAYER_CANNOT_VOTE_CARD(36L, "El jugador no puede votar"),
+    PLAYER_CANNOT_VOTE_DELETION(37L, "El jugador no puede votar");
 
     final Long errorCode;
     final String errorDesc;

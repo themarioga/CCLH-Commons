@@ -354,14 +354,6 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    void testVoteCard_CardAlreadyVoted() {
-        gameService.startGame(0L);
-        gameService.voteForCard(0L, 0L, 0L);
-
-        Assertions.assertThrows(CardAlreadyVotedException.class, () -> gameService.voteForCard(0L, 1L, 0L));
-    }
-
-    @Test
     void testVoteCard_PlayerCannotVote() {
         gameService.setType(0L, GameTypeEnum.DICTATORSHIP);
         gameService.startGame(0L);

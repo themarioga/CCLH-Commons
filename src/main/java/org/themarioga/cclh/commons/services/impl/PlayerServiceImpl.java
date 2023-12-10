@@ -8,7 +8,11 @@ import org.springframework.stereotype.Service;
 import org.themarioga.cclh.commons.dao.intf.PlayerDao;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
-import org.themarioga.cclh.commons.models.*;
+import org.themarioga.cclh.commons.exceptions.player.PlayerCannotPlayCardException;
+import org.themarioga.cclh.commons.models.Card;
+import org.themarioga.cclh.commons.models.Game;
+import org.themarioga.cclh.commons.models.Player;
+import org.themarioga.cclh.commons.models.User;
 import org.themarioga.cclh.commons.services.intf.ConfigurationService;
 import org.themarioga.cclh.commons.services.intf.PlayerService;
 import org.themarioga.cclh.commons.services.intf.UserService;
@@ -77,6 +81,17 @@ public class PlayerServiceImpl implements PlayerService {
             player.getDeck().removeAll(cardsToTransfer);
             playerDao.update(player);
         }
+    }
+
+    @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    public void removeCardFromHand(Player player, Card card) {
+        logger.debug("Removing card {} from the hand of the player {}", card, player);
+
+        if (!player.getHand().contains(card)) throw new PlayerCannotPlayCardException();
+
+        player.getHand().remove(card);
+        playerDao.update(player);
     }
 
     @Override
