@@ -10,11 +10,11 @@ import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.dao.intf.GameDao;
 import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
+import org.themarioga.cclh.commons.exceptions.card.CardAlreadyPlayedException;
+import org.themarioga.cclh.commons.exceptions.card.CardAlreadyVotedException;
 import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.game.*;
-import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyExistsException;
-import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyVotedDeleteException;
-import org.themarioga.cclh.commons.exceptions.player.PlayerDoesntExistsException;
+import org.themarioga.cclh.commons.exceptions.player.*;
 import org.themarioga.cclh.commons.exceptions.room.RoomDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.user.UserNotActiveException;
 import org.themarioga.cclh.commons.models.Game;
@@ -317,6 +317,22 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
+    void testPlayCard_PlayerAlreadyPlayed() {
+        gameService.startGame(0L);
+        gameService.playCard(0L, 0L, 0L);
+
+        Assertions.assertThrows(PlayerAlreadyPlayedCardException.class, () -> gameService.playCard(0L, 0L, 0L));
+    }
+
+    @Test
+    void testPlayCard_CardAlreadyPlayed() {
+        gameService.startGame(0L);
+        gameService.playCard(0L, 0L, 0L);
+
+        Assertions.assertThrows(CardAlreadyPlayedException.class, () -> gameService.playCard(0L, 1L, 0L));
+    }
+
+    @Test
     void testVoteCard() {
         gameService.startGame(0L);
         Game game = gameService.voteForCard(0L, 0L, 0L);
@@ -327,6 +343,30 @@ class GameServiceTest extends BaseTest {
     @Test
     void testVoteCard_GameNotStarted() {
         Assertions.assertThrows(GameNotStartedException.class, () -> gameService.voteForCard(0L, 0L, 0L));
+    }
+
+    @Test
+    void testVoteCard_PlayerAlreadyVoted() {
+        gameService.startGame(0L);
+        gameService.voteForCard(0L, 0L, 0L);
+
+        Assertions.assertThrows(PlayerAlreadyVotedCardException.class, () -> gameService.voteForCard(0L, 0L, 0L));
+    }
+
+    @Test
+    void testVoteCard_CardAlreadyVoted() {
+        gameService.startGame(0L);
+        gameService.voteForCard(0L, 0L, 0L);
+
+        Assertions.assertThrows(CardAlreadyVotedException.class, () -> gameService.voteForCard(0L, 1L, 0L));
+    }
+
+    @Test
+    void testVoteCard_PlayerCannotVote() {
+        gameService.setType(0L, GameTypeEnum.DICTATORSHIP);
+        gameService.startGame(0L);
+
+        Assertions.assertThrows(PlayerCannotVoteCardException.class, () -> gameService.voteForCard(0L, 1L, 0L));
     }
 
 }

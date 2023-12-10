@@ -23,15 +23,20 @@ public enum ErrorEnum {
     GAME_CREATOR_CANNOT_LEAVE(20L, "El creador no puede dejar el juego"),
     CARD_NOT_FOUND(21L, "Carta no encontrada"),
     CARD_ALREADY_EXISTS(22L, "Carta ya existente"),
-    CARD_ALREADY_USED(23L, "Carta ya usada"),
-    CARD_TEXT_TOO_LONG(24L, "Texto de la carta demasiado largo"),
-    DICTIONARY_NOT_FOUND(25L, "Diccionario no encontrado"),
-    DICTIONARY_NOT_FILLED(26L, "Diccionario no completado"),
-    DICTIONARY_ALREADY_EXISTS(27L, "Diccionario ya existe"),
-    DICTIONARY_ALREADY_FILLED(28L, "Diccionario ya completado"),
-    PLAYER_NOT_FOUND(29L, "Jugador no encontrado"),
-    PLAYER_ALREADY_EXISTS(30L, "Jugador ya existente"),
-    PLAYER_ALREADY_VOTED(31L, "El jugador ya ha votado");
+    CARD_TEXT_TOO_LONG(23L, "Texto de la carta demasiado largo"),
+    CARD_ALREADY_PLAYED(24L, "Carta ya jugada"),
+    CARD_ALREADY_VOTED(25L, "Carta ya votada"),
+    DICTIONARY_NOT_FOUND(26L, "Diccionario no encontrado"),
+    DICTIONARY_NOT_FILLED(27L, "Diccionario no completado"),
+    DICTIONARY_ALREADY_EXISTS(28L, "Diccionario ya existe"),
+    DICTIONARY_ALREADY_FILLED(29L, "Diccionario ya completado"),
+    PLAYER_NOT_FOUND(30L, "Jugador no encontrado"),
+    PLAYER_ALREADY_EXISTS(31L, "Jugador ya existente"),
+    PLAYER_ALREADY_VOTED_DELETION(32L, "El jugador ya ha votado"),
+    PLAYER_ALREADY_PLAYED_CARD(33L, "El jugador ya ha jugado"),
+    PLAYER_ALREADY_VOTED_CARD(34L, "El jugador ya ha votado"),
+    PLAYER_CANNOT_VOTE_CARD(35L, "El jugador no puede votar"),
+    PLAYER_CANNOT_VOTE_DELETION(36L, "El jugador no puede votar");
 
     final Long errorCode;
     final String errorDesc;

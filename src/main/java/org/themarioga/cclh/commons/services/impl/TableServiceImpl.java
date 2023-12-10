@@ -9,10 +9,17 @@ import org.themarioga.cclh.commons.dao.intf.TableDao;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
+import org.themarioga.cclh.commons.exceptions.card.CardAlreadyPlayedException;
+import org.themarioga.cclh.commons.exceptions.card.CardAlreadyVotedException;
+import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyPlayedCardException;
+import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyVotedCardException;
+import org.themarioga.cclh.commons.exceptions.player.PlayerCannotVoteCardException;
 import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.services.intf.PlayerService;
 import org.themarioga.cclh.commons.services.intf.TableService;
 import org.themarioga.cclh.commons.util.Assert;
+
+import java.util.function.Predicate;
 
 @Service
 public class TableServiceImpl implements TableService {
@@ -107,7 +114,20 @@ public class TableServiceImpl implements TableService {
         Table table = game.getTable();
         Assert.assertNotNull(table, ErrorEnum.GAME_NOT_FOUND);
 
-        // ToDo: play card
+        // Check if the player already played
+        if (table.getPlayedCards().stream().anyMatch(playedCard -> playedCard.getPlayer().getId().equals(player.getId())))
+            throw new PlayerAlreadyPlayedCardException();
+
+        // Check if the card was already played
+        if (table.getPlayedCards().stream().anyMatch(playedCard -> playedCard.getCard().getId().equals(card.getId())))
+            throw new CardAlreadyPlayedException();
+
+        // Set the played card
+        PlayedCard playedCard = new PlayedCard();
+        playedCard.setGameId(game.getId());
+        playedCard.setPlayer(player);
+        playedCard.setCard(card);
+        table.getPlayedCards().add(playedCard);
 
         return tableDao.update(table);
     }
@@ -124,7 +144,24 @@ public class TableServiceImpl implements TableService {
         Table table = game.getTable();
         Assert.assertNotNull(table, ErrorEnum.GAME_NOT_FOUND);
 
-        // ToDo: play card
+        // Check if the player already voted
+        if (table.getPlayerVotes().stream().anyMatch(votedCard -> votedCard.getPlayer().getId().equals(player.getId())))
+            throw new PlayerAlreadyVotedCardException();
+
+        // Check if the card was already voted
+        if (table.getPlayerVotes().stream().anyMatch(votedCard -> votedCard.getCard().getId().equals(card.getId())))
+            throw new CardAlreadyVotedException();
+
+        // Check if the player can vote
+        if ((game.getType().equals(GameTypeEnum.DICTATORSHIP) || game.getType().equals(GameTypeEnum.CLASSIC)) && !player.equals(table.getCurrentPresident()))
+            throw new PlayerCannotVoteCardException();
+
+        // Set the player vote
+        PlayerVote playerVote = new PlayerVote();
+        playerVote.setGameId(game.getId());
+        playerVote.setPlayer(player);
+        playerVote.setCard(card);
+        table.getPlayerVotes().add(playerVote);
 
         return tableDao.update(table);
     }

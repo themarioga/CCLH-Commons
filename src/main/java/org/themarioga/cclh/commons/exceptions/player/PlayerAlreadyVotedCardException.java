@@ -3,10 +3,10 @@ package org.themarioga.cclh.commons.exceptions.player;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
 
-public class PlayerAlreadyVotedDeleteException extends ApplicationException {
+public class PlayerAlreadyVotedCardException extends ApplicationException {
 
-    public PlayerAlreadyVotedDeleteException() {
-        super(ErrorEnum.PLAYER_ALREADY_VOTED_DELETION);
+    public PlayerAlreadyVotedCardException() {
+        super(ErrorEnum.PLAYER_ALREADY_VOTED_CARD);
     }
 
 }

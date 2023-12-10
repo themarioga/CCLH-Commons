@@ -22,7 +22,6 @@ public interface GameService {
 
     Game addPlayer(long roomId, long userId);
 
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
     Game leaveGame(long roomId, long userId);
 
     Game startGame(long roomId);
