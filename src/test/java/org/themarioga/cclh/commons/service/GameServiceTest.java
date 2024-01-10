@@ -10,14 +10,15 @@ import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.dao.intf.GameDao;
 import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
-import org.themarioga.cclh.commons.exceptions.card.CardAlreadyPlayedException;
-import org.themarioga.cclh.commons.exceptions.card.CardAlreadyVotedException;
+import org.themarioga.cclh.commons.enums.TableStatusEnum;
 import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.game.*;
 import org.themarioga.cclh.commons.exceptions.player.*;
 import org.themarioga.cclh.commons.exceptions.room.RoomDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.user.UserNotActiveException;
+import org.themarioga.cclh.commons.models.Card;
 import org.themarioga.cclh.commons.models.Game;
+import org.themarioga.cclh.commons.models.Player;
 import org.themarioga.cclh.commons.services.intf.DictionaryService;
 import org.themarioga.cclh.commons.services.intf.GameService;
 import org.themarioga.cclh.commons.services.intf.UserService;
@@ -261,6 +262,8 @@ class GameServiceTest extends BaseTest {
         Assertions.assertEquals(1, game.getTable().getCurrentRoundNumber());
         Assertions.assertNotNull(game.getTable().getCurrentBlackCard());
 
+        game.getTable().setStatus(TableStatusEnum.ENDING);
+        gameDao.update(game);
         gameService.endRound(0L);
 
         Assertions.assertNull(game.getTable().getCurrentBlackCard());
@@ -306,7 +309,10 @@ class GameServiceTest extends BaseTest {
     @Test
     void testPlayCard() {
         gameService.startGame(0L);
-        Game game = gameService.playCard(0L, 0L, 0L);
+        Game game = gameService.startRound(0L);
+        getCurrentSession().flush();
+        Player player = game.getPlayers().get(0);
+        game = gameService.playCard(game.getRoom().getId(), player.getUser().getId(), player.getHand().get(0).getId());
 
         Assertions.assertEquals(1, game.getTable().getPlayedCards().size());
     }
@@ -319,23 +325,33 @@ class GameServiceTest extends BaseTest {
     @Test
     void testPlayCard_PlayerAlreadyPlayed() {
         gameService.startGame(0L);
-        gameService.playCard(0L, 0L, 0L);
+        Game game = gameService.startRound(0L);
+        Player player = game.getPlayers().get(0);
+        gameService.playCard(game.getRoom().getId(), player.getUser().getId(), player.getHand().get(0).getId());
 
-        Assertions.assertThrows(PlayerAlreadyPlayedCardException.class, () -> gameService.playCard(0L, 0L, 0L));
+        Assertions.assertThrows(PlayerAlreadyPlayedCardException.class, () -> gameService.playCard(game.getRoom().getId(), player.getUser().getId(), player.getHand().get(0).getId()));
     }
 
     @Test
-    void testPlayCard_CardAlreadyPlayed() {
+    void testPlayCard_PlayerCannotPlayCardException() {
         gameService.startGame(0L);
-        gameService.playCard(0L, 0L, 0L);
+        Game game = gameService.startRound(0L);
+        Player player = game.getPlayers().get(0);
+        gameService.playCard(game.getRoom().getId(), player.getUser().getId(), player.getHand().get(0).getId());
 
-        Assertions.assertThrows(CardAlreadyPlayedException.class, () -> gameService.playCard(0L, 1L, 0L));
+        Assertions.assertThrows(PlayerCannotPlayCardException.class, () -> gameService.playCard(game.getRoom().getId(), 1L, player.getHand().get(0).getId()));
     }
 
     @Test
     void testVoteCard() {
         gameService.startGame(0L);
-        Game game = gameService.voteForCard(0L, 0L, 0L);
+        Game game = gameService.startRound(0L);
+        Player player = game.getPlayers().get(0);
+        Card card = player.getHand().get(0);
+        gameService.playCard(game.getRoom().getId(), player.getUser().getId(), card.getId());
+        game.getTable().setStatus(TableStatusEnum.VOTING);
+        gameDao.update(game);
+        game = gameService.voteForCard(game.getRoom().getId(), player.getUser().getId(), card.getId());
 
         Assertions.assertEquals(1, game.getTable().getPlayerVotes().size());
     }
@@ -348,15 +364,23 @@ class GameServiceTest extends BaseTest {
     @Test
     void testVoteCard_PlayerAlreadyVoted() {
         gameService.startGame(0L);
-        gameService.voteForCard(0L, 0L, 0L);
+        Game game = gameService.startRound(0L);
+        Player player = game.getPlayers().get(0);
+        Card card = player.getHand().get(0);
+        gameService.playCard(game.getRoom().getId(), player.getUser().getId(), card.getId());
+        game.getTable().setStatus(TableStatusEnum.VOTING);
+        gameDao.update(game);
+        gameService.voteForCard(game.getRoom().getId(), player.getUser().getId(), card.getId());
 
-        Assertions.assertThrows(PlayerAlreadyVotedCardException.class, () -> gameService.voteForCard(0L, 0L, 0L));
+        Assertions.assertThrows(PlayerAlreadyVotedCardException.class, () -> gameService.voteForCard(game.getRoom().getId(), player.getUser().getId(), card.getId()));
     }
 
     @Test
     void testVoteCard_PlayerCannotVote() {
         gameService.setType(0L, GameTypeEnum.DICTATORSHIP);
-        gameService.startGame(0L);
+        Game game = gameService.startGame(0L);
+        game.getTable().setStatus(TableStatusEnum.VOTING);
+        gameDao.update(game);
 
         Assertions.assertThrows(PlayerCannotVoteCardException.class, () -> gameService.voteForCard(0L, 1L, 0L));
     }

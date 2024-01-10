@@ -37,7 +37,8 @@ public enum ErrorEnum {
     PLAYER_ALREADY_VOTED_DELETION(34L, "El jugador ya ha votado"),
     PLAYER_CANNOT_PLAY_CARD(35L, "El jugador no puede jugar esa carta"),
     PLAYER_CANNOT_VOTE_CARD(36L, "El jugador no puede votar"),
-    PLAYER_CANNOT_VOTE_DELETION(37L, "El jugador no puede votar");
+    PLAYER_CANNOT_VOTE_DELETION(37L, "El jugador no puede votar"),
+    TABLE_WRONG_STATUS(38L, "Mesa en estado incorrecto");
 
     final Long errorCode;
     final String errorDesc;

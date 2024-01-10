@@ -350,7 +350,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game   playCard(long roomId, long userId, long cardId) {
+    public Game playCard(long roomId, long userId, long cardId) {
         logger.debug("Player {} used the card {} of the game in room {}", userId, cardId, roomId);
 
         // Get the game

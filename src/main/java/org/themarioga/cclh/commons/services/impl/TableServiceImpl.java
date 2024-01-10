@@ -8,12 +8,14 @@ import org.springframework.stereotype.Service;
 import org.themarioga.cclh.commons.dao.intf.TableDao;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
+import org.themarioga.cclh.commons.enums.TableStatusEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.exceptions.card.CardAlreadyPlayedException;
-import org.themarioga.cclh.commons.exceptions.card.CardAlreadyVotedException;
+import org.themarioga.cclh.commons.exceptions.card.CardNotPlayedException;
 import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyPlayedCardException;
 import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyVotedCardException;
 import org.themarioga.cclh.commons.exceptions.player.PlayerCannotVoteCardException;
+import org.themarioga.cclh.commons.exceptions.table.TableWrongStatusException;
 import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.services.intf.PlayerService;
 import org.themarioga.cclh.commons.services.intf.TableService;
@@ -44,6 +46,7 @@ public class TableServiceImpl implements TableService {
         // Create table
         Table table = new Table();
         table.setGameId(game.getId());
+        table.setStatus(TableStatusEnum.STARTING);
         table.setCurrentRoundNumber(0);
 
         // Set dictator if needed
@@ -65,6 +68,13 @@ public class TableServiceImpl implements TableService {
         // Check table exists
         Table table = game.getTable();
         Assert.assertNotNull(table, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check if the table is ready to start
+        if (table.getStatus() != TableStatusEnum.STARTING)
+            throw new TableWrongStatusException(game.getId());
+
+        // Set the table mode to play
+        table.setStatus(TableStatusEnum.PLAYING);
 
         // Increment round number
         table.setCurrentRoundNumber(table.getCurrentRoundNumber() + 1);
@@ -92,6 +102,13 @@ public class TableServiceImpl implements TableService {
         Table table = game.getTable();
         Assert.assertNotNull(table, ErrorEnum.GAME_NOT_FOUND);
 
+        // Check if the table is ready to start
+        if (table.getStatus() != TableStatusEnum.ENDING)
+            throw new TableWrongStatusException(game.getId());
+
+        // Set the table mode to play
+        table.setStatus(TableStatusEnum.STARTING);
+
         // Empty table
         table.getPlayerVotes().clear();
         table.getPlayedCards().clear();
@@ -112,6 +129,10 @@ public class TableServiceImpl implements TableService {
         Table table = game.getTable();
         Assert.assertNotNull(table, ErrorEnum.GAME_NOT_FOUND);
 
+        // Check if the table is ready to start
+        if (table.getStatus() != TableStatusEnum.PLAYING)
+            throw new TableWrongStatusException(game.getId());
+
         // Check if the player already played
         if (table.getPlayedCards().stream().anyMatch(playedCard -> playedCard.getPlayer().getId().equals(player.getId())))
             throw new PlayerAlreadyPlayedCardException();
@@ -130,6 +151,11 @@ public class TableServiceImpl implements TableService {
         playedCard.setCard(card);
         table.getPlayedCards().add(playedCard);
 
+        // Check we need to proceed to voting
+        if (checkIfEveryoneHavePlayedACard(game, table)) {
+            table.setStatus(TableStatusEnum.VOTING);
+        }
+
         return tableDao.update(table);
     }
 
@@ -145,13 +171,21 @@ public class TableServiceImpl implements TableService {
         Table table = game.getTable();
         Assert.assertNotNull(table, ErrorEnum.GAME_NOT_FOUND);
 
-        // Check if the player already voted
-        if (table.getPlayerVotes().stream().anyMatch(votedCard -> votedCard.getPlayer().getId().equals(player.getId())))
-            throw new PlayerAlreadyVotedCardException();
+        // Check if the table is ready to start
+        if (table.getStatus() != TableStatusEnum.VOTING)
+            throw new TableWrongStatusException(game.getId());
 
         // Check if the player can vote
         if ((game.getType().equals(GameTypeEnum.DICTATORSHIP) || game.getType().equals(GameTypeEnum.CLASSIC)) && !player.equals(table.getCurrentPresident()))
             throw new PlayerCannotVoteCardException();
+
+        // Check if the player already voted
+        if (table.getPlayerVotes().stream().anyMatch(votedCard -> votedCard.getPlayer().getId().equals(player.getId())))
+            throw new PlayerAlreadyVotedCardException();
+
+        // Check if the card have been played this round
+        if (table.getPlayedCards().stream().noneMatch(playedCard -> playedCard.getCard().getId().equals(card.getId())))
+            throw new CardNotPlayedException();
 
         // Set the player vote
         PlayerVote playerVote = new PlayerVote();
@@ -159,6 +193,11 @@ public class TableServiceImpl implements TableService {
         playerVote.setPlayer(player);
         playerVote.setCard(card);
         table.getPlayerVotes().add(playerVote);
+
+        // Check we need to end the round
+        if (checkIfEveryoneHaveVotedACard(game, table)) {
+            table.setStatus(TableStatusEnum.ENDING);
+        }
 
         return tableDao.update(table);
     }
@@ -200,6 +239,20 @@ public class TableServiceImpl implements TableService {
         }
 
         return 0;
+    }
+
+    private boolean checkIfEveryoneHavePlayedACard(Game game, Table table) {
+        int cardsNeededToVote = game.getPlayers().size();
+        if (game.getType() == GameTypeEnum.DICTATORSHIP || game.getType() == GameTypeEnum.CLASSIC) cardsNeededToVote--;
+
+        return table.getPlayedCards().size() == cardsNeededToVote;
+    }
+
+    private boolean checkIfEveryoneHaveVotedACard(Game game, Table table) {
+        int cardsNeededToEnd = game.getPlayers().size();
+        if (game.getType() == GameTypeEnum.DICTATORSHIP || game.getType() == GameTypeEnum.CLASSIC) cardsNeededToEnd = 1;
+
+        return table.getPlayerVotes().size() == cardsNeededToEnd;
     }
 
 }

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.dao.intf.*;
+import org.themarioga.cclh.commons.enums.TableStatusEnum;
 import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
@@ -60,6 +61,7 @@ class TableDaoTest extends BaseTest {
 
         Table table = new Table();
         table.setGameId(game.getId());
+        table.setStatus(TableStatusEnum.STARTING);
         table.setCurrentRoundNumber(1);
         table.setCurrentPresident(playerDao.findPlayerByUser(creator));
         table.setCurrentBlackCard(card);

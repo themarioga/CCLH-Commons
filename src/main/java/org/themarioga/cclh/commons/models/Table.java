@@ -1,6 +1,7 @@
 package org.themarioga.cclh.commons.models;
 
 import jakarta.persistence.*;
+import org.themarioga.cclh.commons.enums.TableStatusEnum;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,6 +14,8 @@ public class Table implements Serializable {
     @Id
     @Column(name = "game_id")
     private Long gameId;
+    @Column(name = "status", nullable = false)
+    private TableStatusEnum status;
     @Column(name = "round_number", nullable = false)
     private Integer currentRoundNumber;
 
@@ -37,6 +40,14 @@ public class Table implements Serializable {
 
     public void setGameId(Long gameId) {
         this.gameId = gameId;
+    }
+
+    public TableStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(TableStatusEnum status) {
+        this.status = status;
     }
 
     public Integer getCurrentRoundNumber() {
@@ -81,6 +92,6 @@ public class Table implements Serializable {
 
     @Override
     public String toString() {
-        return "GameStatus{" + "gameId=" + gameId + ", currentRoundNumber=" + currentRoundNumber + '}';
+        return "GameStatus{" + "gameId=" + gameId + ", status=" + status + ", currentRoundNumber=" + currentRoundNumber + '}';
     }
 }
