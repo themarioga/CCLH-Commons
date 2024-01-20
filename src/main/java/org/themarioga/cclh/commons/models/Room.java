@@ -15,10 +15,6 @@ public class Room extends Base {
     @Column(name = "active", nullable = false)
     private Boolean active;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", referencedColumnName = "id")
-    private User owner;
-
     public Long getId() {
         return id;
     }
@@ -41,14 +37,6 @@ public class Room extends Base {
 
     public void setActive(Boolean active) {
         this.active = active;
-    }
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
     }
 
     @Override

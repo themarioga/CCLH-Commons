@@ -10,7 +10,6 @@ import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.dao.intf.RoomDao;
 import org.themarioga.cclh.commons.dao.intf.UserDao;
 import org.themarioga.cclh.commons.models.Room;
-import org.themarioga.cclh.commons.models.User;
 
 import java.util.List;
 
@@ -26,13 +25,10 @@ class RoomDaoTest extends BaseTest {
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/room/testCreateRoom-expected.xml", table = "T_ROOM", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void createRoom() {
-        User user = userDao.findOne(0L);
-
         Room room = new Room();
         room.setId(2L);
         room.setName("Test room");
         room.setActive(true);
-        room.setOwner(user);
 
         roomDao.create(room);
         getCurrentSession().flush();

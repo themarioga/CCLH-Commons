@@ -12,14 +12,14 @@ import org.themarioga.cclh.commons.services.intf.GameService;
 @DatabaseSetup("classpath:dbunit/service/setup/room.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/dictionary.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
-public class CCLHServiceTest extends BaseTest {
+class CCLHServiceTest extends BaseTest {
 
     @Autowired
     GameService gameService;
 
     @Test
-    public void completeGameTest() {
-        Game game = gameService.create(0L, "Habitación", 0L, 0L);
+    void completeGameTest() {
+        Game game = gameService.create(0L, "Habitación", 0L);
         gameService.setType(0L, GameTypeEnum.DEMOCRACY);
         gameService.setNumberOfCardsToWin(0L, 3);
         gameService.setDictionary(0L, 0L);

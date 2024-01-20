@@ -12,7 +12,6 @@ import org.themarioga.cclh.commons.exceptions.room.RoomDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.room.RoomNotActiveException;
 import org.themarioga.cclh.commons.models.Room;
 import org.themarioga.cclh.commons.services.intf.RoomService;
-import org.themarioga.cclh.commons.services.intf.UserService;
 import org.themarioga.cclh.commons.util.Assert;
 
 import java.util.Date;
@@ -23,17 +22,15 @@ public class RoomServiceImpl implements RoomService {
     private final Logger logger = LoggerFactory.getLogger(RoomServiceImpl.class);
 
     private final RoomDao roomDao;
-    private final UserService userService;
 
     @Autowired
-    public RoomServiceImpl(RoomDao roomDao, UserService userService) {
+    public RoomServiceImpl(RoomDao roomDao) {
         this.roomDao = roomDao;
-        this.userService = userService;
     }
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Room createOrReactivate(long id, String name, long ownerId) {
+    public Room createOrReactivate(long id, String name) {
         logger.debug("Creating or reactivating room: {} ({})", id, name);
 
         Assert.assertNotNull(id, ErrorEnum.ROOM_ID_EMPTY);
@@ -45,7 +42,6 @@ public class RoomServiceImpl implements RoomService {
             room.setId(id);
             room.setName(name);
             room.setActive(true);
-            room.setOwner(userService.getById(ownerId));
             room.setCreationDate(new Date());
 
             return roomDao.create(room);
@@ -53,7 +49,6 @@ public class RoomServiceImpl implements RoomService {
             if (Boolean.FALSE.equals(roomFromBd.getActive())) {
                 roomFromBd.setName(name);
                 roomFromBd.setActive(true);
-                roomFromBd.setOwner(userService.getById(ownerId));
                 return roomDao.update(roomFromBd);
             } else {
                 return roomFromBd;

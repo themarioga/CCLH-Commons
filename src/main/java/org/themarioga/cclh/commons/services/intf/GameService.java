@@ -8,9 +8,12 @@ import org.themarioga.cclh.commons.models.Room;
 
 public interface GameService {
 
-    Game create(long roomId, String roomName, long roomOwnerId, long creatorId);
+    Game create(long roomId, String roomName, long creatorId);
 
     Game delete(long roomId);
+
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    Game deleteByCreatorId(long userId);
 
     Game setType(long roomId, GameTypeEnum type);
 

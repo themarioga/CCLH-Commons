@@ -21,7 +21,7 @@ public class Game extends Base {
     private GameTypeEnum type;
     @Column(name = "n_cards_to_win", nullable = false)
     private Integer numberOfCardsToWin;
-    @Column(name = "n_players")
+    @Column(name = "n_players", nullable = false)
     private Integer maxNumberOfPlayers;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)

@@ -16,7 +16,7 @@ public enum ErrorEnum {
     GAME_NOT_FOUND(13L, "Juego no encontrado"),
     GAME_NOT_CONFIGURED(14L, "Juego no configurado"),
     GAME_NOT_FILLED(15L, "Juego no completado"),
-    GAME_ALREADY_EXISTS(16L, "Juego ya configurado"),
+    GAME_ALREADY_EXISTS(16L, "Juego ya creado"),
     GAME_ALREADY_CONFIGURED(17L, "Juego ya configurado"),
     GAME_ALREADY_FILLED(18L, "Juego lleno"),
     GAME_ALREADY_STARTED(19L, "Juego ya iniciado"),

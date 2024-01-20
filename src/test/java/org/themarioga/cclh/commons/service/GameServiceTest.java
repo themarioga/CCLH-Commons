@@ -47,7 +47,7 @@ class GameServiceTest extends BaseTest {
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/service/expected/testCreateGame-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testCreateGame_CreateRoom() {
-        Game game = gameService.create(2L, "Room 3", 0L, 0L);
+        Game game = gameService.create(2L, "Room 3", 3L);
 
         Assertions.assertNotNull(game);
         Assertions.assertNotNull(game.getId());
@@ -55,7 +55,7 @@ class GameServiceTest extends BaseTest {
         Assertions.assertNotNull(game.getCreator().getId());
 
         Assertions.assertEquals(2L, game.getRoom().getId());
-        Assertions.assertEquals(0L, game.getCreator().getId());
+        Assertions.assertEquals(3L, game.getCreator().getId());
         Assertions.assertEquals(GameStatusEnum.CREATED, game.getStatus());
     }
 

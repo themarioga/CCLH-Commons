@@ -15,9 +15,9 @@ CREATE TABLE IF NOT EXISTS t_configuration
 DROP TABLE IF EXISTS t_user;
 CREATE TABLE IF NOT EXISTS t_user
 (
-    id     INTEGER NOT NULL,
+    id     BIGINT NOT NULL,
     name   TEXT    NOT NULL,
-    active INTEGER DEFAULT 1,
+    active BOOLEAN DEFAULT 1,
     PRIMARY KEY (id)
 );
 
@@ -26,25 +26,22 @@ CREATE INDEX user_idx_id ON t_user (id);
 DROP TABLE IF EXISTS t_room;
 CREATE TABLE IF NOT EXISTS t_room
 (
-    id       INTEGER NOT NULL,
+    id       BIGINT NOT NULL,
     name     TEXT    NOT NULL,
-    owner_id INTEGER NOT NULL,
-    active   INTEGER DEFAULT 1,
-    PRIMARY KEY (id),
-    FOREIGN KEY (owner_id) REFERENCES t_user (id)
+    active   BOOLEAN DEFAULT 1,
+    PRIMARY KEY (id)
 );
 
 CREATE INDEX room_idx_id ON t_room (id);
-CREATE INDEX room_owner_idx_id ON t_room (owner_id);
 
 DROP TABLE IF EXISTS t_dictionary;
 CREATE TABLE IF NOT EXISTS t_dictionary
 (
-    id         INTEGER NOT NULL,
+    id         BIGINT NOT NULL AUTO_INCREMENT,
     name       TEXT    NOT NULL UNIQUE,
-    creator_id INTEGER NOT NULL,
-    published  INTEGER DEFAULT 0,
-    shared     INTEGER DEFAULT 0,
+    creator_id BIGINT NOT NULL,
+    published  BOOLEAN DEFAULT 0,
+    shared     BOOLEAN DEFAULT 0,
     PRIMARY KEY (id),
     FOREIGN KEY (creator_id) REFERENCES t_user (id)
 );
@@ -55,10 +52,10 @@ CREATE INDEX dictionary_creator_idx_id ON t_dictionary (creator_id);
 DROP TABLE IF EXISTS t_card;
 CREATE TABLE IF NOT EXISTS t_card
 (
-    id            INTEGER NOT NULL,
+    id            BIGINT NOT NULL AUTO_INCREMENT,
     text          TEXT    NOT NULL,
-    type          INTEGER NOT NULL,
-    dictionary_id INTEGER NOT NULL,
+    type          TINYINT NOT NULL,
+    dictionary_id BIGINT NOT NULL,
     PRIMARY KEY (id),
     UNIQUE (text, type, dictionary_id),
     FOREIGN KEY (dictionary_id) REFERENCES t_dictionary (id)
@@ -72,14 +69,14 @@ CREATE INDEX card_dictionary_idx_id ON t_card (dictionary_id);
 DROP TABLE IF EXISTS t_game;
 CREATE TABLE IF NOT EXISTS t_game
 (
-    id             INTEGER NOT NULL,
-    room_id        INTEGER NOT NULL,
-    creator_id     INTEGER NOT NULL,
-    status         INTEGER NOT NULL,
-    type           INTEGER NOT NULL,
-    dictionary_id  INTEGER NOT NULL,
-    n_cards_to_win INTEGER NOT NULL,
-    n_players      INTEGER,
+    id             BIGINT NOT NULL AUTO_INCREMENT,
+    room_id        BIGINT NOT NULL,
+    creator_id     BIGINT NOT NULL,
+    status         TINYINT NOT NULL,
+    type           TINYINT NOT NULL,
+    dictionary_id  BIGINT NOT NULL,
+    n_cards_to_win TINYINT NOT NULL,
+    n_players      TINYINT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (room_id) REFERENCES t_room (id),
     FOREIGN KEY (creator_id) REFERENCES t_user (id),
@@ -94,11 +91,11 @@ CREATE INDEX game_creator_idx_id ON t_game (creator_id);
 DROP TABLE IF EXISTS t_player;
 CREATE TABLE IF NOT EXISTS t_player
 (
-    id         INTEGER NOT NULL,
-    user_id    INTEGER NOT NULL,
-    game_id    INTEGER NOT NULL,
-    join_order INTEGER NOT NULL,
-    points     INTEGER DEFAULT 0,
+    id         BIGINT NOT NULL AUTO_INCREMENT,
+    user_id    BIGINT NOT NULL,
+    game_id    BIGINT NOT NULL,
+    join_order TINYINT NOT NULL,
+    points     TINYINT DEFAULT 0,
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES t_user (id),
     FOREIGN KEY (game_id) REFERENCES t_game (id),

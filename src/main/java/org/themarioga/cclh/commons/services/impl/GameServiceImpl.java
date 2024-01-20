@@ -53,11 +53,17 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game create(long roomId, String roomName, long roomOwnerId, long creatorId) {
+    public Game create(long roomId, String roomName, long creatorId) {
         logger.debug("Creating game in room: {}({})", roomId, roomName);
 
         // Create or load room
-        Room room = roomService.createOrReactivate(roomId, roomName, roomOwnerId);
+        Room room = roomService.createOrReactivate(roomId, roomName);
+
+        // Check if a game already exists in this room
+        if (gameDao.countByRoom(roomService.getById(roomId)) > 0) throw new GameAlreadyExistsException(roomId);
+
+        // Check if this user already have a running game
+        if (gameDao.countByCreator(userService.getById(creatorId)) > 0) throw new GameAlreadyExistsException(roomId);
 
         // Create game
         Game game = new Game();
@@ -67,6 +73,7 @@ public class GameServiceImpl implements GameService {
         game.setStatus(GameStatusEnum.CREATED);
         game.setType(GameTypeEnum.DEMOCRACY);
         game.setNumberOfCardsToWin(getDefaultNumberCardsToWin());
+        game.setMaxNumberOfPlayers(getDefaultMaxNumberOfPlayers());
         game.setDictionary(dictionaryService.getDefaultDictionary());
 
         return gameDao.create(game);
@@ -80,6 +87,22 @@ public class GameServiceImpl implements GameService {
         Game game = gameDao.getByRoom(roomService.getById(roomId));
 
         if (game == null) throw new GameDoesntExistsException(roomId);
+
+        gameDao.delete(game);
+
+        game.setStatus(GameStatusEnum.DELETED);
+
+        return game;
+    }
+
+    @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    public Game deleteByCreatorId(long userId) {
+        logger.debug("Deleting game by user: {}", userId);
+
+        Game game = gameDao.getByCreator(userService.getById(userId));
+
+        if (game == null) throw new GameDoesntExistsException(userId);
 
         gameDao.delete(game);
 
@@ -192,7 +215,7 @@ public class GameServiceImpl implements GameService {
         Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
 
         // Check game is not full
-        if (game.getPlayers().size() >= getMaxNumberOfPlayers(game))
+        if (game.getPlayers().size() >= game.getMaxNumberOfPlayers())
             throw new GameAlreadyFilledException(game.getId());
 
         // Check if the user is already playing
@@ -434,13 +457,12 @@ public class GameServiceImpl implements GameService {
         return Integer.parseInt(configurationService.getConfiguration("game_min_number_of_players"));
     }
 
-    private int getMaxNumberOfPlayers(Game game) {
-        if (game.getMaxNumberOfPlayers() != null) return game.getMaxNumberOfPlayers();
-        else return Integer.parseInt(configurationService.getConfiguration("game_max_number_of_players"));
-    }
-
     private int getDefaultNumberCardsToWin() {
         return Integer.parseInt(configurationService.getConfiguration("game_default_number_cards_to_win"));
+    }
+
+    private int getDefaultMaxNumberOfPlayers() {
+        return Integer.parseInt(configurationService.getConfiguration("game_max_number_of_players"));
     }
 
     private void addBlackCardsToTableDeck(Game game) {
