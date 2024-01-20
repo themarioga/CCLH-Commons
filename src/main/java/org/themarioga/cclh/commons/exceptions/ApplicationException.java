@@ -10,12 +10,17 @@ public class ApplicationException extends RuntimeException {
         this.error = error;
     }
 
+    public ApplicationException(String message) {
+        super(message);
+        this.error = null;
+    }
+
     public ErrorEnum getErrorEnum() {
         return error;
     }
 
     @Override
     public String getMessage() {
-        return error.getErrorDesc();
+        return error != null ? error.getErrorDesc() : super.getMessage();
     }
 }
