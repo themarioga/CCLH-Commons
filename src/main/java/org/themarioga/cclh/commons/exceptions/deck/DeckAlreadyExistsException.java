@@ -1,11 +1,11 @@
-package org.themarioga.cclh.commons.exceptions.dictionary;
+package org.themarioga.cclh.commons.exceptions.deck;
 
 import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
 
-public class DictionaryAlreadyExistsException extends ApplicationException {
+public class DeckAlreadyExistsException extends ApplicationException {
 
-    public DictionaryAlreadyExistsException() {
+    public DeckAlreadyExistsException() {
         super(ErrorEnum.DICTIONARY_ALREADY_EXISTS);
     }
 

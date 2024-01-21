@@ -36,7 +36,9 @@ class PlayerServiceTest extends BaseTest {
     @Autowired
     PlayerService playerService;
     @Autowired
-    DictionaryService dictionaryService;
+    DeckService deckService;
+    @Autowired
+    CardService cardService;
 
     @Test
     void testCreate() {
@@ -69,7 +71,7 @@ class PlayerServiceTest extends BaseTest {
     void testAddCardsToPlayerDeck() {
         Player player = playerService.findByUserId(0L);
 
-        List<Card> cards = dictionaryService.findCardsByDictionaryIdAndType(dictionaryService.findOne(0L), CardTypeEnum.WHITE);
+        List<Card> cards = cardService.findCardsByDictionaryIdAndType(deckService.findOne(0L), CardTypeEnum.WHITE);
         List<Card> card = cards.subList(0, 1);
 
         playerService.addCardsToPlayerDeck(player, card);

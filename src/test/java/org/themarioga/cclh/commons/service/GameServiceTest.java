@@ -11,7 +11,8 @@ import org.themarioga.cclh.commons.dao.intf.GameDao;
 import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.enums.TableStatusEnum;
-import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryDoesntExistsException;
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
+import org.themarioga.cclh.commons.exceptions.deck.DeckDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.game.*;
 import org.themarioga.cclh.commons.exceptions.player.*;
 import org.themarioga.cclh.commons.exceptions.room.RoomDoesntExistsException;
@@ -19,7 +20,7 @@ import org.themarioga.cclh.commons.exceptions.user.UserNotActiveException;
 import org.themarioga.cclh.commons.models.Card;
 import org.themarioga.cclh.commons.models.Game;
 import org.themarioga.cclh.commons.models.Player;
-import org.themarioga.cclh.commons.services.intf.DictionaryService;
+import org.themarioga.cclh.commons.services.intf.DeckService;
 import org.themarioga.cclh.commons.services.intf.GameService;
 import org.themarioga.cclh.commons.services.intf.UserService;
 
@@ -42,7 +43,7 @@ class GameServiceTest extends BaseTest {
     GameService gameService;
 
     @Autowired
-    DictionaryService dictionaryService;
+    DeckService deckService;
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/service/expected/testCreateGame-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
@@ -62,7 +63,7 @@ class GameServiceTest extends BaseTest {
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/service/expected/testDeleteGame-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testDeleteGame() {
-        gameService.delete(0L);
+        gameService.delete(gameService.getByRoomId(0L));
 
         Game game = gameService.getByRoomId(0L);
 
@@ -71,18 +72,18 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testDelete_RoomNotExists() {
-        Assertions.assertThrows(RoomDoesntExistsException.class, () -> gameService.delete(70L));
+        Assertions.assertThrows(RoomDoesntExistsException.class, () -> gameService.delete(gameService.getByRoomId(70L)));
     }
 
     @Test
     void testDelete_GameNotExists() {
-        Assertions.assertThrows(GameDoesntExistsException.class, () -> gameService.delete(4L));
+        Assertions.assertThrows(ApplicationException.class, () -> gameService.delete(gameService.getByRoomId(4L)));
     }
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameType-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetType() {
-        Game game = gameService.setType(0L, GameTypeEnum.DICTATORSHIP);
+        Game game = gameService.setType(gameService.getByRoomId(0L), GameTypeEnum.DICTATORSHIP);
 
         getCurrentSession().flush();
 
@@ -91,13 +92,13 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testSetType_GameAlreadyStarted() {
-        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setType(3L, GameTypeEnum.DICTATORSHIP));
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setType(gameService.getByRoomId(3L), GameTypeEnum.DICTATORSHIP));
     }
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameNumberCards-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetNumberOfCardsToWin() {
-        Game game = gameService.setNumberOfCardsToWin(0L, 5);
+        Game game = gameService.setNumberOfCardsToWin(gameService.getByRoomId(0L), 5);
 
         getCurrentSession().flush();
 
@@ -106,13 +107,13 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testSetNumberOfCardsToWin_GameAlreadyStarted() {
-        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setNumberOfCardsToWin(3L, 5));
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setNumberOfCardsToWin(gameService.getByRoomId(3L), 5));
     }
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameNumberPlayers-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetMaxNumberOfPlayers() {
-        Game game = gameService.setMaxNumberOfPlayers(0L, 5);
+        Game game = gameService.setMaxNumberOfPlayers(gameService.getByRoomId(0L), 5);
 
         getCurrentSession().flush();
 
@@ -121,113 +122,113 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testSetMaxNumberOfPlayers_GameAlreadyStarted() {
-        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setMaxNumberOfPlayers(3L, 5));
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setMaxNumberOfPlayers(gameService.getByRoomId(3L), 5));
     }
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameDictionary-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetDictionary() {
-        Game game = gameService.setDictionary(0L, 1L);
+        Game game = gameService.setDictionary(gameService.getByRoomId(0L), 1L);
 
         getCurrentSession().flush();
 
-        Assertions.assertEquals(dictionaryService.findOne(1L), game.getDictionary());
+        Assertions.assertEquals(deckService.findOne(1L), game.getDictionary());
     }
 
     @Test
     void testSetMaxDictionary_GameAlreadyStarted() {
-        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setDictionary(3L, 0L));
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setDictionary(gameService.getByRoomId(3L), 0L));
     }
 
     @Test
     void testSetMaxDictionary_DictionaryDoesntExists() {
-        Assertions.assertThrows(DictionaryDoesntExistsException.class, () -> gameService.setDictionary(0L, 50L));
+        Assertions.assertThrows(DeckDoesntExistsException.class, () -> gameService.setDictionary(gameService.getByRoomId(0L), 50L));
     }
 
     @Test
     void testAddPlayer() {
-        Game game = gameService.addPlayer(1L, 4L);
+        Game game = gameService.addPlayer(gameService.getByRoomId(1L), 4L);
 
         Assertions.assertEquals(1L, game.getPlayers().size());
     }
 
     @Test
     void testAddPlayer_GameAlreadyFilled() {
-        Assertions.assertThrows(GameAlreadyFilledException.class, () -> gameService.addPlayer(0L, 3L));
+        Assertions.assertThrows(GameAlreadyFilledException.class, () -> gameService.addPlayer(gameService.getByRoomId(0L), 3L));
     }
 
     @Test
     void testAddPlayer_UserNotActive() {
-        Assertions.assertThrows(UserNotActiveException.class, () -> gameService.addPlayer(0L, 2L));
+        Assertions.assertThrows(UserNotActiveException.class, () -> gameService.addPlayer(gameService.getByRoomId(0L), 2L));
     }
 
     @Test
     void testAddPlayer_AlreadyAdded() {
-        Assertions.assertThrows(PlayerAlreadyExistsException.class, () -> gameService.addPlayer(1L, 1L));
+        Assertions.assertThrows(PlayerAlreadyExistsException.class, () -> gameService.addPlayer(gameService.getByRoomId(1L), 1L));
     }
 
     @Test
     void testLeaveGame() {
-        Game game = gameService.leaveGame(0L, 1L);
+        Game game = gameService.leaveGame(gameService.getByRoomId(0L), 1L);
 
         Assertions.assertEquals(2L, game.getPlayers().size());
     }
 
     @Test
     void testLeaveGame_GameAlreadyStarted() {
-        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.leaveGame(3L, 0L));
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.leaveGame(gameService.getByRoomId(3L), 0L));
     }
 
     @Test
     void testLeaveGame_CreatorLeave() {
-        Assertions.assertThrows(GameCreatorCannotLeaveException.class, () -> gameService.leaveGame(0L, 0L));
+        Assertions.assertThrows(GameCreatorCannotLeaveException.class, () -> gameService.leaveGame(gameService.getByRoomId(0L), 0L));
     }
 
     @Test
     void testLeaveGame_PlayerNotInGame() {
-        Assertions.assertThrows(PlayerDoesntExistsException.class, () -> gameService.leaveGame(0L, 5L));
+        Assertions.assertThrows(PlayerDoesntExistsException.class, () -> gameService.leaveGame(gameService.getByRoomId(0L), 5L));
     }
 
     @Test
     void testStartGame_Democracy() {
-        Game game = gameService.startGame(0L);
+        Game game = gameService.startGame(gameService.getByRoomId(0L));
 
         Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
         Assertions.assertNotNull(game.getTable());
-        Assertions.assertEquals(3, game.getDeck().size());
+        Assertions.assertEquals(3, game.getTable().getDeck().size());
         Assertions.assertEquals(3, game.getPlayers().size());
         Assertions.assertEquals(3, game.getPlayers().get(0).getDeck().size());
     }
 
     @Test
     void testStartGame_Dictatorship() {
-        gameService.addPlayer(1L, 4L);
-        gameService.addPlayer(1L, 5L);
-        gameService.addPlayer(1L, 6L);
+        gameService.addPlayer(gameService.getByRoomId(1L), 4L);
+        gameService.addPlayer(gameService.getByRoomId(1L), 5L);
+        gameService.addPlayer(gameService.getByRoomId(1L), 6L);
 
-        Game game = gameService.startGame(1L);
+        Game game = gameService.startGame(gameService.getByRoomId(1L));
 
         Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
         Assertions.assertNotNull(game.getTable());
-        Assertions.assertEquals(3, game.getDeck().size());
+        Assertions.assertEquals(3, game.getTable().getDeck().size());
         Assertions.assertEquals(3, game.getPlayers().size());
         Assertions.assertEquals(10L, game.getTable().getCurrentPresident().getId());
     }
 
     @Test
     void testStartGame_GameAlreadyStarted() {
-        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.startGame(3L));
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.startGame(gameService.getByRoomId(3L)));
     }
 
     @Test
     void testStartGame_GameNotFilled() {
-        Assertions.assertThrows(GameNotFilledException.class, () -> gameService.startGame(1L));
+        Assertions.assertThrows(GameNotFilledException.class, () -> gameService.startGame(gameService.getByRoomId(1L)));
     }
 
     @Test
     void testStartRound() {
-        gameService.startGame(0L);
-        Game game = gameService.startRound(0L);
+        gameService.startGame(gameService.getByRoomId(0L));
+        Game game = gameService.startRound(gameService.getByRoomId(0L));
 
         Assertions.assertEquals(0L, game.getRoom().getId());
         Assertions.assertEquals(3, game.getPlayers().size());
@@ -238,9 +239,9 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testStartRound_Classic() {
-        gameService.setType(0L, GameTypeEnum.CLASSIC);
-        gameService.startGame(0L);
-        Game game = gameService.startRound(0L);
+        gameService.setType(gameService.getByRoomId(0L), GameTypeEnum.CLASSIC);
+        gameService.startGame(gameService.getByRoomId(0L));
+        Game game = gameService.startRound(gameService.getByRoomId(0L));
 
         Assertions.assertEquals(0L, game.getRoom().getId());
         Assertions.assertEquals(11L, game.getTable().getCurrentPresident().getId());
@@ -248,13 +249,13 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testStartRound_GameNotStarted() {
-        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.startRound(0L));
+        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.startRound(gameService.getByRoomId(0L)));
     }
 
     @Test
     void testEndRound() {
-        gameService.startGame(0L);
-        Game game = gameService.startRound(0L);
+        gameService.startGame(gameService.getByRoomId(0L));
+        Game game = gameService.startRound(gameService.getByRoomId(0L));
 
         Assertions.assertEquals(0L, game.getRoom().getId());
         Assertions.assertEquals(3, game.getPlayers().size());
@@ -264,7 +265,7 @@ class GameServiceTest extends BaseTest {
 
         game.getTable().setStatus(TableStatusEnum.ENDING);
         gameDao.update(game);
-        gameService.endRound(0L);
+        gameService.endRound(gameService.getByRoomId(0L));
 
         Assertions.assertNull(game.getTable().getCurrentBlackCard());
         Assertions.assertEquals(0, game.getTable().getPlayedCards().size());
@@ -273,8 +274,8 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testVoteDeletion_vote() {
-        gameService.startGame(0L);
-        Game game = gameService.voteForDeletion(0L, 0L);
+        gameService.startGame(gameService.getByRoomId(0L));
+        Game game = gameService.voteForDeletion(gameService.getByRoomId(0L), 0L);
 
         Assertions.assertNotNull(game);
         Assertions.assertNotNull(game.getDeletionVotes().get(0));
@@ -283,9 +284,9 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testVoteDeletion_delete() {
-        gameService.startGame(0L);
-        gameService.voteForDeletion(0L, 1L);
-        Game game = gameService.voteForDeletion(0L, 0L);
+        gameService.startGame(gameService.getByRoomId(0L));
+        gameService.voteForDeletion(gameService.getByRoomId(0L), 1L);
+        Game game = gameService.voteForDeletion(gameService.getByRoomId(0L), 0L);
 
         Assertions.assertNotNull(game);
         Assertions.assertNotNull(game.getDeletionVotes().get(0));
@@ -295,94 +296,94 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testLeaveGame_GameNotStarted() {
-        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.voteForDeletion(0L, 0L));
+        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.voteForDeletion(gameService.getByRoomId(0L), 0L));
     }
 
     @Test
     void testVoteDeletion_PlayerAlreadyVoted() {
-        gameService.startGame(0L);
-        gameService.voteForDeletion(0L, 1L);
+        gameService.startGame(gameService.getByRoomId(0L));
+        gameService.voteForDeletion(gameService.getByRoomId(0L), 1L);
 
-        Assertions.assertThrows(PlayerAlreadyVotedDeleteException.class, () -> gameService.voteForDeletion(0L, 1L));
+        Assertions.assertThrows(PlayerAlreadyVotedDeleteException.class, () -> gameService.voteForDeletion(gameService.getByRoomId(0L), 1L));
     }
 
     @Test
     void testPlayCard() {
-        gameService.startGame(0L);
-        Game game = gameService.startRound(0L);
+        gameService.startGame(gameService.getByRoomId(0L));
+        Game game = gameService.startRound(gameService.getByRoomId(0L));
         getCurrentSession().flush();
         Player player = game.getPlayers().get(0);
-        game = gameService.playCard(game.getRoom().getId(), player.getUser().getId(), player.getHand().get(0).getId());
+        game = gameService.playCard(game, player.getUser().getId(), player.getHand().get(0).getId());
 
         Assertions.assertEquals(1, game.getTable().getPlayedCards().size());
     }
 
     @Test
     void testPlayCard_GameNotStarted() {
-        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.playCard(0L, 0L, 0L));
+        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.playCard(gameService.getByRoomId(0L), 0L, 0L));
     }
 
     @Test
     void testPlayCard_PlayerAlreadyPlayed() {
-        gameService.startGame(0L);
-        Game game = gameService.startRound(0L);
+        gameService.startGame(gameService.getByRoomId(0L));
+        Game game = gameService.startRound(gameService.getByRoomId(0L));
         Player player = game.getPlayers().get(0);
-        gameService.playCard(game.getRoom().getId(), player.getUser().getId(), player.getHand().get(0).getId());
+        gameService.playCard(game, player.getUser().getId(), player.getHand().get(0).getId());
 
-        Assertions.assertThrows(PlayerAlreadyPlayedCardException.class, () -> gameService.playCard(game.getRoom().getId(), player.getUser().getId(), player.getHand().get(0).getId()));
+        Assertions.assertThrows(PlayerAlreadyPlayedCardException.class, () -> gameService.playCard(game, player.getUser().getId(), player.getHand().get(0).getId()));
     }
 
     @Test
     void testPlayCard_PlayerCannotPlayCardException() {
-        gameService.startGame(0L);
-        Game game = gameService.startRound(0L);
+        gameService.startGame(gameService.getByRoomId(0L));
+        Game game = gameService.startRound(gameService.getByRoomId(0L));
         Player player = game.getPlayers().get(0);
-        gameService.playCard(game.getRoom().getId(), player.getUser().getId(), player.getHand().get(0).getId());
+        gameService.playCard(game, player.getUser().getId(), player.getHand().get(0).getId());
 
-        Assertions.assertThrows(PlayerCannotPlayCardException.class, () -> gameService.playCard(game.getRoom().getId(), 1L, player.getHand().get(0).getId()));
+        Assertions.assertThrows(PlayerCannotPlayCardException.class, () -> gameService.playCard(game, 1L, player.getHand().get(0).getId()));
     }
 
     @Test
     void testVoteCard() {
-        gameService.startGame(0L);
-        Game game = gameService.startRound(0L);
+        gameService.startGame(gameService.getByRoomId(0L));
+        Game game = gameService.startRound(gameService.getByRoomId(0L));
         Player player = game.getPlayers().get(0);
         Card card = player.getHand().get(0);
-        gameService.playCard(game.getRoom().getId(), player.getUser().getId(), card.getId());
+        gameService.playCard(game, player.getUser().getId(), card.getId());
         game.getTable().setStatus(TableStatusEnum.VOTING);
         gameDao.update(game);
-        game = gameService.voteForCard(game.getRoom().getId(), player.getUser().getId(), card.getId());
+        game = gameService.voteForCard(game, player.getUser().getId(), card.getId());
 
         Assertions.assertEquals(1, game.getTable().getPlayerVotes().size());
     }
 
     @Test
     void testVoteCard_GameNotStarted() {
-        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.voteForCard(0L, 0L, 0L));
+        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.voteForCard(gameService.getByRoomId(0L), 0L, 0L));
     }
 
     @Test
     void testVoteCard_PlayerAlreadyVoted() {
-        gameService.startGame(0L);
-        Game game = gameService.startRound(0L);
+        gameService.startGame(gameService.getByRoomId(0L));
+        Game game = gameService.startRound(gameService.getByRoomId(0L));
         Player player = game.getPlayers().get(0);
         Card card = player.getHand().get(0);
-        gameService.playCard(game.getRoom().getId(), player.getUser().getId(), card.getId());
+        gameService.playCard(game, player.getUser().getId(), card.getId());
         game.getTable().setStatus(TableStatusEnum.VOTING);
         gameDao.update(game);
-        gameService.voteForCard(game.getRoom().getId(), player.getUser().getId(), card.getId());
+        gameService.voteForCard(game, player.getUser().getId(), card.getId());
 
-        Assertions.assertThrows(PlayerAlreadyVotedCardException.class, () -> gameService.voteForCard(game.getRoom().getId(), player.getUser().getId(), card.getId()));
+        Assertions.assertThrows(PlayerAlreadyVotedCardException.class, () -> gameService.voteForCard(game, player.getUser().getId(), card.getId()));
     }
 
     @Test
     void testVoteCard_PlayerCannotVote() {
-        gameService.setType(0L, GameTypeEnum.DICTATORSHIP);
-        Game game = gameService.startGame(0L);
+        gameService.setType(gameService.getByRoomId(0L), GameTypeEnum.DICTATORSHIP);
+        Game game = gameService.startGame(gameService.getByRoomId(0L));
         game.getTable().setStatus(TableStatusEnum.VOTING);
         gameDao.update(game);
 
-        Assertions.assertThrows(PlayerCannotVoteCardException.class, () -> gameService.voteForCard(0L, 1L, 0L));
+        Assertions.assertThrows(PlayerCannotVoteCardException.class, () -> gameService.voteForCard(gameService.getByRoomId(0L), 1L, 0L));
     }
 
 }

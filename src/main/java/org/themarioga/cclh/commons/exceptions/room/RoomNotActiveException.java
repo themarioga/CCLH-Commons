@@ -5,16 +5,8 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 
 public class RoomNotActiveException extends ApplicationException {
 
-    private final long id;
-
-    public RoomNotActiveException(long id) {
+    public RoomNotActiveException() {
         super(ErrorEnum.ROOM_NOT_ACTIVE);
-
-        this.id = id;
-    }
-
-    public long getID() {
-        return id;
     }
 
 }

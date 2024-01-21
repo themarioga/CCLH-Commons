@@ -1,8 +1,6 @@
 package org.themarioga.cclh.commons.services.intf;
 
-import jakarta.transaction.Transactional;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
-import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.models.Game;
 import org.themarioga.cclh.commons.models.Room;
 
@@ -10,34 +8,31 @@ public interface GameService {
 
     Game create(long roomId, String roomName, long creatorId);
 
-    Game delete(long roomId);
+    Game delete(Game game);
 
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    Game deleteByCreatorId(long userId);
+    Game setType(Game game, GameTypeEnum type);
 
-    Game setType(long roomId, GameTypeEnum type);
+    Game setNumberOfCardsToWin(Game game, int numberOfCardsToWin);
 
-    Game setNumberOfCardsToWin(long roomId, int numberOfCardsToWin);
+    Game setMaxNumberOfPlayers(Game game, int maxNumberOfPlayers);
 
-    Game setMaxNumberOfPlayers(long roomId, int maxNumberOfPlayers);
+    Game setDictionary(Game game, long dictionaryId);
 
-    Game setDictionary(long roomId, long dictionaryId);
+    Game addPlayer(Game game, long userId);
 
-    Game addPlayer(long roomId, long userId);
+    Game leaveGame(Game game, long userId);
 
-    Game leaveGame(long roomId, long userId);
+    Game startGame(Game game);
 
-    Game startGame(long roomId);
+    Game startRound(Game game);
 
-    Game startRound(long roomId);
+    Game endRound(Game game);
 
-    Game endRound(long roomId);
+    Game voteForDeletion(Game game, long userId);
 
-    Game voteForDeletion(long roomId, long userId);
+    Game playCard(Game game, long userId, long cardId);
 
-    Game playCard(long roomId, long userId, long cardId);
-
-    Game voteForCard(long roomId, long userId, long cardId);
+    Game voteForCard(Game game, long userId, long cardId);
 
     Game getByRoom(Room room);
 

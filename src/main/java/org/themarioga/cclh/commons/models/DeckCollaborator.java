@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 @Entity
 @jakarta.persistence.Table(name = "t_dictionary_collaborators")
-public class DictionaryCollaborator implements Serializable {
+public class DeckCollaborator implements Serializable {
 
     @Id
     @Column(name = "dictionary_id")

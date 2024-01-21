@@ -5,16 +5,8 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 
 public class RoomAlreadyExistsException extends ApplicationException {
 
-    private final long id;
-
-    public RoomAlreadyExistsException(long id) {
+    public RoomAlreadyExistsException() {
         super(ErrorEnum.ROOM_ALREADY_EXISTS);
-
-        this.id = id;
-    }
-
-    public long getID() {
-        return id;
     }
 
 }

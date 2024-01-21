@@ -32,7 +32,7 @@ public class Game extends Base {
     private User creator;
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "dictionary_id", referencedColumnName = "id", nullable = false)
-    private Dictionary dictionary;
+    private Deck deck;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "id", referencedColumnName = "game_id")
@@ -40,10 +40,6 @@ public class Game extends Base {
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Player> players = new ArrayList<>(0);
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "t_table_deck", joinColumns = @JoinColumn(name = "game_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "card_id", nullable = false))
-    private List<Card> deck = new ArrayList<>(0);
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "t_game_deletionvotes", joinColumns = @JoinColumn(name = "game_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "player_id", nullable = false))
@@ -89,12 +85,12 @@ public class Game extends Base {
         this.status = currentStatus;
     }
 
-    public Dictionary getDictionary() {
-        return dictionary;
+    public Deck getDictionary() {
+        return deck;
     }
 
-    public void setDictionary(Dictionary dictionary) {
-        this.dictionary = dictionary;
+    public void setDictionary(Deck deck) {
+        this.deck = deck;
     }
 
     public Room getRoom() {
@@ -119,14 +115,6 @@ public class Game extends Base {
 
     public void setTable(Table table) {
         this.table = table;
-    }
-
-    public List<Card> getDeck() {
-        return deck;
-    }
-
-    public void setDeck(List<Card> deck) {
-        this.deck = deck;
     }
 
     public List<Player> getPlayers() {

@@ -5,16 +5,8 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 
 public class GameAlreadyFilledException extends ApplicationException {
 
-    private final long id;
-
-    public GameAlreadyFilledException(long id) {
+    public GameAlreadyFilledException() {
         super(ErrorEnum.GAME_ALREADY_FILLED);
-
-        this.id = id;
-    }
-
-    public long getID() {
-        return id;
     }
 
 }

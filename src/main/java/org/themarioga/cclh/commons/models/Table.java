@@ -27,6 +27,10 @@ public class Table implements Serializable {
     private Player currentPresident;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "t_table_deck", joinColumns = @JoinColumn(name = "game_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "card_id", nullable = false))
+    private List<Card> deck = new ArrayList<>(0);
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id", referencedColumnName = "game_id")
     private List<PlayedCard> playedCards = new ArrayList<>(0);
 
@@ -72,6 +76,14 @@ public class Table implements Serializable {
 
     public void setCurrentPresident(Player currentPresident) {
         this.currentPresident = currentPresident;
+    }
+
+    public List<Card> getDeck() {
+        return deck;
+    }
+
+    public void setDeck(List<Card> deck) {
+        this.deck = deck;
     }
 
     public List<PlayedCard> getPlayedCards() {

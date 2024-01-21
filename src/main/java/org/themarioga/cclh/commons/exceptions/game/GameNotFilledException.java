@@ -5,16 +5,8 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 
 public class GameNotFilledException extends ApplicationException {
 
-    private final long id;
-
-    public GameNotFilledException(long id) {
+    public GameNotFilledException() {
         super(ErrorEnum.GAME_NOT_FILLED);
-
-        this.id = id;
-    }
-
-    public long getID() {
-        return id;
     }
 
 }

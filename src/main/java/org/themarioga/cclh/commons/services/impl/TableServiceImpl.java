@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.themarioga.cclh.commons.dao.intf.TableDao;
+import org.themarioga.cclh.commons.enums.CardTypeEnum;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.enums.TableStatusEnum;
@@ -17,9 +18,14 @@ import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyVotedCardExcep
 import org.themarioga.cclh.commons.exceptions.player.PlayerCannotVoteCardException;
 import org.themarioga.cclh.commons.exceptions.table.TableWrongStatusException;
 import org.themarioga.cclh.commons.models.*;
+import org.themarioga.cclh.commons.services.intf.CardService;
 import org.themarioga.cclh.commons.services.intf.PlayerService;
 import org.themarioga.cclh.commons.services.intf.TableService;
 import org.themarioga.cclh.commons.util.Assert;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class TableServiceImpl implements TableService {
@@ -27,11 +33,13 @@ public class TableServiceImpl implements TableService {
     private final Logger logger = LoggerFactory.getLogger(TableServiceImpl.class);
 
     private final TableDao tableDao;
+    private final CardService cardService;
     private final PlayerService playerService;
 
     @Autowired
-    public TableServiceImpl(TableDao tableDao, PlayerService playerService) {
+    public TableServiceImpl(TableDao tableDao, CardService cardService, PlayerService playerService) {
         this.tableDao = tableDao;
+        this.cardService = cardService;
         this.playerService = playerService;
     }
 
@@ -54,6 +62,9 @@ public class TableServiceImpl implements TableService {
             table.setCurrentPresident(playerService.findByUser(game.getCreator()));
         }
 
+        // Add cards from dictionary to table
+        addBlackCardsToTableDeck(table, game.getDictionary());
+
         return tableDao.create(table);
     }
 
@@ -71,7 +82,7 @@ public class TableServiceImpl implements TableService {
 
         // Check if the table is ready to start
         if (table.getStatus() != TableStatusEnum.STARTING)
-            throw new TableWrongStatusException(game.getId());
+            throw new TableWrongStatusException();
 
         // Set the table mode to play
         table.setStatus(TableStatusEnum.PLAYING);
@@ -80,7 +91,7 @@ public class TableServiceImpl implements TableService {
         table.setCurrentRoundNumber(table.getCurrentRoundNumber() + 1);
 
         // Set current black card
-        transferCardFromDeckToTable(game);
+        transferCardFromDeckToTable(game.getTable());
 
         // Set current president if needed
         if (game.getType() == GameTypeEnum.CLASSIC) {
@@ -104,7 +115,7 @@ public class TableServiceImpl implements TableService {
 
         // Check if the table is ready to start
         if (table.getStatus() != TableStatusEnum.ENDING)
-            throw new TableWrongStatusException(game.getId());
+            throw new TableWrongStatusException();
 
         // Set the table mode to play
         table.setStatus(TableStatusEnum.STARTING);
@@ -131,7 +142,7 @@ public class TableServiceImpl implements TableService {
 
         // Check if the table is ready to start
         if (table.getStatus() != TableStatusEnum.PLAYING)
-            throw new TableWrongStatusException(game.getId());
+            throw new TableWrongStatusException();
 
         // Check if the player already played
         if (table.getPlayedCards().stream().anyMatch(playedCard -> playedCard.getPlayer().getId().equals(player.getId())))
@@ -173,7 +184,7 @@ public class TableServiceImpl implements TableService {
 
         // Check if the table is ready to start
         if (table.getStatus() != TableStatusEnum.VOTING)
-            throw new TableWrongStatusException(game.getId());
+            throw new TableWrongStatusException();
 
         // Check if the player can vote
         if ((game.getType().equals(GameTypeEnum.DICTATORSHIP) || game.getType().equals(GameTypeEnum.CLASSIC)) && !player.equals(table.getCurrentPresident()))
@@ -210,14 +221,24 @@ public class TableServiceImpl implements TableService {
         return tableDao.getMostVotedCard(gameId);
     }
 
-    private void transferCardFromDeckToTable(Game game) {
-        logger.debug("Transferring black card from deck to table in game {}", game);
+    private void transferCardFromDeckToTable(Table table) {
+        logger.debug("Transferring black card from deck to table {}", table);
 
-        if (game.getDeck() != null && !game.getDeck().isEmpty()) {
-            Card nextBlackCard = game.getDeck().get(0);
-            game.getTable().setCurrentBlackCard(nextBlackCard);
-            game.getDeck().remove(nextBlackCard);
+        if (table.getDeck() != null && !table.getDeck().isEmpty()) {
+            Card nextBlackCard = table.getDeck().get(0);
+            table.setCurrentBlackCard(nextBlackCard);
+            table.getDeck().remove(nextBlackCard);
         }
+    }
+
+    private void addBlackCardsToTableDeck(Table table, Deck deck) {
+        logger.debug("Adding black cards from the deck {} to table {}", deck, table);
+
+        List<Card> cards = new ArrayList<>(cardService.findCardsByDictionaryIdAndType(deck, CardTypeEnum.BLACK));
+
+        Collections.shuffle(cards);
+
+        table.getDeck().addAll(cards);
     }
 
     private void selectPlayerForRoundPresident(Game game) {

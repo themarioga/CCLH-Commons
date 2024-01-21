@@ -5,16 +5,8 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 
 public class GameAlreadyConfiguredException extends ApplicationException {
 
-    private final long id;
-
-    public GameAlreadyConfiguredException(long id) {
+    public GameAlreadyConfiguredException() {
         super(ErrorEnum.GAME_ALREADY_CONFIGURED);
-
-        this.id = id;
-    }
-
-    public long getID() {
-        return id;
     }
 
 }

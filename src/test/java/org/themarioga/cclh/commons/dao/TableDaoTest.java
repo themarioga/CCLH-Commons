@@ -37,7 +37,7 @@ class TableDaoTest extends BaseTest {
     @Autowired
     private PlayerDao playerDao;
     @Autowired
-    private DictionaryDao dictionaryDao;
+    private DeckDao deckDao;
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testCreateGame-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
@@ -45,7 +45,7 @@ class TableDaoTest extends BaseTest {
     void createGameAndTable() {
         Room room = roomDao.findOne(1L);
         User creator = userDao.findOne(0L);
-        Dictionary dictionary = dictionaryDao.findOne(0L);
+        Deck deck = deckDao.findOne(0L);
         Card card = cardDao.findOne(0L);
 
         Game game = new Game();
@@ -55,7 +55,7 @@ class TableDaoTest extends BaseTest {
         game.setStatus(GameStatusEnum.CREATED);
         game.setRoom(room);
         game.setCreator(creator);
-        game.setDictionary(dictionary);
+        game.setDictionary(deck);
 
         gameDao.create(game);
 

@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.dao.intf.CardDao;
-import org.themarioga.cclh.commons.dao.intf.DictionaryDao;
+import org.themarioga.cclh.commons.dao.intf.DeckDao;
 import org.themarioga.cclh.commons.enums.CardTypeEnum;
 import org.themarioga.cclh.commons.models.Card;
-import org.themarioga.cclh.commons.models.Dictionary;
+import org.themarioga.cclh.commons.models.Deck;
 
 import java.util.List;
 
@@ -23,17 +23,17 @@ class CardDaoTest extends BaseTest {
     @Autowired
     private CardDao cardDao;
     @Autowired
-    private DictionaryDao dictionaryDao;
+    private DeckDao deckDao;
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/card/testCreateCard-expected.xml", table = "T_CARD", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void createCard() {
-        Dictionary dictionary = dictionaryDao.findOne(0L);
+        Deck deck = deckDao.findOne(0L);
 
         Card card = new Card();
         card.setText("Test card");
         card.setType(CardTypeEnum.WHITE);
-        card.setDictionary(dictionary);
+        card.setDictionary(deck);
 
         cardDao.create(card);
 
@@ -91,6 +91,19 @@ class CardDaoTest extends BaseTest {
         long total = cardDao.countAll();
 
         Assertions.assertEquals(1, total);
+    }
+
+    @Test
+    @DatabaseSetup("classpath:dbunit/dao/setup/card.xml")
+    void testFindCardsByDictionaryIdAndType() {
+        Deck deck = deckDao.findOne(0L);
+
+        List<Card> cards = cardDao.findCardsByDictionaryIdAndType(deck, CardTypeEnum.BLACK);
+        int cardNumber = cardDao.countCardsByDictionaryIdAndType(deck, CardTypeEnum.BLACK);
+
+        Assertions.assertEquals(1L, cards.size());
+        Assertions.assertEquals(1L, cardNumber);
+        Assertions.assertEquals(cardNumber, cards.size());
     }
 
 }

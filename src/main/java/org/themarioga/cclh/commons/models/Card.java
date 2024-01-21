@@ -19,7 +19,7 @@ public class Card extends Base {
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "dictionary_id", referencedColumnName = "id")
-    private Dictionary dictionary;
+    private Deck deck;
 
     public Long getId() {
         return id;
@@ -45,12 +45,12 @@ public class Card extends Base {
         this.text = text;
     }
 
-    public Dictionary getDictionary() {
-        return dictionary;
+    public Deck getDictionary() {
+        return deck;
     }
 
-    public void setDictionary(Dictionary dictionary) {
-        this.dictionary = dictionary;
+    public void setDictionary(Deck deck) {
+        this.deck = deck;
     }
 
     @Override

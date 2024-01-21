@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
                 return userDao.update(userFromBd);
             } else {
                 logger.error("Error trying to create user {} ({}): Already exists", id, name);
-                throw new UserAlreadyExistsException(id);
+                throw new UserAlreadyExistsException();
             }
         }
     }
@@ -65,11 +65,11 @@ public class UserServiceImpl implements UserService {
         User user = userDao.findOne(id);
         if (user == null) {
             logger.error("Error getting user with id {}: Doesn't exists.", id);
-            throw new UserDoesntExistsException(id);
+            throw new UserDoesntExistsException();
         }
         if (Boolean.FALSE.equals(user.getActive())) {
             logger.error("Error getting user with id {}: Not active.", id);
-            throw new UserNotActiveException(id);
+            throw new UserNotActiveException();
         }
 
         return user;

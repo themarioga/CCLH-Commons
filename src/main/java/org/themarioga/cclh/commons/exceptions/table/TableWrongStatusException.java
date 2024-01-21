@@ -5,16 +5,8 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 
 public class TableWrongStatusException extends ApplicationException {
 
-    private final Long gameId;
-
-    public TableWrongStatusException(long gameId) {
+    public TableWrongStatusException() {
         super(ErrorEnum.TABLE_WRONG_STATUS);
-
-        this.gameId = gameId;
-    }
-
-    public Long getGameId() {
-        return gameId;
     }
 
 }

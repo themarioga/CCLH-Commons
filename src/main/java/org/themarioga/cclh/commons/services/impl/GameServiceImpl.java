@@ -11,7 +11,7 @@ import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
-import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryDoesntExistsException;
+import org.themarioga.cclh.commons.exceptions.deck.DeckDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.game.*;
 import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyExistsException;
 import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyVotedDeleteException;
@@ -36,18 +36,18 @@ public class GameServiceImpl implements GameService {
     private final CardService cardService;
     private final TableService tableService;
     private final PlayerService playerService;
-    private final DictionaryService dictionaryService;
+    private final DeckService deckService;
     private final ConfigurationService configurationService;
 
     @Autowired
-    public GameServiceImpl(GameDao gameDao, UserService userService, RoomService roomService, CardService cardService, PlayerService playerService, TableService tableService, DictionaryService dictionaryService, ConfigurationService configurationService) {
+    public GameServiceImpl(GameDao gameDao, UserService userService, RoomService roomService, CardService cardService, PlayerService playerService, TableService tableService, DeckService deckService, ConfigurationService configurationService) {
         this.gameDao = gameDao;
         this.userService = userService;
         this.roomService = roomService;
         this.cardService = cardService;
         this.playerService = playerService;
         this.tableService = tableService;
-        this.dictionaryService = dictionaryService;
+        this.deckService = deckService;
         this.configurationService = configurationService;
     }
 
@@ -60,10 +60,10 @@ public class GameServiceImpl implements GameService {
         Room room = roomService.createOrReactivate(roomId, roomName);
 
         // Check if a game already exists in this room
-        if (gameDao.countByRoom(roomService.getById(roomId)) > 0) throw new GameAlreadyExistsException(roomId);
+        if (gameDao.countByRoom(roomService.getById(roomId)) > 0) throw new GameAlreadyExistsException();
 
         // Check if this user already have a running game
-        if (gameDao.countByCreator(userService.getById(creatorId)) > 0) throw new GameAlreadyExistsException(roomId);
+        if (gameDao.countByCreator(userService.getById(creatorId)) > 0) throw new GameAlreadyExistsException();
 
         // Create game
         Game game = new Game();
@@ -74,35 +74,18 @@ public class GameServiceImpl implements GameService {
         game.setType(GameTypeEnum.DEMOCRACY);
         game.setNumberOfCardsToWin(getDefaultNumberCardsToWin());
         game.setMaxNumberOfPlayers(getDefaultMaxNumberOfPlayers());
-        game.setDictionary(dictionaryService.getDefaultDictionary());
+        game.setDictionary(deckService.getDefaultDictionary());
 
         return gameDao.create(game);
     }
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game delete(long roomId) {
-        logger.debug("Deleting game in room: {}", roomId);
+    public Game delete(Game game) {
+        logger.debug("Deleting game: {}", game);
 
-        Game game = gameDao.getByRoom(roomService.getById(roomId));
-
-        if (game == null) throw new GameDoesntExistsException(roomId);
-
-        gameDao.delete(game);
-
-        game.setStatus(GameStatusEnum.DELETED);
-
-        return game;
-    }
-
-    @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game deleteByCreatorId(long userId) {
-        logger.debug("Deleting game by user: {}", userId);
-
-        Game game = gameDao.getByCreator(userService.getById(userId));
-
-        if (game == null) throw new GameDoesntExistsException(userId);
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         gameDao.delete(game);
 
@@ -113,17 +96,14 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game setType(long roomId, GameTypeEnum type) {
-        logger.debug("Setting type {} to game in room {}", type, roomId);
-
-        // Get the game
-        Game game = gameDao.getByRoom(roomService.getById(roomId));
+    public Game setType(Game game, GameTypeEnum type) {
+        logger.debug("Setting type {} to game {}", type, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check if the game has already started
-        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException(game.getId());
+        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
 
         // Set the type to game
         game.setType(type);
@@ -133,17 +113,14 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game setNumberOfCardsToWin(long roomId, int numberOfCards) {
-        logger.debug("Setting number of cards {} to game in room {}", numberOfCards, roomId);
-
-        // Get the game
-        Game game = gameDao.getByRoom(roomService.getById(roomId));
+    public Game setNumberOfCardsToWin(Game game, int numberOfCards) {
+        logger.debug("Setting number of cards {} to game {}", numberOfCards, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check if the game has already started
-        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException(game.getId());
+        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
 
         // Set the number of cards to win
         game.setNumberOfCardsToWin(numberOfCards);
@@ -153,17 +130,14 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game setMaxNumberOfPlayers(long roomId, int maxNumberOfPlayers) {
-        logger.debug("Setting max number of players {} to game in room {}", maxNumberOfPlayers, roomId);
-
-        // Get the game
-        Game game = gameDao.getByRoom(roomService.getById(roomId));
+    public Game setMaxNumberOfPlayers(Game game, int maxNumberOfPlayers) {
+        logger.debug("Setting max number of players {} to game {}", maxNumberOfPlayers, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check if the game has already started
-        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException(game.getId());
+        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
 
         // Set the max number of players
         game.setMaxNumberOfPlayers(maxNumberOfPlayers);
@@ -173,37 +147,31 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game setDictionary(long roomId, long dictionaryId) {
-        logger.debug("Setting dictionary {} to game in room {}", dictionaryId, roomId);
-
-        // Get the game
-        Game game = gameDao.getByRoom(roomService.getById(roomId));
+    public Game setDictionary(Game game, long dictionaryId) {
+        logger.debug("Setting dictionary {} to game {}", dictionaryId, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check if the game has already started
-        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException(game.getId());
+        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
 
         // Find the dictionary
-        Dictionary dictionary = dictionaryService.findOne(dictionaryId);
+        Deck deck = deckService.findOne(dictionaryId);
 
         // Check if the dictionary exists
-        if (dictionary == null) throw new DictionaryDoesntExistsException(dictionaryId);
+        if (deck == null) throw new DeckDoesntExistsException();
 
         // Set the dictionary
-        game.setDictionary(dictionary);
+        game.setDictionary(deck);
 
         return gameDao.update(game);
     }
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game addPlayer(long roomId, long userId) {
-        logger.debug("Creating player from user {} in game in room {}", userId, roomId);
-
-        // Get the game
-        Game game = gameDao.getByRoom(roomService.getById(roomId));
+    public Game addPlayer(Game game, long userId) {
+        logger.debug("Creating player from user {} in game {}", userId, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
@@ -216,11 +184,11 @@ public class GameServiceImpl implements GameService {
 
         // Check game is not full
         if (game.getPlayers().size() >= game.getMaxNumberOfPlayers())
-            throw new GameAlreadyFilledException(game.getId());
+            throw new GameAlreadyFilledException();
 
         // Check if the user is already playing
         if (playerService.findByUserId(userId) != null)
-            throw new PlayerAlreadyExistsException(userId);
+            throw new PlayerAlreadyExistsException();
 
         // Create player
         Player player = playerService.create(game, user);
@@ -233,27 +201,24 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game leaveGame(long roomId, long userId) {
-        logger.debug("Removing player from user {} in game in room {}", userId, roomId);
-
-        // Get the game
-        Game game = gameDao.getByRoom(roomService.getById(roomId));
+    public Game leaveGame(Game game, long userId) {
+        logger.debug("Removing player from user {} in game {}", userId, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check the status of the game
-        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException(game.getId());
+        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
 
         // Game creator cannor leave
-        if (game.getCreator().getId() == userId) throw new GameCreatorCannotLeaveException(game.getId());
+        if (game.getCreator().getId() == userId) throw new GameCreatorCannotLeaveException();
 
         // Get the player
         Player player = playerService.findByUserId(userId);
 
         // Check if the user is not playing
         if (player == null)
-            throw new PlayerDoesntExistsException(userId);
+            throw new PlayerDoesntExistsException();
 
         // Remove a player
         game.getPlayers().remove(player);
@@ -263,21 +228,18 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game startGame(long roomId) {
-        logger.debug("Starting game in room {}", roomId);
-
-        // Get the game
-        Game game = gameDao.getByRoom(roomService.getById(roomId));
+    public Game startGame(Game game) {
+        logger.debug("Starting game in room {}", game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check the status of the game
-        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException(game.getId());
+        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
 
         // Check the number of players in the game
         if (game.getPlayers().size() < getMinNumberOfPlayers())
-            throw new GameNotFilledException(game.getId());
+            throw new GameNotFilledException();
 
         // Change game status
         game.setStatus(GameStatusEnum.STARTED);
@@ -285,8 +247,7 @@ public class GameServiceImpl implements GameService {
         // Create table
         game.setTable(tableService.create(game));
 
-        // Add cards to table and players
-        addBlackCardsToTableDeck(game);
+        // Add cards to players decks
         addWhiteCardsToPlayersDecks(game);
 
         return gameDao.update(game);
@@ -294,18 +255,15 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game startRound(long roomId) {
-        logger.debug("Starting round for game in room {}", roomId);
-
-        // Get the game
-        Game game = gameDao.getByRoom(roomService.getById(roomId));
+    public Game startRound(Game game) {
+        logger.debug("Starting round for game in room {}", game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check if game is started
         if (game.getStatus() != GameStatusEnum.STARTED)
-            throw new GameNotStartedException(roomId);
+            throw new GameNotStartedException();
 
         // Add cards to player hands
         for (Player player : game.getPlayers()) {
@@ -320,11 +278,8 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game endRound(long roomId) {
-        logger.debug("Ending round for game in room {}", roomId);
-
-        // Get the game
-        Game game = gameDao.getByRoom(roomService.getById(roomId));
+    public Game endRound(Game game) {
+        logger.debug("Ending round for game {}", game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
@@ -337,18 +292,15 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game voteForDeletion(long roomId, long userId) {
-        logger.debug("Player {} vote for the deletion of the game in room {}", userId, roomId);
-
-        // Get the game
-        Game game = gameDao.getByRoom(roomService.getById(roomId));
+    public Game voteForDeletion(Game game, long userId) {
+        logger.debug("Player {} vote for the deletion of the game {}", userId, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check if game is started
         if (game.getStatus() != GameStatusEnum.STARTED)
-            throw new GameNotStartedException(roomId);
+            throw new GameNotStartedException();
 
         // Get the player
         Player player = playerService.findByUserId(userId);
@@ -365,7 +317,7 @@ public class GameServiceImpl implements GameService {
 
         // If more than half of the game players vote to delete the game...
         if (game.getStatus().equals(GameStatusEnum.STARTED) && game.getDeletionVotes().size() >= ((game.getPlayers().size() / 2) + 1)) {
-            return delete(roomId);
+            return delete(game);
         } else {
             return gameDao.update(game);
         }
@@ -373,18 +325,15 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game playCard(long roomId, long userId, long cardId) {
-        logger.debug("Player {} used the card {} of the game in room {}", userId, cardId, roomId);
-
-        // Get the game
-        Game game = gameDao.getByRoom(roomService.getById(roomId));
+    public Game playCard(Game game, long userId, long cardId) {
+        logger.debug("Player {} used the card {} of the game {}", userId, cardId, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check if game is started
         if (game.getStatus() != GameStatusEnum.STARTED)
-            throw new GameNotStartedException(roomId);
+            throw new GameNotStartedException();
 
         // Get the player
         Player player = playerService.findByUserId(userId);
@@ -406,18 +355,15 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game voteForCard(long roomId, long userId, long cardId) {
-        logger.debug("Player {} vote for the card {} of the game in room {}", userId, cardId, roomId);
-
-        // Get the game
-        Game game = gameDao.getByRoom(roomService.getById(roomId));
+    public Game voteForCard(Game game, long userId, long cardId) {
+        logger.debug("Player {} vote for the card {} of the game {}", userId, cardId, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check if game is started
         if (game.getStatus() != GameStatusEnum.STARTED)
-            throw new GameNotStartedException(roomId);
+            throw new GameNotStartedException();
 
         // Get the player
         Player player = playerService.findByUserId(userId);
@@ -465,22 +411,10 @@ public class GameServiceImpl implements GameService {
         return Integer.parseInt(configurationService.getConfiguration("game_max_number_of_players"));
     }
 
-    private void addBlackCardsToTableDeck(Game game) {
-        logger.debug("Adding black cards to table in the game {}", game);
-
-        List<Card> cards = new ArrayList<>(dictionaryService.findCardsByDictionaryIdAndType(game.getDictionary(), CardTypeEnum.BLACK));
-
-        Collections.shuffle(cards);
-
-        game.getDeck().addAll(cards);
-
-        gameDao.update(game);
-    }
-
     private void addWhiteCardsToPlayersDecks(Game game) {
         logger.debug("Adding white cards to players in the game {}", game);
 
-        List<Card> cards = new ArrayList<>(dictionaryService.findCardsByDictionaryIdAndType(game.getDictionary(), CardTypeEnum.WHITE));
+        List<Card> cards = new ArrayList<>(cardService.findCardsByDictionaryIdAndType(game.getDictionary(), CardTypeEnum.WHITE));
 
         Collections.shuffle(cards);
 

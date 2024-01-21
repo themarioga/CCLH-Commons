@@ -64,11 +64,11 @@ public class RoomServiceImpl implements RoomService {
         Room room = roomDao.findOne(id);
         if (room == null) {
             logger.error("Error getting room with id {}: Doesn't exists.", id);
-            throw new RoomDoesntExistsException(id);
+            throw new RoomDoesntExistsException();
         }
         if (Boolean.FALSE.equals(room.getActive())) {
             logger.error("Error getting room with id {}: Not active.", id);
-            throw new RoomNotActiveException(id);
+            throw new RoomNotActiveException();
         }
 
         return room;

@@ -34,14 +34,14 @@ class GameDaoTest extends BaseTest {
     @Autowired
     private PlayerDao playerDao;
     @Autowired
-    private DictionaryDao dictionaryDao;
+    private DeckDao deckDao;
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testCreateGame-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void createGame() {
         Room room = roomDao.findOne(1L);
         User creator = userDao.findOne(0L);
-        Dictionary dictionary = dictionaryDao.findOne(0L);
+        Deck deck = deckDao.findOne(0L);
 
         Game game = new Game();
         game.setType(GameTypeEnum.DICTATORSHIP);
@@ -50,7 +50,7 @@ class GameDaoTest extends BaseTest {
         game.setStatus(GameStatusEnum.CREATED);
         game.setRoom(room);
         game.setCreator(creator);
-        game.setDictionary(dictionary);
+        game.setDictionary(deck);
 
         gameDao.create(game);
 
@@ -139,12 +139,12 @@ class GameDaoTest extends BaseTest {
         Game game = gameDao.findOne(0L);
         Card card = cardDao.findOne(0L);
 
-        game.getDeck().add(card);
+        game.getTable().getDeck().add(card);
 
         gameDao.update(game);
         getCurrentSession().flush();
 
-        Assertions.assertEquals(1, game.getDeck().size());
+        Assertions.assertEquals(1, game.getTable().getDeck().size());
     }
 
     @Test
@@ -186,8 +186,8 @@ class GameDaoTest extends BaseTest {
 
         Assertions.assertEquals(0L, game.getId());
 
-        Assertions.assertNotNull(game.getDeck());
-        Assertions.assertEquals(1, game.getDeck().size());
+        Assertions.assertNotNull(game.getTable().getDeck());
+        Assertions.assertEquals(1, game.getTable().getDeck().size());
     }
 
 }
