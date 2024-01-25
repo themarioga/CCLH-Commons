@@ -128,21 +128,21 @@ class GameServiceTest extends BaseTest {
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameDictionary-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetDictionary() {
-        Game game = gameService.setDictionary(gameService.getByRoomId(0L), 1L);
+        Game game = gameService.setDeck(gameService.getByRoomId(0L), 1L);
 
         getCurrentSession().flush();
 
-        Assertions.assertEquals(deckService.findOne(1L), game.getDictionary());
+        Assertions.assertEquals(deckService.findOne(1L), game.getDeck());
     }
 
     @Test
     void testSetMaxDictionary_GameAlreadyStarted() {
-        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setDictionary(gameService.getByRoomId(3L), 0L));
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setDeck(gameService.getByRoomId(3L), 0L));
     }
 
     @Test
     void testSetMaxDictionary_DictionaryDoesntExists() {
-        Assertions.assertThrows(DeckDoesntExistsException.class, () -> gameService.setDictionary(gameService.getByRoomId(0L), 50L));
+        Assertions.assertThrows(DeckDoesntExistsException.class, () -> gameService.setDeck(gameService.getByRoomId(0L), 50L));
     }
 
     @Test

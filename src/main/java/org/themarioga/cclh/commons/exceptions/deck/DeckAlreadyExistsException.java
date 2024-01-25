@@ -6,7 +6,7 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 public class DeckAlreadyExistsException extends ApplicationException {
 
     public DeckAlreadyExistsException() {
-        super(ErrorEnum.DICTIONARY_ALREADY_EXISTS);
+        super(ErrorEnum.DECK_ALREADY_EXISTS);
     }
 
 }

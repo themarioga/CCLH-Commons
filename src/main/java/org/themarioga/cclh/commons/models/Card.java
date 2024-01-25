@@ -45,11 +45,11 @@ public class Card extends Base {
         this.text = text;
     }
 
-    public Deck getDictionary() {
+    public Deck getDeck() {
         return deck;
     }
 
-    public void setDictionary(Deck deck) {
+    public void setDeck(Deck deck) {
         this.deck = deck;
     }
 

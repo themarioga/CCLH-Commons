@@ -6,7 +6,7 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 public class DeckNotCompletedException extends ApplicationException {
 
     public DeckNotCompletedException() {
-        super(ErrorEnum.DICTIONARY_NOT_FILLED);
+        super(ErrorEnum.DECK_NOT_FILLED);
     }
 
 }

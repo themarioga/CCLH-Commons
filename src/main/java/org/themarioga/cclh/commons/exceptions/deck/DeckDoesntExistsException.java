@@ -6,7 +6,7 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 public class DeckDoesntExistsException extends ApplicationException {
 
     public DeckDoesntExistsException() {
-        super(ErrorEnum.DICTIONARY_NOT_FOUND);
+        super(ErrorEnum.DECK_NOT_FOUND);
     }
 
 }

@@ -16,7 +16,7 @@ public interface GameService {
 
     Game setMaxNumberOfPlayers(Game game, int maxNumberOfPlayers);
 
-    Game setDictionary(Game game, long dictionaryId);
+    Game setDeck(Game game, long deckId);
 
     Game addPlayer(Game game, long userId);
 

@@ -55,7 +55,7 @@ class TableDaoTest extends BaseTest {
         game.setStatus(GameStatusEnum.CREATED);
         game.setRoom(room);
         game.setCreator(creator);
-        game.setDictionary(deck);
+        game.setDeck(deck);
 
         gameDao.create(game);
 

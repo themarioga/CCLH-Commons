@@ -74,7 +74,7 @@ public class GameServiceImpl implements GameService {
         game.setType(GameTypeEnum.DEMOCRACY);
         game.setNumberOfCardsToWin(getDefaultNumberCardsToWin());
         game.setMaxNumberOfPlayers(getDefaultMaxNumberOfPlayers());
-        game.setDictionary(deckService.getDefaultDictionary());
+        game.setDeck(deckService.getDefaultDeck());
 
         return gameDao.create(game);
     }
@@ -147,8 +147,8 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game setDictionary(Game game, long dictionaryId) {
-        logger.debug("Setting dictionary {} to game {}", dictionaryId, game);
+    public Game setDeck(Game game, long deckId) {
+        logger.debug("Setting deck {} to game {}", deckId, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
@@ -156,14 +156,14 @@ public class GameServiceImpl implements GameService {
         // Check if the game has already started
         if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
 
-        // Find the dictionary
-        Deck deck = deckService.findOne(dictionaryId);
+        // Find the deck
+        Deck deck = deckService.findOne(deckId);
 
-        // Check if the dictionary exists
+        // Check if the deck exists
         if (deck == null) throw new DeckDoesntExistsException();
 
-        // Set the dictionary
-        game.setDictionary(deck);
+        // Set the deck
+        game.setDeck(deck);
 
         return gameDao.update(game);
     }
@@ -414,7 +414,7 @@ public class GameServiceImpl implements GameService {
     private void addWhiteCardsToPlayersDecks(Game game) {
         logger.debug("Adding white cards to players in the game {}", game);
 
-        List<Card> cards = new ArrayList<>(cardService.findCardsByDictionaryIdAndType(game.getDictionary(), CardTypeEnum.WHITE));
+        List<Card> cards = new ArrayList<>(cardService.findCardsByDeckIdAndType(game.getDeck(), CardTypeEnum.WHITE));
 
         Collections.shuffle(cards);
 

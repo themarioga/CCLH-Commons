@@ -33,7 +33,7 @@ class CardDaoTest extends BaseTest {
         Card card = new Card();
         card.setText("Test card");
         card.setType(CardTypeEnum.WHITE);
-        card.setDictionary(deck);
+        card.setDeck(deck);
 
         cardDao.create(card);
 
@@ -71,7 +71,7 @@ class CardDaoTest extends BaseTest {
         Assertions.assertEquals(0L, card.getId());
         Assertions.assertEquals("First", card.getText());
         Assertions.assertEquals(CardTypeEnum.BLACK, card.getType());
-        Assertions.assertEquals(0, card.getDictionary().getId());
+        Assertions.assertEquals(0, card.getDeck().getId());
     }
 
     @Test
@@ -83,7 +83,7 @@ class CardDaoTest extends BaseTest {
         Assertions.assertEquals(0L, cards.get(0).getId());
         Assertions.assertEquals("First", cards.get(0).getText());
         Assertions.assertEquals(CardTypeEnum.BLACK, cards.get(0).getType());
-        Assertions.assertEquals(0, cards.get(0).getDictionary().getId());
+        Assertions.assertEquals(0, cards.get(0).getDeck().getId());
     }
 
     @Test
@@ -98,8 +98,8 @@ class CardDaoTest extends BaseTest {
     void testFindCardsByDictionaryIdAndType() {
         Deck deck = deckDao.findOne(0L);
 
-        List<Card> cards = cardDao.findCardsByDictionaryIdAndType(deck, CardTypeEnum.BLACK);
-        int cardNumber = cardDao.countCardsByDictionaryIdAndType(deck, CardTypeEnum.BLACK);
+        List<Card> cards = cardDao.findCardsByDeckIdAndType(deck, CardTypeEnum.BLACK);
+        int cardNumber = cardDao.countCardsByDeckIdAndType(deck, CardTypeEnum.BLACK);
 
         Assertions.assertEquals(1L, cards.size());
         Assertions.assertEquals(1L, cardNumber);

@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface DeckDao extends InterfaceHibernateDao<Deck> {
 
-    List<Deck> getDictionariesPaginated(User creator, int firstResult, int maxResults);
+    List<Deck> getDecksPaginated(User creator, int firstResult, int maxResults);
 
+	Long getDeckCount(User creator);
 }

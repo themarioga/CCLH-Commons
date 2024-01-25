@@ -70,17 +70,17 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
-    public List<Card> findCardsByDictionaryIdAndType(Deck deck, CardTypeEnum cardTypeEnum) {
-        logger.debug("Getting cards by dictionary {} and type {}", deck, cardTypeEnum);
+    public List<Card> findCardsByDeckIdAndType(Deck deck, CardTypeEnum cardTypeEnum) {
+        logger.debug("Getting cards by deck {} and type {}", deck, cardTypeEnum);
 
-        return cardDao.findCardsByDictionaryIdAndType(deck, cardTypeEnum);
+        return cardDao.findCardsByDeckIdAndType(deck, cardTypeEnum);
     }
 
     @Override
     @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
-    public long countCardsByDictionaryIdAndType(Deck deck, CardTypeEnum cardTypeEnum) {
-        logger.debug("Counting cards by dictionary {} and type {}", deck, cardTypeEnum);
+    public long countCardsByDeckIdAndType(Deck deck, CardTypeEnum cardTypeEnum) {
+        logger.debug("Counting cards by deck {} and type {}", deck, cardTypeEnum);
 
-        return cardDao.countCardsByDictionaryIdAndType(deck, cardTypeEnum);
+        return cardDao.countCardsByDeckIdAndType(deck, cardTypeEnum);
     }
 }

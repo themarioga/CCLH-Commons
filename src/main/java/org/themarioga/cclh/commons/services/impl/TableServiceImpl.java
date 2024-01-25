@@ -63,7 +63,7 @@ public class TableServiceImpl implements TableService {
         }
 
         // Add cards from dictionary to table
-        addBlackCardsToTableDeck(table, game.getDictionary());
+        addBlackCardsToTableDeck(table, game.getDeck());
 
         return tableDao.create(table);
     }
@@ -234,7 +234,7 @@ public class TableServiceImpl implements TableService {
     private void addBlackCardsToTableDeck(Table table, Deck deck) {
         logger.debug("Adding black cards from the deck {} to table {}", deck, table);
 
-        List<Card> cards = new ArrayList<>(cardService.findCardsByDictionaryIdAndType(deck, CardTypeEnum.BLACK));
+        List<Card> cards = new ArrayList<>(cardService.findCardsByDeckIdAndType(deck, CardTypeEnum.BLACK));
 
         Collections.shuffle(cards);
 

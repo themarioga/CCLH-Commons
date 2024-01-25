@@ -50,7 +50,7 @@ class GameDaoTest extends BaseTest {
         game.setStatus(GameStatusEnum.CREATED);
         game.setRoom(room);
         game.setCreator(creator);
-        game.setDictionary(deck);
+        game.setDeck(deck);
 
         gameDao.create(game);
 
@@ -91,7 +91,7 @@ class GameDaoTest extends BaseTest {
         Assertions.assertEquals(0, game.getMaxNumberOfPlayers());
         Assertions.assertEquals(0, game.getRoom().getId());
         Assertions.assertEquals(0, game.getCreator().getId());
-        Assertions.assertEquals(0, game.getDictionary().getId());
+        Assertions.assertEquals(0, game.getDeck().getId());
         Assertions.assertEquals(GameTypeEnum.DEMOCRACY, game.getType());
         Assertions.assertEquals(GameStatusEnum.CREATED, game.getStatus());
     }
@@ -105,7 +105,7 @@ class GameDaoTest extends BaseTest {
         Assertions.assertEquals(0, game.getMaxNumberOfPlayers());
         Assertions.assertEquals(0, game.getRoom().getId());
         Assertions.assertEquals(0, game.getCreator().getId());
-        Assertions.assertEquals(0, game.getDictionary().getId());
+        Assertions.assertEquals(0, game.getDeck().getId());
         Assertions.assertEquals(GameTypeEnum.DEMOCRACY, game.getType());
         Assertions.assertEquals(GameStatusEnum.CREATED, game.getStatus());
     }
@@ -121,7 +121,7 @@ class GameDaoTest extends BaseTest {
         Assertions.assertEquals(0, games.get(0).getMaxNumberOfPlayers());
         Assertions.assertEquals(0, games.get(0).getRoom().getId());
         Assertions.assertEquals(0, games.get(0).getCreator().getId());
-        Assertions.assertEquals(0, games.get(0).getDictionary().getId());
+        Assertions.assertEquals(0, games.get(0).getDeck().getId());
         Assertions.assertEquals(GameTypeEnum.DEMOCRACY, games.get(0).getType());
         Assertions.assertEquals(GameStatusEnum.CREATED, games.get(0).getStatus());
     }

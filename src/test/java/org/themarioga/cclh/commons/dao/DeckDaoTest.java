@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.dao.intf.DeckDao;
 import org.themarioga.cclh.commons.dao.intf.UserDao;
-import org.themarioga.cclh.commons.enums.CardTypeEnum;
-import org.themarioga.cclh.commons.models.Card;
 import org.themarioga.cclh.commons.models.Deck;
 import org.themarioga.cclh.commons.models.DeckCollaborator;
 import org.themarioga.cclh.commons.models.User;
@@ -104,7 +102,7 @@ class DeckDaoTest extends BaseTest {
         User user = userDao.findOne(0L);
 
         DeckCollaborator deckCollaborator = new DeckCollaborator();
-        deckCollaborator.setDictionaryId(0L);
+        deckCollaborator.setDeckId(0L);
         deckCollaborator.setUser(user);
         deckCollaborator.setAccepted(true);
         deckCollaborator.setCanEdit(true);

@@ -1,6 +1,9 @@
 package org.themarioga.cclh.commons.services.intf;
 
 import org.themarioga.cclh.commons.models.Deck;
+import org.themarioga.cclh.commons.models.User;
+
+import java.util.List;
 
 public interface DeckService {
 
@@ -10,9 +13,11 @@ public interface DeckService {
 
     void delete(Deck deck);
 
-    void deleteById(long id);
-
     Deck findOne(long id);
 
-    Deck getDefaultDictionary();
+    List<Deck> getDeckPaginated(User creator, int firstResult, int maxResults);
+
+	Long getDeckCount(User creator);
+
+	Deck getDefaultDeck();
 }

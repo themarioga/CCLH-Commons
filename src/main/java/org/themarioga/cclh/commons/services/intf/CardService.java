@@ -18,8 +18,8 @@ public interface CardService {
 
     Card findOne(long id);
 
-    List<Card> findCardsByDictionaryIdAndType(Deck deck, CardTypeEnum cardTypeEnum);
+    List<Card> findCardsByDeckIdAndType(Deck deck, CardTypeEnum cardTypeEnum);
 
-    long countCardsByDictionaryIdAndType(Deck deck, CardTypeEnum cardTypeEnum);
+    long countCardsByDeckIdAndType(Deck deck, CardTypeEnum cardTypeEnum);
 
 }

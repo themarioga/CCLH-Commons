@@ -103,7 +103,7 @@ public class Deck extends Base {
 
     @Override
     public String toString() {
-        return "Dictionary{" + "id=" + id + ", name='" + name + '\'' + ", shared=" + shared + ", published=" + published + '}';
+        return "Deck{" + "id=" + id + ", name='" + name + '\'' + ", shared=" + shared + ", published=" + published + '}';
     }
 
 }

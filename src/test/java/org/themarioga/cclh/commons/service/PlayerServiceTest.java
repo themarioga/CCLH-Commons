@@ -71,7 +71,7 @@ class PlayerServiceTest extends BaseTest {
     void testAddCardsToPlayerDeck() {
         Player player = playerService.findByUserId(0L);
 
-        List<Card> cards = cardService.findCardsByDictionaryIdAndType(deckService.findOne(0L), CardTypeEnum.WHITE);
+        List<Card> cards = cardService.findCardsByDeckIdAndType(deckService.findOne(0L), CardTypeEnum.WHITE);
         List<Card> card = cards.subList(0, 1);
 
         playerService.addCardsToPlayerDeck(player, card);

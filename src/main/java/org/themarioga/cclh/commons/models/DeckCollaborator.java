@@ -10,7 +10,7 @@ public class DeckCollaborator implements Serializable {
 
     @Id
     @Column(name = "dictionary_id")
-    private Long dictionaryId;
+    private Long deckId;
 
     @Id
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
@@ -22,12 +22,12 @@ public class DeckCollaborator implements Serializable {
     @Column(name = "accepted", nullable = false)
     private Boolean accepted;
 
-    public Long getDictionaryId() {
-        return dictionaryId;
+    public Long getDeckId() {
+        return deckId;
     }
 
-    public void setDictionaryId(Long dictionaryId) {
-        this.dictionaryId = dictionaryId;
+    public void setDeckId(Long deckId) {
+        this.deckId = deckId;
     }
 
     public User getUser() {
@@ -56,7 +56,7 @@ public class DeckCollaborator implements Serializable {
 
     @Override
     public String toString() {
-        return "DictionaryCollaborator{" + "dictionaryId=" + dictionaryId + ", canEdit=" + canEdit + ", accepted=" + accepted + '}';
+        return "DeckCollaborator{" + "deckId=" + deckId + ", canEdit=" + canEdit + ", accepted=" + accepted + '}';
     }
 
 }

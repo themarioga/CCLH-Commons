@@ -9,8 +9,8 @@ import java.util.List;
 
 public interface CardDao extends InterfaceHibernateDao<Card> {
 
-    List<Card> findCardsByDictionaryIdAndType(Deck deck, CardTypeEnum cardTypeEnum);
+    List<Card> findCardsByDeckIdAndType(Deck deck, CardTypeEnum cardTypeEnum);
 
-    int countCardsByDictionaryIdAndType(Deck deck, CardTypeEnum cardTypeEnum);
+    int countCardsByDeckIdAndType(Deck deck, CardTypeEnum cardTypeEnum);
 
 }

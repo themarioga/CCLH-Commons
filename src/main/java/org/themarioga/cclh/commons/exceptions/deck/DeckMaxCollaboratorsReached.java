@@ -6,7 +6,7 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 public class DeckMaxCollaboratorsReached extends ApplicationException {
 
     public DeckMaxCollaboratorsReached() {
-        super(ErrorEnum.DICTIONARY_ALREADY_FILLED);
+        super(ErrorEnum.DECK_ALREADY_FILLED);
     }
 
 }

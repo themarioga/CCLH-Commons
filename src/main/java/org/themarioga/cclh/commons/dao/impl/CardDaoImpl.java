@@ -17,12 +17,12 @@ public class CardDaoImpl extends AbstractHibernateDao<Card> implements CardDao {
     }
 
     @Override
-    public List<Card> findCardsByDictionaryIdAndType(Deck deck, CardTypeEnum cardTypeEnum) {
+    public List<Card> findCardsByDeckIdAndType(Deck deck, CardTypeEnum cardTypeEnum) {
         return getCurrentSession().createQuery("SELECT t FROM Card t where t.deck=:deck and t.type=:type", Card.class).setParameter("deck", deck).setParameter("type", cardTypeEnum).getResultList();
     }
 
     @Override
-    public int countCardsByDictionaryIdAndType(Deck deck, CardTypeEnum cardTypeEnum) {
+    public int countCardsByDeckIdAndType(Deck deck, CardTypeEnum cardTypeEnum) {
         return getCurrentSession().createQuery("SELECT count(*) FROM Card t where t.deck=:deck and t.type=:type", Long.class).setParameter("deck", deck).setParameter("type", cardTypeEnum).getSingleResultOrNull().intValue();
     }
 
