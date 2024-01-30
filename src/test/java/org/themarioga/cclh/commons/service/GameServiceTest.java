@@ -22,6 +22,7 @@ import org.themarioga.cclh.commons.models.Game;
 import org.themarioga.cclh.commons.models.Player;
 import org.themarioga.cclh.commons.services.intf.DeckService;
 import org.themarioga.cclh.commons.services.intf.GameService;
+import org.themarioga.cclh.commons.services.intf.PlayerService;
 import org.themarioga.cclh.commons.services.intf.UserService;
 
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")
@@ -44,6 +45,9 @@ class GameServiceTest extends BaseTest {
 
     @Autowired
     DeckService deckService;
+
+    @Autowired
+    PlayerService playerService;
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/service/expected/testCreateGame-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
@@ -147,24 +151,20 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testAddPlayer() {
-        Game game = gameService.addPlayer(gameService.getByRoomId(1L), 4L);
+        Game game = gameService.getByRoomId(1L);
+        gameService.addPlayer(game, playerService.create(game, 4L));
 
         Assertions.assertEquals(1L, game.getPlayers().size());
     }
 
     @Test
     void testAddPlayer_GameAlreadyFilled() {
-        Assertions.assertThrows(GameAlreadyFilledException.class, () -> gameService.addPlayer(gameService.getByRoomId(0L), 3L));
+        Assertions.assertThrows(GameAlreadyFilledException.class, () -> gameService.addPlayer(gameService.getByRoomId(0L), playerService.findByUserId(3L)));
     }
 
     @Test
     void testAddPlayer_UserNotActive() {
-        Assertions.assertThrows(UserNotActiveException.class, () -> gameService.addPlayer(gameService.getByRoomId(0L), 2L));
-    }
-
-    @Test
-    void testAddPlayer_AlreadyAdded() {
-        Assertions.assertThrows(PlayerAlreadyExistsException.class, () -> gameService.addPlayer(gameService.getByRoomId(1L), 1L));
+        Assertions.assertThrows(UserNotActiveException.class, () -> gameService.addPlayer(gameService.getByRoomId(0L), playerService.findByUserId(2L)));
     }
 
     @Test
@@ -202,11 +202,13 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testStartGame_Dictatorship() {
-        gameService.addPlayer(gameService.getByRoomId(1L), 4L);
-        gameService.addPlayer(gameService.getByRoomId(1L), 5L);
-        gameService.addPlayer(gameService.getByRoomId(1L), 6L);
+        Game game = gameService.getByRoomId(1L);
 
-        Game game = gameService.startGame(gameService.getByRoomId(1L));
+        gameService.addPlayer(game, playerService.create(game, 4L));
+        gameService.addPlayer(game, playerService.create(game, 5L));
+        gameService.addPlayer(game, playerService.create(game, 6L));
+
+        gameService.startGame(game);
 
         Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
         Assertions.assertNotNull(game.getTable());

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.themarioga.cclh.commons.dao.intf.PlayerDao;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
+import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyExistsException;
 import org.themarioga.cclh.commons.exceptions.player.PlayerCannotPlayCardException;
 import org.themarioga.cclh.commons.models.Card;
 import org.themarioga.cclh.commons.models.Game;
@@ -39,14 +40,24 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Player create(Game game, User user) {
-        logger.debug("Creating player from user {} in game {}", user, game);
+    public Player create(Game game, long userId) {
+        logger.debug("Creating player from user {} in game {}", userId, game);
 
-        // Check game exists
+        // Check game is not null
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check user is not null
+        Assert.assertNotNull(userId, ErrorEnum.USER_NOT_FOUND);
+
+        // Get the user
+        User user = userService.getById(userId);
 
         // Check user exists
         Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+
+        // Check if the user is already playing
+        if (playerDao.findPlayerByUser(user) != null)
+            throw new PlayerAlreadyExistsException();
 
         // Create player
         Player player = new Player();
@@ -92,6 +103,14 @@ public class PlayerServiceImpl implements PlayerService {
 
         player.getHand().remove(card);
         playerDao.update(player);
+    }
+
+    @Override
+    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    public Player findById(long id) {
+        logger.debug("Getting player with ID: {}", id);
+
+        return playerDao.findOne(id);
     }
 
     @Override

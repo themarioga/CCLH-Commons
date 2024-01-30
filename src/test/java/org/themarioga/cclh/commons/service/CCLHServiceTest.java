@@ -7,6 +7,7 @@ import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.models.Game;
 import org.themarioga.cclh.commons.services.intf.GameService;
+import org.themarioga.cclh.commons.services.intf.PlayerService;
 
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/room.xml")
@@ -17,15 +18,18 @@ class CCLHServiceTest extends BaseTest {
     @Autowired
     GameService gameService;
 
+    @Autowired
+    PlayerService playerService;
+
     @Test
     void completeGameTest() {
         Game game = gameService.create(0L, "Habitación", 0L);
         gameService.setType(game, GameTypeEnum.DEMOCRACY);
         gameService.setNumberOfCardsToWin(game, 3);
         gameService.setDeck(game, 0L);
-        gameService.addPlayer(game, 0L);
-        gameService.addPlayer(game, 1L);
-        gameService.addPlayer(game, 3L);
+        gameService.addPlayer(game, playerService.create(game, 0L));
+        gameService.addPlayer(game, playerService.create(game, 1L));
+        gameService.addPlayer(game, playerService.create(game, 3L));
         gameService.startGame(game);
         gameService.startRound(game);
         gameService.playCard(game, 0L, game.getPlayers().get(0).getHand().get(0).getId());

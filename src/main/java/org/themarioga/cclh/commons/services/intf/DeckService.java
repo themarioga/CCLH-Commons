@@ -17,7 +17,7 @@ public interface DeckService {
 
     List<Deck> getDeckPaginated(User creator, int firstResult, int maxResults);
 
-	Long getDeckCount(User creator);
+    Long getDeckCount(User creator);
 
-	Deck getDefaultDeck();
+    Deck getDefaultDeck();
 }

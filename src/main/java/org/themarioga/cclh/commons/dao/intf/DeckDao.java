@@ -10,5 +10,5 @@ public interface DeckDao extends InterfaceHibernateDao<Deck> {
 
     List<Deck> getDecksPaginated(User creator, int firstResult, int maxResults);
 
-	Long getDeckCount(User creator);
+    Long getDeckCount(User creator);
 }

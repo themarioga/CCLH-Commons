@@ -13,7 +13,6 @@ import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.exceptions.deck.DeckDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.game.*;
-import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyExistsException;
 import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyVotedDeleteException;
 import org.themarioga.cclh.commons.exceptions.player.PlayerDoesntExistsException;
 import org.themarioga.cclh.commons.models.*;
@@ -170,28 +169,18 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game addPlayer(Game game, long userId) {
-        logger.debug("Creating player from user {} in game {}", userId, game);
+    public Game addPlayer(Game game, Player player) {
+        logger.debug("Adding player {} to game {}", player, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
-        // Get the user
-        User user = userService.getById(userId);
-
-        // Check user exists
-        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+        // Check player exists
+        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
 
         // Check game is not full
         if (game.getPlayers().size() >= game.getMaxNumberOfPlayers())
             throw new GameAlreadyFilledException();
-
-        // Check if the user is already playing
-        if (playerService.findByUserId(userId) != null)
-            throw new PlayerAlreadyExistsException();
-
-        // Create player
-        Player player = playerService.create(game, user);
 
         // Add player to game
         game.getPlayers().add(player);

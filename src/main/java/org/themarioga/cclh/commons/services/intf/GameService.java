@@ -2,6 +2,7 @@ package org.themarioga.cclh.commons.services.intf;
 
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.models.Game;
+import org.themarioga.cclh.commons.models.Player;
 import org.themarioga.cclh.commons.models.Room;
 
 public interface GameService {
@@ -18,7 +19,7 @@ public interface GameService {
 
     Game setDeck(Game game, long deckId);
 
-    Game addPlayer(Game game, long userId);
+    Game addPlayer(Game game, Player player);
 
     Game leaveGame(Game game, long userId);
 
