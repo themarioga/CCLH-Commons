@@ -138,6 +138,9 @@ public class GameServiceImpl implements GameService {
         // Check if the game has already started
         if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
 
+        // Check if the game has more players than the max we want to set
+        if (game.getMaxNumberOfPlayers() < game.getPlayers().size()) throw new GameAlreadyFilledException();
+
         // Set the max number of players
         game.setMaxNumberOfPlayers(maxNumberOfPlayers);
 
