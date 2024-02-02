@@ -25,13 +25,11 @@ public class Player extends Base {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "t_player_deck", joinColumns = @JoinColumn(name = "player_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "card_id", nullable = false))
-    private List<Card> deck = new ArrayList<>(0);
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player")
+    private List<PlayerDeckCard> deck = new ArrayList<>(0);
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "t_player_hand", joinColumns = @JoinColumn(name = "player_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "card_id", nullable = false))
-    private List<Card> hand = new ArrayList<>(0);
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player")
+    private List<PlayerHandCard> hand = new ArrayList<>(0);
 
     public Long getId() {
         return id;
@@ -73,19 +71,19 @@ public class Player extends Base {
         this.user = user;
     }
 
-    public List<Card> getDeck() {
+    public List<PlayerDeckCard> getDeck() {
         return deck;
     }
 
-    public void setDeck(List<Card> deck) {
+    public void setDeck(List<PlayerDeckCard> deck) {
         this.deck = deck;
     }
 
-    public List<Card> getHand() {
+    public List<PlayerHandCard> getHand() {
         return hand;
     }
 
-    public void setHand(List<Card> hand) {
+    public void setHand(List<PlayerHandCard> hand) {
         this.hand = hand;
     }
 

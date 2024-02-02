@@ -101,7 +101,11 @@ class PlayerDaoTest extends BaseTest {
         Player player = playerDao.findOne(0L);
         Card card = cardDao.findOne(0L);
 
-        player.getDeck().add(card);
+        PlayerDeckCard playerDeckCard = new PlayerDeckCard();
+        playerDeckCard.setPlayer(player);
+        playerDeckCard.setCard(card);
+
+        player.getDeck().add(playerDeckCard);
 
         playerDao.update(player);
         getCurrentSession().flush();
@@ -116,7 +120,11 @@ class PlayerDaoTest extends BaseTest {
         Player player = playerDao.findOne(0L);
         Card card = cardDao.findOne(0L);
 
-        player.getHand().add(card);
+        PlayerHandCard playerHandCard = new PlayerHandCard();
+        playerHandCard.setPlayer(player);
+        playerHandCard.setCard(card);
+
+        player.getHand().add(playerHandCard);
 
         playerDao.update(player);
         getCurrentSession().flush();

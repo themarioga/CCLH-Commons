@@ -53,7 +53,7 @@ public class TableServiceImpl implements TableService {
 
         // Create table
         Table table = new Table();
-        table.setGameId(game.getId());
+        table.setGame(game);
         table.setStatus(TableStatusEnum.STARTING);
         table.setCurrentRoundNumber(0);
 

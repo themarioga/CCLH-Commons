@@ -30,7 +30,6 @@ import org.themarioga.cclh.commons.services.intf.UserService;
 @DatabaseSetup("classpath:dbunit/service/setup/dictionary.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/game.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/table.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/player.xml")
 class GameServiceTest extends BaseTest {
 
@@ -315,7 +314,7 @@ class GameServiceTest extends BaseTest {
         Game game = gameService.startRound(gameService.getByRoomId(0L));
         getCurrentSession().flush();
         Player player = game.getPlayers().get(0);
-        game = gameService.playCard(game, player.getUser().getId(), player.getHand().get(0).getId());
+        game = gameService.playCard(game, player.getUser().getId(), player.getHand().get(0).getCard().getId());
 
         Assertions.assertEquals(1, game.getTable().getPlayedCards().size());
     }
@@ -330,9 +329,9 @@ class GameServiceTest extends BaseTest {
         gameService.startGame(gameService.getByRoomId(0L));
         Game game = gameService.startRound(gameService.getByRoomId(0L));
         Player player = game.getPlayers().get(0);
-        gameService.playCard(game, player.getUser().getId(), player.getHand().get(0).getId());
+        gameService.playCard(game, player.getUser().getId(), player.getHand().get(0).getCard().getId());
 
-        Assertions.assertThrows(PlayerAlreadyPlayedCardException.class, () -> gameService.playCard(game, player.getUser().getId(), player.getHand().get(0).getId()));
+        Assertions.assertThrows(PlayerAlreadyPlayedCardException.class, () -> gameService.playCard(game, player.getUser().getId(), player.getHand().get(0).getCard().getId()));
     }
 
     @Test
@@ -340,9 +339,9 @@ class GameServiceTest extends BaseTest {
         gameService.startGame(gameService.getByRoomId(0L));
         Game game = gameService.startRound(gameService.getByRoomId(0L));
         Player player = game.getPlayers().get(0);
-        gameService.playCard(game, player.getUser().getId(), player.getHand().get(0).getId());
+        gameService.playCard(game, player.getUser().getId(), player.getHand().get(0).getCard().getId());
 
-        Assertions.assertThrows(PlayerCannotPlayCardException.class, () -> gameService.playCard(game, 1L, player.getHand().get(0).getId()));
+        Assertions.assertThrows(PlayerCannotPlayCardException.class, () -> gameService.playCard(game, 1L, player.getHand().get(0).getCard().getId()));
     }
 
     @Test
@@ -350,7 +349,7 @@ class GameServiceTest extends BaseTest {
         gameService.startGame(gameService.getByRoomId(0L));
         Game game = gameService.startRound(gameService.getByRoomId(0L));
         Player player = game.getPlayers().get(0);
-        Card card = player.getHand().get(0);
+        Card card = player.getHand().get(0).getCard();
         gameService.playCard(game, player.getUser().getId(), card.getId());
         game.getTable().setStatus(TableStatusEnum.VOTING);
         gameDao.update(game);
@@ -369,7 +368,7 @@ class GameServiceTest extends BaseTest {
         gameService.startGame(gameService.getByRoomId(0L));
         Game game = gameService.startRound(gameService.getByRoomId(0L));
         Player player = game.getPlayers().get(0);
-        Card card = player.getHand().get(0);
+        Card card = player.getHand().get(0).getCard();
         gameService.playCard(game, player.getUser().getId(), card.getId());
         game.getTable().setStatus(TableStatusEnum.VOTING);
         gameDao.update(game);

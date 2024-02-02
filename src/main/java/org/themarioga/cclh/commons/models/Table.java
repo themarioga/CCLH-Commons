@@ -12,8 +12,9 @@ import java.util.List;
 public class Table implements Serializable {
 
     @Id
-    @Column(name = "game_id")
-    private Long gameId;
+    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "game_id", referencedColumnName = "id")
+    private Game game;
     @Column(name = "status", nullable = false)
     private TableStatusEnum status;
     @Column(name = "round_number", nullable = false)
@@ -38,12 +39,12 @@ public class Table implements Serializable {
     @JoinColumn(name = "game_id", referencedColumnName = "game_id")
     private List<PlayerVote> playerVotes = new ArrayList<>(0);
 
-    public Long getGameId() {
-        return gameId;
+    public Game getGame() {
+        return game;
     }
 
-    public void setGameId(Long gameId) {
-        this.gameId = gameId;
+    public void setGame(Game game) {
+        this.game = game;
     }
 
     public TableStatusEnum getStatus() {
@@ -104,6 +105,6 @@ public class Table implements Serializable {
 
     @Override
     public String toString() {
-        return "GameStatus{" + "gameId=" + gameId + ", status=" + status + ", currentRoundNumber=" + currentRoundNumber + '}';
+        return "GameStatus{status=" + status + ", currentRoundNumber=" + currentRoundNumber + '}';
     }
 }

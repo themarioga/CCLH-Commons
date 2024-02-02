@@ -60,7 +60,7 @@ class TableDaoTest extends BaseTest {
         gameDao.create(game);
 
         Table table = new Table();
-        table.setGameId(game.getId());
+        table.setGame(game);
         table.setStatus(TableStatusEnum.STARTING);
         table.setCurrentRoundNumber(1);
         table.setCurrentPresident(playerDao.findPlayerByUser(creator));
@@ -70,7 +70,7 @@ class TableDaoTest extends BaseTest {
         gameDao.create(game);
         getCurrentSession().flush();
 
-        Assertions.assertEquals(game.getId(), table.getGameId());
+        Assertions.assertEquals(game.getId(), table.getGame().getId());
     }
 
     @Test
@@ -92,7 +92,7 @@ class TableDaoTest extends BaseTest {
         gameDao.update(game);
         getCurrentSession().flush();
 
-        Assertions.assertEquals(game.getId(), game.getTable().getGameId());
+        Assertions.assertEquals(game.getId(), game.getTable().getGame().getId());
     }
 
     @Test
@@ -127,7 +127,7 @@ class TableDaoTest extends BaseTest {
         Player played = playerDao.findOne(0L);
 
         PlayedCard playedCard = new PlayedCard();
-        playedCard.setGameId(table.getGameId());
+        playedCard.setGameId(table.getGame().getId());
         playedCard.setCard(card);
         playedCard.setPlayer(played);
         table.getPlayedCards().add(playedCard);
@@ -158,7 +158,7 @@ class TableDaoTest extends BaseTest {
         Player played = playerDao.findOne(0L);
 
         PlayerVote playerVote = new PlayerVote();
-        playerVote.setGameId(table.getGameId());
+        playerVote.setGameId(table.getGame().getId());
         playerVote.setCard(card);
         playerVote.setPlayer(played);
         table.getPlayerVotes().add(playerVote);

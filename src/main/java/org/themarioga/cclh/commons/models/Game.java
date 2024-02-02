@@ -34,8 +34,7 @@ public class Game extends Base {
     @JoinColumn(name = "dictionary_id", referencedColumnName = "id", nullable = false)
     private Deck deck;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "id", referencedColumnName = "game_id")
+    @OneToOne(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Table table;
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

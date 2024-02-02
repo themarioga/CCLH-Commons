@@ -10,17 +10,16 @@ import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyExistsException;
 import org.themarioga.cclh.commons.exceptions.player.PlayerCannotPlayCardException;
-import org.themarioga.cclh.commons.models.Card;
-import org.themarioga.cclh.commons.models.Game;
-import org.themarioga.cclh.commons.models.Player;
-import org.themarioga.cclh.commons.models.User;
+import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.services.intf.ConfigurationService;
 import org.themarioga.cclh.commons.services.intf.PlayerService;
 import org.themarioga.cclh.commons.services.intf.UserService;
 import org.themarioga.cclh.commons.util.Assert;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PlayerServiceImpl implements PlayerService {
@@ -74,7 +73,14 @@ public class PlayerServiceImpl implements PlayerService {
     public void addCardsToPlayerDeck(Player player, List<Card> playerCards) {
         logger.debug("Adding cards to player {}", player);
 
-        player.getDeck().addAll(playerCards);
+        for (Card card : playerCards) {
+            PlayerDeckCard playerDeckCard = new PlayerDeckCard();
+            playerDeckCard.setPlayer(player);
+            playerDeckCard.setCard(card);
+
+            player.getDeck().add(playerDeckCard);
+        }
+
         playerDao.update(player);
     }
 
@@ -87,9 +93,16 @@ public class PlayerServiceImpl implements PlayerService {
 
         if (player.getHand().size() < cardsInHand) {
             int missingCards = cardsInHand - player.getHand().size();
-            List<Card> cardsToTransfer = player.getDeck().subList(0, Math.min(missingCards, player.getDeck().size()));
-            player.getHand().addAll(cardsToTransfer);
-            player.getDeck().removeAll(cardsToTransfer);
+            List<PlayerDeckCard> cardsToTransfer = new ArrayList<>(player.getDeck().subList(0, Math.min(missingCards, player.getDeck().size())));
+            for (PlayerDeckCard playerDeckCard : cardsToTransfer) {
+                PlayerHandCard playerHandCard = new PlayerHandCard();
+                playerHandCard.setPlayer(player);
+                playerHandCard.setCard(playerDeckCard.getCard());
+
+                player.getHand().add(playerHandCard);
+                player.getDeck().remove(playerDeckCard);
+            }
+
             playerDao.update(player);
         }
     }
@@ -99,9 +112,12 @@ public class PlayerServiceImpl implements PlayerService {
     public void removeCardFromHand(Player player, Card card) {
         logger.debug("Removing card {} from the hand of the player {}", card, player);
 
-        if (!player.getHand().contains(card)) throw new PlayerCannotPlayCardException();
+        Optional<PlayerHandCard> cards = player.getHand().stream().filter(playerHandCard -> playerHandCard.getCard().equals(card)).findFirst();
 
-        player.getHand().remove(card);
+        if (cards.isEmpty())
+            throw new PlayerCannotPlayCardException();
+
+        player.getHand().remove(cards.get());
         playerDao.update(player);
     }
 

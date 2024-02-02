@@ -86,14 +86,14 @@ class PlayerServiceTest extends BaseTest {
         Player player = playerService.findByUserId(0L);
 
         Assertions.assertEquals(3, player.getDeck().size());
-        Assertions.assertEquals("First white card", player.getDeck().get(0).getText());
+        Assertions.assertEquals("First white card", player.getDeck().get(0).getCard().getText());
         Assertions.assertEquals(0, player.getHand().size());
 
         playerService.transferCardsFromPlayerDeckToPlayerHand(player);
 
         Assertions.assertEquals(0, player.getDeck().size());
         Assertions.assertEquals(3, player.getHand().size());
-        Assertions.assertEquals("First white card", player.getHand().get(0).getText());
+        Assertions.assertEquals("First white card", player.getHand().get(0).getCard().getText());
     }
 
 }
