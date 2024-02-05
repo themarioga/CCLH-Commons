@@ -88,8 +88,6 @@ public class GameServiceImpl implements GameService {
 
         gameDao.delete(game);
 
-        game.setStatus(GameStatusEnum.DELETED);
-
         return game;
     }
 
@@ -309,6 +307,8 @@ public class GameServiceImpl implements GameService {
 
         // If more than half of the game players vote to delete the game...
         if (game.getStatus().equals(GameStatusEnum.STARTED) && game.getDeletionVotes().size() >= ((game.getPlayers().size() / 2) + 1)) {
+            game.setStatus(GameStatusEnum.DELETING);
+
             return delete(game);
         } else {
             return gameDao.update(game);

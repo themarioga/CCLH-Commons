@@ -3,9 +3,10 @@
 DROP TABLE IF EXISTS T_TELEGRAM_GAME;
 CREATE TABLE IF NOT EXISTS T_TELEGRAM_GAME
 (
-    game_id             BIGINT NOT NULL,
-    group_message_id    BIGINT NOT NULL,
-    private_message_id  BIGINT NOT NULL,
+    game_id                 BIGINT NOT NULL,
+    group_message_id        BIGINT NOT NULL,
+    private_message_id      BIGINT NOT NULL,
+    blackcard_message_id    BIGINT,
     PRIMARY KEY (game_id),
     FOREIGN KEY (game_id) REFERENCES t_game (id)
 );

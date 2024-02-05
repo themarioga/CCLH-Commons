@@ -4,6 +4,6 @@ public enum GameStatusEnum {
 
     CREATED,
     STARTED,
-    DELETED
+    DELETING
 
 }

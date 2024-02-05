@@ -292,7 +292,7 @@ class GameServiceTest extends BaseTest {
         Assertions.assertNotNull(game);
         Assertions.assertNotNull(game.getDeletionVotes().get(0));
         Assertions.assertEquals(11L, game.getDeletionVotes().get(0).getId());
-        Assertions.assertEquals(GameStatusEnum.DELETED, game.getStatus());
+        Assertions.assertEquals(GameStatusEnum.DELETING, game.getStatus());
     }
 
     @Test
