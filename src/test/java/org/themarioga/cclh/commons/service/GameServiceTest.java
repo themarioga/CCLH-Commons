@@ -270,7 +270,7 @@ class GameServiceTest extends BaseTest {
 
         Assertions.assertNull(game.getTable().getCurrentBlackCard());
         Assertions.assertEquals(0, game.getTable().getPlayedCards().size());
-        Assertions.assertEquals(0, game.getTable().getPlayerVotes().size());
+        Assertions.assertEquals(0, game.getTable().getVotedCards().size());
     }
 
     @Test
@@ -355,7 +355,7 @@ class GameServiceTest extends BaseTest {
         gameDao.update(game);
         game = gameService.voteForCard(game, player.getUser().getId(), card.getId());
 
-        Assertions.assertEquals(1, game.getTable().getPlayerVotes().size());
+        Assertions.assertEquals(1, game.getTable().getVotedCards().size());
     }
 
     @Test

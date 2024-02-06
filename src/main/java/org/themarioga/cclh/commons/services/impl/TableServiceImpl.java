@@ -121,7 +121,7 @@ public class TableServiceImpl implements TableService {
         table.setStatus(TableStatusEnum.STARTING);
 
         // Empty table
-        table.getPlayerVotes().clear();
+        table.getVotedCards().clear();
         table.getPlayedCards().clear();
         table.setCurrentBlackCard(null);
 
@@ -191,7 +191,7 @@ public class TableServiceImpl implements TableService {
             throw new PlayerCannotVoteCardException();
 
         // Check if the player already voted
-        if (table.getPlayerVotes().stream().anyMatch(votedCard -> votedCard.getPlayer().getId().equals(player.getId())))
+        if (table.getVotedCards().stream().anyMatch(votedCard -> votedCard.getPlayer().getId().equals(player.getId())))
             throw new PlayerAlreadyVotedCardException();
 
         // Check if the card have been played this round
@@ -199,11 +199,11 @@ public class TableServiceImpl implements TableService {
             throw new CardNotPlayedException();
 
         // Set the player vote
-        PlayerVote playerVote = new PlayerVote();
-        playerVote.setGameId(game.getId());
-        playerVote.setPlayer(player);
-        playerVote.setCard(card);
-        table.getPlayerVotes().add(playerVote);
+        VotedCard votedCard = new VotedCard();
+        votedCard.setGameId(game.getId());
+        votedCard.setPlayer(player);
+        votedCard.setCard(card);
+        table.getVotedCards().add(votedCard);
 
         // Check we need to end the round
         if (checkIfEveryoneHaveVotedACard(game, table)) {
@@ -273,7 +273,7 @@ public class TableServiceImpl implements TableService {
         int cardsNeededToEnd = game.getPlayers().size();
         if (game.getType() == GameTypeEnum.DICTATORSHIP || game.getType() == GameTypeEnum.CLASSIC) cardsNeededToEnd = 1;
 
-        return table.getPlayerVotes().size() == cardsNeededToEnd;
+        return table.getVotedCards().size() == cardsNeededToEnd;
     }
 
 }

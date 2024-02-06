@@ -5,7 +5,7 @@ import org.themarioga.cclh.commons.dao.AbstractHibernateDao;
 import org.themarioga.cclh.commons.dao.intf.PlayerDao;
 import org.themarioga.cclh.commons.models.PlayedCard;
 import org.themarioga.cclh.commons.models.Player;
-import org.themarioga.cclh.commons.models.PlayerVote;
+import org.themarioga.cclh.commons.models.VotedCard;
 import org.themarioga.cclh.commons.models.User;
 
 @Repository
@@ -26,8 +26,8 @@ public class PlayerDaoImpl extends AbstractHibernateDao<Player> implements Playe
     }
 
     @Override
-    public PlayerVote findVotesByPlayer(Long playerId) {
-        return getCurrentSession().createQuery("SELECT t FROM PlayerVote t where player.id=:player_id", PlayerVote.class).setParameter("player_id", playerId).getSingleResultOrNull();
+    public VotedCard findVotesByPlayer(Long playerId) {
+        return getCurrentSession().createQuery("SELECT t FROM VotedCard t where player.id=:player_id", VotedCard.class).setParameter("player_id", playerId).getSingleResultOrNull();
     }
 
 }

@@ -173,7 +173,7 @@ class PlayerDaoTest extends BaseTest {
     @DatabaseSetup("classpath:dbunit/dao/setup/table.xml")
     @DatabaseSetup("classpath:dbunit/dao/setup/tableplayervotes.xml")
     void getTablePlayerVotesByPlayerId() {
-        PlayerVote vote = playerDao.findVotesByPlayer(0L);
+        VotedCard vote = playerDao.findVotesByPlayer(0L);
 
         Assertions.assertEquals(0L, vote.getGameId());
         Assertions.assertEquals(0L, vote.getPlayer().getId());

@@ -157,16 +157,16 @@ class TableDaoTest extends BaseTest {
         Card card = cardDao.findOne(0L);
         Player played = playerDao.findOne(0L);
 
-        PlayerVote playerVote = new PlayerVote();
-        playerVote.setGameId(table.getGame().getId());
-        playerVote.setCard(card);
-        playerVote.setPlayer(played);
-        table.getPlayerVotes().add(playerVote);
+        VotedCard votedCard = new VotedCard();
+        votedCard.setGameId(table.getGame().getId());
+        votedCard.setCard(card);
+        votedCard.setPlayer(played);
+        table.getVotedCards().add(votedCard);
 
         tableDao.update(table);
         getCurrentSession().flush();
 
-        Assertions.assertEquals(1, table.getPlayerVotes().size());
+        Assertions.assertEquals(1, table.getVotedCards().size());
     }
 
     @Test
@@ -176,9 +176,9 @@ class TableDaoTest extends BaseTest {
 
         Assertions.assertEquals(0L, game.getId());
 
-        Assertions.assertNotNull(game.getTable().getPlayerVotes());
-        Assertions.assertEquals(1, game.getTable().getPlayerVotes().size());
-        Assertions.assertEquals("First", game.getTable().getPlayerVotes().get(0).getCard().getText());
+        Assertions.assertNotNull(game.getTable().getVotedCards());
+        Assertions.assertEquals(1, game.getTable().getVotedCards().size());
+        Assertions.assertEquals("First", game.getTable().getVotedCards().get(0).getCard().getText());
     }
 
     @Test

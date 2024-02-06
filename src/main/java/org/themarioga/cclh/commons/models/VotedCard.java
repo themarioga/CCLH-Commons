@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 @Entity
 @jakarta.persistence.Table(name = "t_table_playervotes")
-public class PlayerVote implements Serializable {
+public class VotedCard implements Serializable {
 
     @Id
     @Column(name = "game_id")
@@ -46,7 +46,7 @@ public class PlayerVote implements Serializable {
 
     @Override
     public String toString() {
-        return "PlayerVote{" + "gameId=" + gameId + '}';
+        return "VotedCard{" + "gameId=" + gameId + '}';
     }
 
 }

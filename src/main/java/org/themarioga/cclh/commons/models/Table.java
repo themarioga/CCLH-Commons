@@ -37,7 +37,7 @@ public class Table implements Serializable {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id", referencedColumnName = "game_id")
-    private List<PlayerVote> playerVotes = new ArrayList<>(0);
+    private List<VotedCard> votedCards = new ArrayList<>(0);
 
     public Game getGame() {
         return game;
@@ -95,12 +95,12 @@ public class Table implements Serializable {
         this.playedCards = playedCards;
     }
 
-    public List<PlayerVote> getPlayerVotes() {
-        return playerVotes;
+    public List<VotedCard> getVotedCards() {
+        return votedCards;
     }
 
-    public void setPlayerVotes(List<PlayerVote> playerVotes) {
-        this.playerVotes = playerVotes;
+    public void setVotedCards(List<VotedCard> votedCards) {
+        this.votedCards = votedCards;
     }
 
     @Override
