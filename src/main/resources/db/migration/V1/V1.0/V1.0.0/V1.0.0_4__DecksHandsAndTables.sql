@@ -46,16 +46,6 @@ CREATE TABLE IF NOT EXISTS t_game_deck
     FOREIGN KEY (card_id) REFERENCES t_card (id)
 );
 
-DROP TABLE IF EXISTS t_table_deck;
-CREATE TABLE IF NOT EXISTS t_table_deck
-(
-    game_id     BIGINT NOT NULL,
-    card_id     BIGINT NOT NULL,
-    PRIMARY KEY (game_id, card_id),
-    FOREIGN KEY (game_id) REFERENCES t_table (game_id),
-    FOREIGN KEY (card_id) REFERENCES t_card (id)
-);
-
 -- Table tables
 DROP TABLE IF EXISTS t_table_playedcards;
 CREATE TABLE IF NOT EXISTS t_table_playedcards
