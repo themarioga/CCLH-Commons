@@ -5,8 +5,6 @@ import org.themarioga.cclh.commons.dao.AbstractHibernateDao;
 import org.themarioga.cclh.commons.dao.intf.PlayerDao;
 import org.themarioga.cclh.commons.models.*;
 
-import java.util.List;
-
 @Repository
 public class PlayerDaoImpl extends AbstractHibernateDao<Player> implements PlayerDao {
 
@@ -27,11 +25,6 @@ public class PlayerDaoImpl extends AbstractHibernateDao<Player> implements Playe
     @Override
     public VotedCard findVotesByPlayer(Long playerId) {
         return getCurrentSession().createQuery("SELECT t FROM VotedCard t where player.id=:player_id", VotedCard.class).setParameter("player_id", playerId).getSingleResultOrNull();
-    }
-
-    @Override
-    public List<GameDeckCard> getGameDeckCards(long gameId, int cardNumber) {
-        return getCurrentSession().createNativeQuery("SELECT * FROM T_GAME_DECK WHERE game_id=:game_id ORDER BY RAND()", GameDeckCard.class).setParameter("game_id", gameId).setMaxResults(cardNumber).getResultList();
     }
 
 }

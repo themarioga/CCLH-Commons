@@ -24,7 +24,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Override
     @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
     public String getConfiguration(String key) {
-        logger.debug("Obteniendo configuración por clave: {}", key);
+        logger.debug("Getting configuration by key: {}", key);
 
         return configurationDao.getConfiguration(key);
     }

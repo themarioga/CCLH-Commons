@@ -1,5 +1,6 @@
 package org.themarioga.cclh.commons.dao;
 
+import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 
 import java.io.Serializable;
@@ -21,5 +22,7 @@ public interface InterfaceHibernateDao<T extends Serializable> {
 
     Long countAll();
 
-    Session getCurrentSession();
+	EntityManager getEntityManager();
+
+	Session getCurrentSession();
 }

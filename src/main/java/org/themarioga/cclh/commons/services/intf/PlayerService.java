@@ -8,7 +8,7 @@ public interface PlayerService {
 
     Player create(Game game, long userId);
 
-    void transferCardsFromGameDeckToPlayerHand(Player player);
+    void transferWhiteCardsFromGameDeckToPlayerHand(Player player, List<GameDeckCard> cardsToTransfer);
 
     void removeCardFromHand(Player player, Card card);
 

@@ -30,8 +30,6 @@ class GameDaoTest extends BaseTest {
     @Autowired
     private RoomDao roomDao;
     @Autowired
-    private CardDao cardDao;
-    @Autowired
     private PlayerDao playerDao;
     @Autowired
     private DictionaryDao dictionaryDao;
@@ -134,23 +132,6 @@ class GameDaoTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testUpdateGameDeck-expected.xml", table = "T_TABLE_DECK", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
-    void addCardsToGameHand() {
-        Game game = gameDao.findOne(0L);
-        Card card = cardDao.findOne(0L);
-
-        TableDeckCard TableDeckCard = new TableDeckCard();
-        TableDeckCard.setTable(game.getTable());
-        TableDeckCard.setCard(card);
-        game.getTable().getDeck().add(TableDeckCard);
-
-        gameDao.update(game);
-        getCurrentSession().flush();
-
-        Assertions.assertEquals(1, game.getTable().getDeck().size());
-    }
-
-    @Test
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testUpdateGameDeletionVotes-expected.xml", table = "T_GAME_DELETIONVOTES", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void addDeletionVoteToTable() {
         Game game = gameDao.findOne(0L);
@@ -180,17 +161,6 @@ class GameDaoTest extends BaseTest {
         Game game = gameDao.findOne(0L);
 
         Assertions.assertEquals(1, game.getPlayers().size());
-    }
-
-    @Test
-    @DatabaseSetup("classpath:dbunit/dao/setup/tabledeck.xml")
-    void getDeck() {
-        Game game = gameDao.findOne(0L);
-
-        Assertions.assertEquals(0L, game.getId());
-
-        Assertions.assertNotNull(game.getTable().getDeck());
-        Assertions.assertEquals(1, game.getTable().getDeck().size());
     }
 
 }

@@ -194,7 +194,6 @@ class GameServiceTest extends BaseTest {
 
         Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
         Assertions.assertNotNull(game.getTable());
-        Assertions.assertEquals(3, game.getTable().getDeck().size());
         Assertions.assertEquals(3, game.getPlayers().size());
     }
 
@@ -210,7 +209,6 @@ class GameServiceTest extends BaseTest {
 
         Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
         Assertions.assertNotNull(game.getTable());
-        Assertions.assertEquals(3, game.getTable().getDeck().size());
         Assertions.assertEquals(3, game.getPlayers().size());
         Assertions.assertEquals(10L, game.getTable().getCurrentPresident().getId());
     }

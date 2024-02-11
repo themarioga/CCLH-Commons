@@ -233,13 +233,10 @@ public class GameServiceImpl implements GameService {
         game.setStatus(GameStatusEnum.STARTED);
 
         // Add cards to game deck
-        gameDao.transferCardsToGameDeck(game, CardTypeEnum.WHITE);
+        gameDao.transferCardsToGameDeck(game);
 
         // Create table
         game.setTable(tableService.create(game));
-
-        // Add cards from dictionary to table
-        tableService.transferCardsToTableDeck(game, CardTypeEnum.BLACK);
 
         return gameDao.update(game);
     }
@@ -256,13 +253,14 @@ public class GameServiceImpl implements GameService {
         if (game.getStatus() != GameStatusEnum.STARTED)
             throw new GameNotStartedException();
 
-        // Add cards to player hands
-        for (Player player : game.getPlayers()) {
-            playerService.transferCardsFromGameDeckToPlayerHand(player);
-        }
-
         // Set table for new round
         tableService.startRound(game);
+
+        // Setting the black card for the round
+        tableService.setNextBlackCard(game.getTable(), getBlackCardFromGameDeck(game));
+
+        // Add white cards to player hands
+        addWhiteCardsToPlayerHands(game);
 
         return gameDao.update(game);
     }
@@ -403,6 +401,31 @@ public class GameServiceImpl implements GameService {
         logger.debug("Getting game with room id: {}", gameId);
 
         return gameDao.getMostVotedCard(gameId);
+    }
+
+    private Card getBlackCardFromGameDeck(Game game) {
+        logger.debug("Getting black card from deck to table {}", game);
+
+        GameDeckCard nextBlackCard = gameDao.getGameDeckCards(game.getId(), 1, CardTypeEnum.BLACK).get(0);
+        game.getDeckCards().remove(nextBlackCard);
+
+        return nextBlackCard.getCard();
+    }
+
+    private void addWhiteCardsToPlayerHands(Game game) {
+        int cardsInHand = Integer.parseInt(configurationService.getConfiguration("game_whitecards_in_hand"));
+
+        for (Player player : game.getPlayers()) {
+            if (player.getHand().size() < cardsInHand) {
+                int missingCards = Math.min(cardsInHand - player.getHand().size(), player.getGame().getDeckCards().size());
+
+                List<GameDeckCard> cardsToTransfer = new ArrayList<>(gameDao.getGameDeckCards(player.getGame().getId(), missingCards, CardTypeEnum.WHITE));
+
+                playerService.transferWhiteCardsFromGameDeckToPlayerHand(player, cardsToTransfer);
+
+                player.getGame().getDeckCards().removeAll(cardsToTransfer);
+            }
+        }
     }
 
     private int getMinNumberOfPlayers() {

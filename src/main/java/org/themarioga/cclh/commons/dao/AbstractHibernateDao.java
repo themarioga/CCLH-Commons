@@ -62,6 +62,11 @@ public abstract class AbstractHibernateDao<T extends Serializable> implements In
     }
 
     @Override
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
+
+    @Override
     public Session getCurrentSession() {
         return entityManager.unwrap(Session.class);
     }

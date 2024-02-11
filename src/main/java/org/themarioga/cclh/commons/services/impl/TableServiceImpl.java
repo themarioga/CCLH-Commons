@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.themarioga.cclh.commons.dao.intf.TableDao;
-import org.themarioga.cclh.commons.enums.CardTypeEnum;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.enums.TableStatusEnum;
@@ -18,7 +17,6 @@ import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyVotedCardExcep
 import org.themarioga.cclh.commons.exceptions.player.PlayerCannotVoteCardException;
 import org.themarioga.cclh.commons.exceptions.table.TableWrongStatusException;
 import org.themarioga.cclh.commons.models.*;
-import org.themarioga.cclh.commons.services.intf.CardService;
 import org.themarioga.cclh.commons.services.intf.PlayerService;
 import org.themarioga.cclh.commons.services.intf.TableService;
 import org.themarioga.cclh.commons.util.Assert;
@@ -29,13 +27,11 @@ public class TableServiceImpl implements TableService {
     private final Logger logger = LoggerFactory.getLogger(TableServiceImpl.class);
 
     private final TableDao tableDao;
-    private final CardService cardService;
     private final PlayerService playerService;
 
     @Autowired
-    public TableServiceImpl(TableDao tableDao, CardService cardService, PlayerService playerService) {
+    public TableServiceImpl(TableDao tableDao, PlayerService playerService) {
         this.tableDao = tableDao;
-        this.cardService = cardService;
         this.playerService = playerService;
     }
 
@@ -82,9 +78,6 @@ public class TableServiceImpl implements TableService {
 
         // Increment round number
         table.setCurrentRoundNumber(table.getCurrentRoundNumber() + 1);
-
-        // Set current black card
-        transferCardFromDeckToTable(table);
 
         // Set current president if needed
         if (game.getType() == GameTypeEnum.CLASSIC) {
@@ -208,8 +201,10 @@ public class TableServiceImpl implements TableService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public void transferCardsToTableDeck(Game game, CardTypeEnum cardTypeEnum) {
-        tableDao.transferCardsToTableDeck(game, cardTypeEnum);
+    public void setNextBlackCard(Table table, Card nextBlackCard) {
+        logger.debug("Setting next black card to table {}", table);
+
+        table.setCurrentBlackCard(nextBlackCard);
     }
 
     @Override
@@ -218,16 +213,6 @@ public class TableServiceImpl implements TableService {
         logger.debug("Getting most voted card of the table of the game {}", gameId);
 
         return tableDao.getMostVotedCard(gameId);
-    }
-
-    private void transferCardFromDeckToTable(Table table) {
-        logger.debug("Transferring black card from deck to table {}", table);
-
-        if (table.getDeck() != null && !table.getDeck().isEmpty()) {
-            TableDeckCard nextBlackCard = tableDao.getTableDeckCard(table.getGame().getId(), 1);
-            table.setCurrentBlackCard(nextBlackCard.getCard());
-            table.getDeck().remove(nextBlackCard);
-        }
     }
 
     private void selectPlayerForRoundPresident(Game game) {

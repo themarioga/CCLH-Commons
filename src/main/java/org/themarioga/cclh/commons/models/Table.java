@@ -28,9 +28,6 @@ public class Table implements Serializable {
     private Player currentPresident;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "table", orphanRemoval = true)
-    private List<TableDeckCard> deck = new ArrayList<>(0);
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "table", orphanRemoval = true)
     private List<PlayedCard> playedCards = new ArrayList<>(0);
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "table", orphanRemoval = true)
@@ -74,14 +71,6 @@ public class Table implements Serializable {
 
     public void setCurrentPresident(Player currentPresident) {
         this.currentPresident = currentPresident;
-    }
-
-    public List<TableDeckCard> getDeck() {
-        return deck;
-    }
-
-    public void setDeck(List<TableDeckCard> deck) {
-        this.deck = deck;
     }
 
     public List<PlayedCard> getPlayedCards() {

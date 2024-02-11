@@ -11,12 +11,10 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyExistsException;
 import org.themarioga.cclh.commons.exceptions.player.PlayerCannotPlayCardException;
 import org.themarioga.cclh.commons.models.*;
-import org.themarioga.cclh.commons.services.intf.ConfigurationService;
 import org.themarioga.cclh.commons.services.intf.PlayerService;
 import org.themarioga.cclh.commons.services.intf.UserService;
 import org.themarioga.cclh.commons.util.Assert;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -28,13 +26,11 @@ public class PlayerServiceImpl implements PlayerService {
 
     private final PlayerDao playerDao;
     private final UserService userService;
-    private final ConfigurationService configurationService;
 
     @Autowired
-    public PlayerServiceImpl(PlayerDao playerDao, UserService userService, ConfigurationService configurationService) {
+    public PlayerServiceImpl(PlayerDao playerDao, UserService userService) {
         this.playerDao = playerDao;
         this.userService = userService;
-        this.configurationService = configurationService;
     }
 
     @Override
@@ -70,26 +66,18 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public void transferCardsFromGameDeckToPlayerHand(Player player) {
+    public void transferWhiteCardsFromGameDeckToPlayerHand(Player player, List<GameDeckCard> cardsToTransfer) {
         logger.debug("Transferring white cards from deck to hand from player {}", player);
 
-        int cardsInHand = Integer.parseInt(configurationService.getConfiguration("game_whitecards_in_hand"));
+        for (GameDeckCard gameDeckCard : cardsToTransfer) {
+            PlayerHandCard playerHandCard = new PlayerHandCard();
+            playerHandCard.setPlayer(player);
+            playerHandCard.setCard(gameDeckCard.getCard());
 
-        if (player.getHand().size() < cardsInHand) {
-            int missingCards = Math.min(cardsInHand - player.getHand().size(), player.getGame().getDeckCards().size());
-
-            List<GameDeckCard> cardsToTransfer = new ArrayList<>(playerDao.getGameDeckCards(player.getGame().getId(), missingCards));
-            for (GameDeckCard gameDeckCard : cardsToTransfer) {
-                PlayerHandCard playerHandCard = new PlayerHandCard();
-                playerHandCard.setPlayer(player);
-                playerHandCard.setCard(gameDeckCard.getCard());
-
-                player.getHand().add(playerHandCard);
-                player.getGame().getDeckCards().remove(gameDeckCard);
-            }
-
-            playerDao.update(player);
+            player.getHand().add(playerHandCard);
         }
+
+        playerDao.update(player);
     }
 
     @Override
