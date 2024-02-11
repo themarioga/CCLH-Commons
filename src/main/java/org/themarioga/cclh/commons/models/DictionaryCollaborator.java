@@ -6,11 +6,12 @@ import java.io.Serializable;
 
 @Entity
 @jakarta.persistence.Table(name = "t_dictionary_collaborators")
-public class DeckCollaborator implements Serializable {
+public class DictionaryCollaborator implements Serializable {
 
     @Id
-    @Column(name = "dictionary_id")
-    private Long deckId;
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "dictionary_id", referencedColumnName = "id")
+    private Dictionary dictionary;
 
     @Id
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
@@ -22,12 +23,12 @@ public class DeckCollaborator implements Serializable {
     @Column(name = "accepted", nullable = false)
     private Boolean accepted;
 
-    public Long getDeckId() {
-        return deckId;
+    public Dictionary getDictionary() {
+        return dictionary;
     }
 
-    public void setDeckId(Long deckId) {
-        this.deckId = deckId;
+    public void setDictionary(Dictionary dictionary) {
+        this.dictionary = dictionary;
     }
 
     public User getUser() {
@@ -56,7 +57,7 @@ public class DeckCollaborator implements Serializable {
 
     @Override
     public String toString() {
-        return "DeckCollaborator{" + "deckId=" + deckId + ", canEdit=" + canEdit + ", accepted=" + accepted + '}';
+        return "DeckCollaborator{canEdit=" + canEdit + ", accepted=" + accepted + '}';
     }
 
 }

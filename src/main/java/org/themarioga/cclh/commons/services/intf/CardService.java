@@ -1,8 +1,9 @@
 package org.themarioga.cclh.commons.services.intf;
 
+import jakarta.transaction.Transactional;
 import org.themarioga.cclh.commons.enums.CardTypeEnum;
-import org.themarioga.cclh.commons.models.Card;
-import org.themarioga.cclh.commons.models.Deck;
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
+import org.themarioga.cclh.commons.models.*;
 
 import java.util.List;
 
@@ -18,8 +19,8 @@ public interface CardService {
 
     Card findOne(long id);
 
-    List<Card> findCardsByDeckIdAndType(Deck deck, CardTypeEnum cardTypeEnum);
+    List<Card> findCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum);
 
-    long countCardsByDeckIdAndType(Deck deck, CardTypeEnum cardTypeEnum);
+    long countCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum);
 
 }

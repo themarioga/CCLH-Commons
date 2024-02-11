@@ -4,6 +4,7 @@ public enum GameStatusEnum {
 
     CREATED,
     STARTED,
+    ENDED,
     DELETING
 
 }

@@ -5,24 +5,24 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@jakarta.persistence.Table(name = "t_player_deck")
-public class PlayerDeckCard implements Serializable {
+@jakarta.persistence.Table(name = "t_game_deck")
+public class GameDeckCard implements Serializable {
 
     @Id
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "player_id", referencedColumnName = "id")
-    private Player player;
+    @JoinColumn(name = "game_id", referencedColumnName = "id")
+    private Game game;
     @Id
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "card_id", referencedColumnName = "id")
     private Card card;
 
-    public Player getPlayer() {
-        return player;
+    public Game getGame() {
+        return game;
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    public void setGame(Game game) {
+        this.game = game;
     }
 
     public Card getCard() {

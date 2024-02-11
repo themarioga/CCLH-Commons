@@ -9,8 +9,9 @@ import java.io.Serializable;
 public class PlayedCard implements Serializable {
 
     @Id
-    @Column(name = "game_id")
-    private Long gameId;
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "game_id", referencedColumnName = "game_id")
+    private Table table;
     @Id
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "player_id", referencedColumnName = "id")
@@ -20,12 +21,12 @@ public class PlayedCard implements Serializable {
     @JoinColumn(name = "card_id", referencedColumnName = "id")
     private Card card;
 
-    public Long getGameId() {
-        return gameId;
+    public Table getTable() {
+        return table;
     }
 
-    public void setGameId(Long gameId) {
-        this.gameId = gameId;
+    public void setTable(Table table) {
+        this.table = table;
     }
 
     public Player getPlayer() {
@@ -42,11 +43,6 @@ public class PlayedCard implements Serializable {
 
     public void setCard(Card card) {
         this.card = card;
-    }
-
-    @Override
-    public String toString() {
-        return "PlayedCard{" + "gameId=" + gameId + '}';
     }
 
 }

@@ -96,25 +96,6 @@ class PlayerDaoTest extends BaseTest {
 
     @Test
     @DatabaseSetup("classpath:dbunit/dao/setup/card.xml")
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/player/testUpdatePlayersDeck-expected.xml", table = "T_PLAYER_DECK", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
-    void addCardsToPlayersDeck() {
-        Player player = playerDao.findOne(0L);
-        Card card = cardDao.findOne(0L);
-
-        PlayerDeckCard playerDeckCard = new PlayerDeckCard();
-        playerDeckCard.setPlayer(player);
-        playerDeckCard.setCard(card);
-
-        player.getDeck().add(playerDeckCard);
-
-        playerDao.update(player);
-        getCurrentSession().flush();
-
-        Assertions.assertEquals(1, player.getDeck().size());
-    }
-
-    @Test
-    @DatabaseSetup("classpath:dbunit/dao/setup/card.xml")
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/player/testUpdatePlayersHand-expected.xml", table = "T_PLAYER_HAND", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void addCardsToPlayersHand() {
         Player player = playerDao.findOne(0L);
@@ -130,18 +111,6 @@ class PlayerDaoTest extends BaseTest {
         getCurrentSession().flush();
 
         Assertions.assertEquals(1, player.getHand().size());
-    }
-
-    @Test
-    @DatabaseSetup("classpath:dbunit/dao/setup/card.xml")
-    @DatabaseSetup("classpath:dbunit/dao/setup/playerdeck.xml")
-    void getPlayerDeck() {
-        Player player = playerDao.findOne(0L);
-
-        Assertions.assertEquals(0L, player.getId());
-
-        Assertions.assertNotNull(player.getDeck());
-        Assertions.assertEquals(1, player.getDeck().size());
     }
 
     @Test
@@ -163,7 +132,7 @@ class PlayerDaoTest extends BaseTest {
     void getTablePlayedCardsByPlayerId() {
         PlayedCard card = playerDao.findCardByPlayer(0L);
 
-        Assertions.assertEquals(0L, card.getGameId());
+        Assertions.assertEquals(0L, card.getTable().getGame().getId());
         Assertions.assertEquals(0L, card.getPlayer().getId());
         Assertions.assertEquals("First", card.getCard().getText());
     }
@@ -175,7 +144,7 @@ class PlayerDaoTest extends BaseTest {
     void getTablePlayerVotesByPlayerId() {
         VotedCard vote = playerDao.findVotesByPlayer(0L);
 
-        Assertions.assertEquals(0L, vote.getGameId());
+        Assertions.assertEquals(0L, vote.getTable().getGame().getId());
         Assertions.assertEquals(0L, vote.getPlayer().getId());
         Assertions.assertEquals("First", vote.getCard().getText());
     }

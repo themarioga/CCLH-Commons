@@ -11,18 +11,16 @@ import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
-import org.themarioga.cclh.commons.exceptions.deck.DeckDoesntExistsException;
+import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.game.*;
 import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyVotedDeleteException;
 import org.themarioga.cclh.commons.exceptions.player.PlayerDoesntExistsException;
 import org.themarioga.cclh.commons.models.*;
+import org.themarioga.cclh.commons.models.Dictionary;
 import org.themarioga.cclh.commons.services.intf.*;
 import org.themarioga.cclh.commons.util.Assert;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class GameServiceImpl implements GameService {
@@ -35,18 +33,18 @@ public class GameServiceImpl implements GameService {
     private final CardService cardService;
     private final TableService tableService;
     private final PlayerService playerService;
-    private final DeckService deckService;
+    private final DictionaryService dictionaryService;
     private final ConfigurationService configurationService;
 
     @Autowired
-    public GameServiceImpl(GameDao gameDao, UserService userService, RoomService roomService, CardService cardService, PlayerService playerService, TableService tableService, DeckService deckService, ConfigurationService configurationService) {
+    public GameServiceImpl(GameDao gameDao, UserService userService, RoomService roomService, CardService cardService, PlayerService playerService, TableService tableService, DictionaryService dictionaryService, ConfigurationService configurationService) {
         this.gameDao = gameDao;
         this.userService = userService;
         this.roomService = roomService;
         this.cardService = cardService;
         this.playerService = playerService;
         this.tableService = tableService;
-        this.deckService = deckService;
+        this.dictionaryService = dictionaryService;
         this.configurationService = configurationService;
     }
 
@@ -73,7 +71,7 @@ public class GameServiceImpl implements GameService {
         game.setType(GameTypeEnum.DEMOCRACY);
         game.setNumberOfCardsToWin(getDefaultNumberCardsToWin());
         game.setMaxNumberOfPlayers(getDefaultMaxNumberOfPlayers());
-        game.setDeck(deckService.getDefaultDeck());
+        game.setDictionary(dictionaryService.getDefaultDictionary());
 
         return gameDao.create(game);
     }
@@ -147,8 +145,8 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game setDeck(Game game, long deckId) {
-        logger.debug("Setting deck {} to game {}", deckId, game);
+    public Game setDictionary(Game game, long dictionaryId) {
+        logger.debug("Setting dictionary {} to game {}", dictionaryId, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
@@ -156,14 +154,14 @@ public class GameServiceImpl implements GameService {
         // Check if the game has already started
         if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
 
-        // Find the deck
-        Deck deck = deckService.findOne(deckId);
+        // Find the dictionary
+        Dictionary dictionary = dictionaryService.findOne(dictionaryId);
 
-        // Check if the deck exists
-        if (deck == null) throw new DeckDoesntExistsException();
+        // Check if the dictionary exists
+        if (dictionary == null) throw new DictionaryDoesntExistsException();
 
-        // Set the deck
-        game.setDeck(deck);
+        // Set the dictionary
+        game.setDictionary(dictionary);
 
         return gameDao.update(game);
     }
@@ -234,11 +232,14 @@ public class GameServiceImpl implements GameService {
         // Change game status
         game.setStatus(GameStatusEnum.STARTED);
 
+        // Add cards to game deck
+        gameDao.transferCardsToGameDeck(game, CardTypeEnum.WHITE);
+
         // Create table
         game.setTable(tableService.create(game));
 
-        // Add cards to players decks
-        addWhiteCardsToPlayersDecks(game);
+        // Add cards from dictionary to table
+        tableService.transferCardsToTableDeck(game, CardTypeEnum.BLACK);
 
         return gameDao.update(game);
     }
@@ -257,7 +258,7 @@ public class GameServiceImpl implements GameService {
 
         // Add cards to player hands
         for (Player player : game.getPlayers()) {
-            playerService.transferCardsFromPlayerDeckToPlayerHand(player);
+            playerService.transferCardsFromGameDeckToPlayerHand(player);
         }
 
         // Set table for new round
@@ -276,6 +277,11 @@ public class GameServiceImpl implements GameService {
 
         // End table round
         tableService.endRound(game);
+
+        // Send status to ended
+        if (Objects.equals(game.getTable().getCurrentRoundNumber(), game.getNumberOfCardsToWin())) {
+            game.setStatus(GameStatusEnum.ENDED);
+        }
 
         return gameDao.update(game);
     }
@@ -391,6 +397,14 @@ public class GameServiceImpl implements GameService {
         return gameDao.getByRoom(roomService.getById(roomId));
     }
 
+    @Override
+    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    public VotedCard getMostVotedCard(long gameId) {
+        logger.debug("Getting game with room id: {}", gameId);
+
+        return gameDao.getMostVotedCard(gameId);
+    }
+
     private int getMinNumberOfPlayers() {
         return Integer.parseInt(configurationService.getConfiguration("game_min_number_of_players"));
     }
@@ -401,24 +415,6 @@ public class GameServiceImpl implements GameService {
 
     private int getDefaultMaxNumberOfPlayers() {
         return Integer.parseInt(configurationService.getConfiguration("game_max_number_of_players"));
-    }
-
-    private void addWhiteCardsToPlayersDecks(Game game) {
-        logger.debug("Adding white cards to players in the game {}", game);
-
-        List<Card> cards = new ArrayList<>(cardService.findCardsByDeckIdAndType(game.getDeck(), CardTypeEnum.WHITE));
-
-        Collections.shuffle(cards);
-
-        int cardsPerPlayer = Math.floorDiv(cards.size(), game.getPlayers().size());
-
-        for (Player player : game.getPlayers()) {
-            List<Card> playerCards = cards.subList(0, cardsPerPlayer);
-
-            playerService.addCardsToPlayerDeck(player, playerCards);
-
-            cards.removeAll(playerCards);
-        }
     }
 
 }

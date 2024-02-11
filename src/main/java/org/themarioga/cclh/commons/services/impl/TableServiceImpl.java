@@ -23,10 +23,6 @@ import org.themarioga.cclh.commons.services.intf.PlayerService;
 import org.themarioga.cclh.commons.services.intf.TableService;
 import org.themarioga.cclh.commons.util.Assert;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 @Service
 public class TableServiceImpl implements TableService {
 
@@ -62,9 +58,6 @@ public class TableServiceImpl implements TableService {
             table.setCurrentPresident(playerService.findByUser(game.getCreator()));
         }
 
-        // Add cards from dictionary to table
-        addBlackCardsToTableDeck(table, game.getDeck());
-
         return tableDao.create(table);
     }
 
@@ -91,7 +84,7 @@ public class TableServiceImpl implements TableService {
         table.setCurrentRoundNumber(table.getCurrentRoundNumber() + 1);
 
         // Set current black card
-        transferCardFromDeckToTable(game.getTable());
+        transferCardFromDeckToTable(table);
 
         // Set current president if needed
         if (game.getType() == GameTypeEnum.CLASSIC) {
@@ -157,7 +150,7 @@ public class TableServiceImpl implements TableService {
 
         // Set the played card
         PlayedCard playedCard = new PlayedCard();
-        playedCard.setGameId(game.getId());
+        playedCard.setTable(table);
         playedCard.setPlayer(player);
         playedCard.setCard(card);
         table.getPlayedCards().add(playedCard);
@@ -200,7 +193,7 @@ public class TableServiceImpl implements TableService {
 
         // Set the player vote
         VotedCard votedCard = new VotedCard();
-        votedCard.setGameId(game.getId());
+        votedCard.setTable(table);
         votedCard.setPlayer(player);
         votedCard.setCard(card);
         table.getVotedCards().add(votedCard);
@@ -211,6 +204,12 @@ public class TableServiceImpl implements TableService {
         }
 
         return tableDao.update(table);
+    }
+
+    @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    public void transferCardsToTableDeck(Game game, CardTypeEnum cardTypeEnum) {
+        tableDao.transferCardsToTableDeck(game, cardTypeEnum);
     }
 
     @Override
@@ -225,20 +224,10 @@ public class TableServiceImpl implements TableService {
         logger.debug("Transferring black card from deck to table {}", table);
 
         if (table.getDeck() != null && !table.getDeck().isEmpty()) {
-            Card nextBlackCard = table.getDeck().get(0);
-            table.setCurrentBlackCard(nextBlackCard);
+            TableDeckCard nextBlackCard = tableDao.getTableDeckCard(table.getGame().getId(), 1);
+            table.setCurrentBlackCard(nextBlackCard.getCard());
             table.getDeck().remove(nextBlackCard);
         }
-    }
-
-    private void addBlackCardsToTableDeck(Table table, Deck deck) {
-        logger.debug("Adding black cards from the deck {} to table {}", deck, table);
-
-        List<Card> cards = new ArrayList<>(cardService.findCardsByDeckIdAndType(deck, CardTypeEnum.BLACK));
-
-        Collections.shuffle(cards);
-
-        table.getDeck().addAll(cards);
     }
 
     private void selectPlayerForRoundPresident(Game game) {

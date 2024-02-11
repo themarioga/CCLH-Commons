@@ -12,16 +12,6 @@ CREATE TABLE IF NOT EXISTS t_game_deletionvotes
 );
 
 -- Player tables
-DROP TABLE IF EXISTS t_player_deck;
-CREATE TABLE IF NOT EXISTS t_player_deck
-(
-    player_id BIGINT NOT NULL,
-    card_id   BIGINT NOT NULL,
-    PRIMARY KEY (player_id, card_id),
-    FOREIGN KEY (player_id) REFERENCES t_player (id),
-    FOREIGN KEY (card_id) REFERENCES t_card (id)
-);
-
 DROP TABLE IF EXISTS t_player_hand;
 CREATE TABLE IF NOT EXISTS t_player_hand
 (
@@ -44,6 +34,16 @@ CREATE TABLE IF NOT EXISTS t_table
     PRIMARY KEY (game_id),
     FOREIGN KEY (game_id) REFERENCES t_game (id),
     FOREIGN KEY (president_id) REFERENCES t_player (id)
+);
+
+DROP TABLE IF EXISTS t_game_deck;
+CREATE TABLE IF NOT EXISTS t_game_deck
+(
+    game_id     BIGINT NOT NULL,
+    card_id     BIGINT NOT NULL,
+    PRIMARY KEY (game_id, card_id),
+    FOREIGN KEY (game_id) REFERENCES t_game (id),
+    FOREIGN KEY (card_id) REFERENCES t_card (id)
 );
 
 DROP TABLE IF EXISTS t_table_deck;

@@ -8,8 +8,7 @@ import org.springframework.stereotype.Service;
 import org.themarioga.cclh.commons.dao.intf.CardDao;
 import org.themarioga.cclh.commons.enums.CardTypeEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
-import org.themarioga.cclh.commons.models.Card;
-import org.themarioga.cclh.commons.models.Deck;
+import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.services.intf.CardService;
 
 import java.util.Date;
@@ -60,6 +59,7 @@ public class CardServiceImpl implements CardService {
         cardDao.deleteById(id);
     }
 
+
     @Override
     @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
     public Card findOne(long id) {
@@ -70,17 +70,18 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
-    public List<Card> findCardsByDeckIdAndType(Deck deck, CardTypeEnum cardTypeEnum) {
-        logger.debug("Getting cards by deck {} and type {}", deck, cardTypeEnum);
+    public List<Card> findCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
+        logger.debug("Getting cards by dictionary {} and type {}", dictionary, cardTypeEnum);
 
-        return cardDao.findCardsByDeckIdAndType(deck, cardTypeEnum);
+        return cardDao.findCardsByDictionaryIdAndType(dictionary, cardTypeEnum);
     }
 
     @Override
     @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
-    public long countCardsByDeckIdAndType(Deck deck, CardTypeEnum cardTypeEnum) {
-        logger.debug("Counting cards by deck {} and type {}", deck, cardTypeEnum);
+    public long countCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
+        logger.debug("Counting cards by dictionary {} and type {}", dictionary, cardTypeEnum);
 
-        return cardDao.countCardsByDeckIdAndType(deck, cardTypeEnum);
+        return cardDao.countCardsByDictionaryIdAndType(dictionary, cardTypeEnum);
     }
+
 }

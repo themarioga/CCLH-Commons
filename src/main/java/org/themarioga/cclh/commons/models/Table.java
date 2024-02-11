@@ -27,16 +27,13 @@ public class Table implements Serializable {
     @JoinColumn(name = "president_id", referencedColumnName = "id")
     private Player currentPresident;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "t_table_deck", joinColumns = @JoinColumn(name = "game_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "card_id", nullable = false))
-    private List<Card> deck = new ArrayList<>(0);
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "table", orphanRemoval = true)
+    private List<TableDeckCard> deck = new ArrayList<>(0);
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "game_id", referencedColumnName = "game_id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "table", orphanRemoval = true)
     private List<PlayedCard> playedCards = new ArrayList<>(0);
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "game_id", referencedColumnName = "game_id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "table", orphanRemoval = true)
     private List<VotedCard> votedCards = new ArrayList<>(0);
 
     public Game getGame() {
@@ -79,11 +76,11 @@ public class Table implements Serializable {
         this.currentPresident = currentPresident;
     }
 
-    public List<Card> getDeck() {
+    public List<TableDeckCard> getDeck() {
         return deck;
     }
 
-    public void setDeck(List<Card> deck) {
+    public void setDeck(List<TableDeckCard> deck) {
         this.deck = deck;
     }
 

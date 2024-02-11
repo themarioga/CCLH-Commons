@@ -12,7 +12,7 @@ import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.enums.TableStatusEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
-import org.themarioga.cclh.commons.exceptions.deck.DeckDoesntExistsException;
+import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.game.*;
 import org.themarioga.cclh.commons.exceptions.player.*;
 import org.themarioga.cclh.commons.exceptions.room.RoomDoesntExistsException;
@@ -20,7 +20,7 @@ import org.themarioga.cclh.commons.exceptions.user.UserNotActiveException;
 import org.themarioga.cclh.commons.models.Card;
 import org.themarioga.cclh.commons.models.Game;
 import org.themarioga.cclh.commons.models.Player;
-import org.themarioga.cclh.commons.services.intf.DeckService;
+import org.themarioga.cclh.commons.services.intf.DictionaryService;
 import org.themarioga.cclh.commons.services.intf.GameService;
 import org.themarioga.cclh.commons.services.intf.PlayerService;
 import org.themarioga.cclh.commons.services.intf.UserService;
@@ -43,7 +43,7 @@ class GameServiceTest extends BaseTest {
     GameService gameService;
 
     @Autowired
-    DeckService deckService;
+    DictionaryService dictionaryService;
 
     @Autowired
     PlayerService playerService;
@@ -131,21 +131,21 @@ class GameServiceTest extends BaseTest {
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameDictionary-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetDictionary() {
-        Game game = gameService.setDeck(gameService.getByRoomId(0L), 1L);
+        Game game = gameService.setDictionary(gameService.getByRoomId(0L), 1L);
 
         getCurrentSession().flush();
 
-        Assertions.assertEquals(deckService.findOne(1L), game.getDeck());
+        Assertions.assertEquals(dictionaryService.findOne(1L), game.getDictionary());
     }
 
     @Test
     void testSetMaxDictionary_GameAlreadyStarted() {
-        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setDeck(gameService.getByRoomId(3L), 0L));
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setDictionary(gameService.getByRoomId(3L), 0L));
     }
 
     @Test
     void testSetMaxDictionary_DictionaryDoesntExists() {
-        Assertions.assertThrows(DeckDoesntExistsException.class, () -> gameService.setDeck(gameService.getByRoomId(0L), 50L));
+        Assertions.assertThrows(DictionaryDoesntExistsException.class, () -> gameService.setDictionary(gameService.getByRoomId(0L), 50L));
     }
 
     @Test
@@ -196,7 +196,6 @@ class GameServiceTest extends BaseTest {
         Assertions.assertNotNull(game.getTable());
         Assertions.assertEquals(3, game.getTable().getDeck().size());
         Assertions.assertEquals(3, game.getPlayers().size());
-        Assertions.assertEquals(3, game.getPlayers().get(0).getDeck().size());
     }
 
     @Test

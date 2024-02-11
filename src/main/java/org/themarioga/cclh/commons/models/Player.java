@@ -25,11 +25,14 @@ public class Player extends Base {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player")
-    private List<PlayerDeckCard> deck = new ArrayList<>(0);
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
     private List<PlayerHandCard> hand = new ArrayList<>(0);
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
+    private List<PlayedCard> playedCards = new ArrayList<>(0);
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "player", orphanRemoval = true)
+    private List<VotedCard> votedCards = new ArrayList<>(0);
 
     public Long getId() {
         return id;
@@ -71,20 +74,28 @@ public class Player extends Base {
         this.user = user;
     }
 
-    public List<PlayerDeckCard> getDeck() {
-        return deck;
-    }
-
-    public void setDeck(List<PlayerDeckCard> deck) {
-        this.deck = deck;
-    }
-
     public List<PlayerHandCard> getHand() {
         return hand;
     }
 
     public void setHand(List<PlayerHandCard> hand) {
         this.hand = hand;
+    }
+
+    public List<PlayedCard> getPlayedCards() {
+        return playedCards;
+    }
+
+    public void setPlayedCards(List<PlayedCard> playedCards) {
+        this.playedCards = playedCards;
+    }
+
+    public List<VotedCard> getVotedCards() {
+        return votedCards;
+    }
+
+    public void setVotedCards(List<VotedCard> votedCards) {
+        this.votedCards = votedCards;
     }
 
     @Override

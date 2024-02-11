@@ -4,9 +4,10 @@ import org.springframework.stereotype.Repository;
 import org.themarioga.cclh.commons.dao.AbstractHibernateDao;
 import org.themarioga.cclh.commons.dao.intf.CardDao;
 import org.themarioga.cclh.commons.enums.CardTypeEnum;
-import org.themarioga.cclh.commons.models.Card;
-import org.themarioga.cclh.commons.models.Deck;
+import org.themarioga.cclh.commons.models.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -16,14 +17,26 @@ public class CardDaoImpl extends AbstractHibernateDao<Card> implements CardDao {
         setClazz(Card.class);
     }
 
+//    @Override
+//    public List<PlayerDeckCard> getCardsForPlayerDeck(long playerId, long dictionaryId, CardTypeEnum cardTypeEnum, int start, int size) {
+//        return getCurrentSession()
+//                .createNativeQuery("SELECT :player_id as player_id, id as card_id FROM T_CARD WHERE dictionary_id=:dictionary_id AND type=:type", PlayerDeckCard.class)
+//                .setParameter("player_id", playerId)
+//                .setParameter("dictionary_id", dictionaryId)
+//                .setParameter("type", cardTypeEnum)
+//                .setFirstResult(start)
+//                .setMaxResults(size)
+//                .getResultList();
+//    }
+
     @Override
-    public List<Card> findCardsByDeckIdAndType(Deck deck, CardTypeEnum cardTypeEnum) {
-        return getCurrentSession().createQuery("SELECT t FROM Card t where t.deck=:deck and t.type=:type", Card.class).setParameter("deck", deck).setParameter("type", cardTypeEnum).getResultList();
+    public List<Card> findCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
+        return getCurrentSession().createQuery("SELECT t FROM Card t where t.dictionary=:dictionary and t.type=:type", Card.class).setParameter("dictionary", dictionary).setParameter("type", cardTypeEnum).getResultList();
     }
 
     @Override
-    public int countCardsByDeckIdAndType(Deck deck, CardTypeEnum cardTypeEnum) {
-        return getCurrentSession().createQuery("SELECT count(*) FROM Card t where t.deck=:deck and t.type=:type", Long.class).setParameter("deck", deck).setParameter("type", cardTypeEnum).getSingleResultOrNull().intValue();
+    public int countCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
+        return getCurrentSession().createQuery("SELECT count(*) FROM Card t where t.dictionary=:dictionary and t.type=:type", Long.class).setParameter("dictionary", dictionary).setParameter("type", cardTypeEnum).getSingleResultOrNull().intValue();
     }
 
 }

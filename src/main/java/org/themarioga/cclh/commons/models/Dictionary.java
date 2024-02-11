@@ -8,7 +8,7 @@ import java.util.Objects;
 
 @Entity
 @jakarta.persistence.Table(name = "t_dictionary")
-public class Deck extends Base {
+public class Dictionary extends Base {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,9 +28,8 @@ public class Deck extends Base {
     @JoinTable(name = "t_card", joinColumns = @JoinColumn(name = "dictionary_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "id", nullable = false))
     private List<Card> cards = new ArrayList<>(0);
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "dictionary_id", referencedColumnName = "id")
-    private List<DeckCollaborator> collaborators = new ArrayList<>(0);
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "dictionary", orphanRemoval = true)
+    private List<DictionaryCollaborator> collaborators = new ArrayList<>(0);
 
     public Long getId() {
         return id;
@@ -80,19 +79,19 @@ public class Deck extends Base {
         this.cards = cards;
     }
 
-    public List<DeckCollaborator> getCollaborators() {
+    public List<DictionaryCollaborator> getCollaborators() {
         return collaborators;
     }
 
-    public void setCollaborators(List<DeckCollaborator> deckCollaborators) {
-        this.collaborators = deckCollaborators;
+    public void setCollaborators(List<DictionaryCollaborator> dictionaryCollaborators) {
+        this.collaborators = dictionaryCollaborators;
     }
 
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
-        Deck card = (Deck) object;
+        Dictionary card = (Dictionary) object;
         return Objects.equals(id, card.id);
     }
 

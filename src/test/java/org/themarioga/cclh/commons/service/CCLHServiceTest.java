@@ -26,7 +26,7 @@ class CCLHServiceTest extends BaseTest {
         Game game = gameService.create(0L, "Habitación", 0L);
         gameService.setType(game, GameTypeEnum.DEMOCRACY);
         gameService.setNumberOfCardsToWin(game, 3);
-        gameService.setDeck(game, 0L);
+        gameService.setDictionary(game, 0L);
         gameService.addPlayer(game, playerService.create(game, 0L));
         gameService.addPlayer(game, playerService.create(game, 1L));
         gameService.addPlayer(game, playerService.create(game, 3L));

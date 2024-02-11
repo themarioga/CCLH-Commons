@@ -70,37 +70,22 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public void addCardsToPlayerDeck(Player player, List<Card> playerCards) {
-        logger.debug("Adding cards to player {}", player);
-
-        for (Card card : playerCards) {
-            PlayerDeckCard playerDeckCard = new PlayerDeckCard();
-            playerDeckCard.setPlayer(player);
-            playerDeckCard.setCard(card);
-
-            player.getDeck().add(playerDeckCard);
-        }
-
-        playerDao.update(player);
-    }
-
-    @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public void transferCardsFromPlayerDeckToPlayerHand(Player player) {
+    public void transferCardsFromGameDeckToPlayerHand(Player player) {
         logger.debug("Transferring white cards from deck to hand from player {}", player);
 
         int cardsInHand = Integer.parseInt(configurationService.getConfiguration("game_whitecards_in_hand"));
 
         if (player.getHand().size() < cardsInHand) {
-            int missingCards = cardsInHand - player.getHand().size();
-            List<PlayerDeckCard> cardsToTransfer = new ArrayList<>(player.getDeck().subList(0, Math.min(missingCards, player.getDeck().size())));
-            for (PlayerDeckCard playerDeckCard : cardsToTransfer) {
+            int missingCards = Math.min(cardsInHand - player.getHand().size(), player.getGame().getDeckCards().size());
+
+            List<GameDeckCard> cardsToTransfer = new ArrayList<>(playerDao.getGameDeckCards(player.getGame().getId(), missingCards));
+            for (GameDeckCard gameDeckCard : cardsToTransfer) {
                 PlayerHandCard playerHandCard = new PlayerHandCard();
                 playerHandCard.setPlayer(player);
-                playerHandCard.setCard(playerDeckCard.getCard());
+                playerHandCard.setCard(gameDeckCard.getCard());
 
                 player.getHand().add(playerHandCard);
-                player.getDeck().remove(playerDeckCard);
+                player.getGame().getDeckCards().remove(gameDeckCard);
             }
 
             playerDao.update(player);

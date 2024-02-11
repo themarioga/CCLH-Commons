@@ -34,14 +34,14 @@ class GameDaoTest extends BaseTest {
     @Autowired
     private PlayerDao playerDao;
     @Autowired
-    private DeckDao deckDao;
+    private DictionaryDao dictionaryDao;
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testCreateGame-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void createGame() {
         Room room = roomDao.findOne(1L);
         User creator = userDao.findOne(0L);
-        Deck deck = deckDao.findOne(0L);
+        Dictionary dictionary = dictionaryDao.findOne(0L);
 
         Game game = new Game();
         game.setType(GameTypeEnum.DICTATORSHIP);
@@ -50,7 +50,7 @@ class GameDaoTest extends BaseTest {
         game.setStatus(GameStatusEnum.CREATED);
         game.setRoom(room);
         game.setCreator(creator);
-        game.setDeck(deck);
+        game.setDictionary(dictionary);
 
         gameDao.create(game);
 
@@ -91,7 +91,7 @@ class GameDaoTest extends BaseTest {
         Assertions.assertEquals(0, game.getMaxNumberOfPlayers());
         Assertions.assertEquals(0, game.getRoom().getId());
         Assertions.assertEquals(0, game.getCreator().getId());
-        Assertions.assertEquals(0, game.getDeck().getId());
+        Assertions.assertEquals(0, game.getDictionary().getId());
         Assertions.assertEquals(GameTypeEnum.DEMOCRACY, game.getType());
         Assertions.assertEquals(GameStatusEnum.CREATED, game.getStatus());
     }
@@ -105,7 +105,7 @@ class GameDaoTest extends BaseTest {
         Assertions.assertEquals(0, game.getMaxNumberOfPlayers());
         Assertions.assertEquals(0, game.getRoom().getId());
         Assertions.assertEquals(0, game.getCreator().getId());
-        Assertions.assertEquals(0, game.getDeck().getId());
+        Assertions.assertEquals(0, game.getDictionary().getId());
         Assertions.assertEquals(GameTypeEnum.DEMOCRACY, game.getType());
         Assertions.assertEquals(GameStatusEnum.CREATED, game.getStatus());
     }
@@ -121,7 +121,7 @@ class GameDaoTest extends BaseTest {
         Assertions.assertEquals(0, games.get(0).getMaxNumberOfPlayers());
         Assertions.assertEquals(0, games.get(0).getRoom().getId());
         Assertions.assertEquals(0, games.get(0).getCreator().getId());
-        Assertions.assertEquals(0, games.get(0).getDeck().getId());
+        Assertions.assertEquals(0, games.get(0).getDictionary().getId());
         Assertions.assertEquals(GameTypeEnum.DEMOCRACY, games.get(0).getType());
         Assertions.assertEquals(GameStatusEnum.CREATED, games.get(0).getStatus());
     }
@@ -139,7 +139,10 @@ class GameDaoTest extends BaseTest {
         Game game = gameDao.findOne(0L);
         Card card = cardDao.findOne(0L);
 
-        game.getTable().getDeck().add(card);
+        TableDeckCard TableDeckCard = new TableDeckCard();
+        TableDeckCard.setTable(game.getTable());
+        TableDeckCard.setCard(card);
+        game.getTable().getDeck().add(TableDeckCard);
 
         gameDao.update(game);
         getCurrentSession().flush();

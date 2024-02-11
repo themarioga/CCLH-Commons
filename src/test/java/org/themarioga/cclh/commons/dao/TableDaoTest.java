@@ -37,7 +37,7 @@ class TableDaoTest extends BaseTest {
     @Autowired
     private PlayerDao playerDao;
     @Autowired
-    private DeckDao deckDao;
+    private DictionaryDao dictionaryDao;
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testCreateGame-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
@@ -45,7 +45,7 @@ class TableDaoTest extends BaseTest {
     void createGameAndTable() {
         Room room = roomDao.findOne(1L);
         User creator = userDao.findOne(0L);
-        Deck deck = deckDao.findOne(0L);
+        Dictionary dictionary = dictionaryDao.findOne(0L);
         Card card = cardDao.findOne(0L);
 
         Game game = new Game();
@@ -55,7 +55,7 @@ class TableDaoTest extends BaseTest {
         game.setStatus(GameStatusEnum.CREATED);
         game.setRoom(room);
         game.setCreator(creator);
-        game.setDeck(deck);
+        game.setDictionary(dictionary);
 
         gameDao.create(game);
 
@@ -127,7 +127,7 @@ class TableDaoTest extends BaseTest {
         Player played = playerDao.findOne(0L);
 
         PlayedCard playedCard = new PlayedCard();
-        playedCard.setGameId(table.getGame().getId());
+        playedCard.setTable(table);
         playedCard.setCard(card);
         playedCard.setPlayer(played);
         table.getPlayedCards().add(playedCard);
@@ -158,7 +158,7 @@ class TableDaoTest extends BaseTest {
         Player played = playerDao.findOne(0L);
 
         VotedCard votedCard = new VotedCard();
-        votedCard.setGameId(table.getGame().getId());
+        votedCard.setTable(table);
         votedCard.setCard(card);
         votedCard.setPlayer(played);
         table.getVotedCards().add(votedCard);
@@ -189,6 +189,15 @@ class TableDaoTest extends BaseTest {
 
         Assertions.assertNotNull(card);
         Assertions.assertEquals(0, card.getCard().getId());
+    }
+
+    @Test
+    @DatabaseSetup("classpath:dbunit/dao/setup/tableplayervotes.xml")
+    void getTableMaxPlayerVotes() {
+        VotedCard mostVotedCard = gameDao.getMostVotedCard(0L);
+
+        Assertions.assertEquals(0L, mostVotedCard.getTable().getGame().getId());
+        Assertions.assertEquals(0L, mostVotedCard.getCard().getId());
     }
 
 }

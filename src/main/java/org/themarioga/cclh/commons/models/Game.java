@@ -32,17 +32,20 @@ public class Game extends Base {
     private User creator;
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "dictionary_id", referencedColumnName = "id", nullable = false)
-    private Deck deck;
+    private Dictionary dictionary;
 
-    @OneToOne(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Table table;
-
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "game", orphanRemoval = true)
     private List<Player> players = new ArrayList<>(0);
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "game", orphanRemoval = true)
+    private List<GameDeckCard> deckCards = new ArrayList<>(0);
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "t_game_deletionvotes", joinColumns = @JoinColumn(name = "game_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "player_id", nullable = false))
     private List<Player> deletionVotes = new ArrayList<>(0);
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "game", orphanRemoval = true)
+    private Table table;
 
     public Long getId() {
         return id;
@@ -84,12 +87,12 @@ public class Game extends Base {
         this.status = currentStatus;
     }
 
-    public Deck getDeck() {
-        return deck;
+    public Dictionary getDictionary() {
+        return dictionary;
     }
 
-    public void setDeck(Deck deck) {
-        this.deck = deck;
+    public void setDictionary(Dictionary dictionary) {
+        this.dictionary = dictionary;
     }
 
     public Room getRoom() {
@@ -122,6 +125,14 @@ public class Game extends Base {
 
     public void setPlayers(List<Player> players) {
         this.players = players;
+    }
+
+    public List<GameDeckCard> getDeckCards() {
+        return deckCards;
+    }
+
+    public void setDeckCards(List<GameDeckCard> deckCards) {
+        this.deckCards = deckCards;
     }
 
     public List<Player> getDeletionVotes() {
