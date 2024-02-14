@@ -151,6 +151,8 @@ public class TableServiceImpl implements TableService {
         // Check we need to proceed to voting
         if (checkIfEveryoneHavePlayedACard(game, table)) {
             table.setStatus(TableStatusEnum.VOTING);
+
+
         }
 
         return tableDao.update(table);
@@ -194,6 +196,8 @@ public class TableServiceImpl implements TableService {
         // Check we need to end the round
         if (checkIfEveryoneHaveVotedACard(game, table)) {
             table.setStatus(TableStatusEnum.ENDING);
+
+            incrementMostVotedCardPlayerPoints(game);
         }
 
         return tableDao.update(table);
@@ -209,7 +213,7 @@ public class TableServiceImpl implements TableService {
 
     @Override
     @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
-    public PlayedCard getMostVotedCard(Long gameId) {
+    public VotedCard getMostVotedCard(long gameId) {
         logger.debug("Getting most voted card of the table of the game {}", gameId);
 
         return tableDao.getMostVotedCard(gameId);
@@ -225,6 +229,12 @@ public class TableServiceImpl implements TableService {
         }
 
         game.getTable().setCurrentPresident(game.getPlayers().get(playerIndex));
+    }
+
+    private void incrementMostVotedCardPlayerPoints(Game game) {
+        VotedCard mostVotedCard = tableDao.getMostVotedCard(game.getId());
+        Player mostVotedCardPlayer = mostVotedCard.getPlayer();
+        mostVotedCardPlayer.setPoints(mostVotedCardPlayer.getPoints() + 1);
     }
 
     private int getCurrentPresidentIndex(Game game) {

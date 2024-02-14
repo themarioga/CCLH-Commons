@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.models.PlayedCard;
+import org.themarioga.cclh.commons.models.VotedCard;
 import org.themarioga.cclh.commons.services.intf.TableService;
 
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")
@@ -24,7 +25,7 @@ class TableServiceTest extends BaseTest {
     @DatabaseSetup("classpath:dbunit/service/setup/tableplayedcards.xml")
     @DatabaseSetup("classpath:dbunit/service/setup/tableplayervotes.xml")
     void testGetMostVotedCard() {
-        PlayedCard card = tableService.getMostVotedCard(10L);
+        VotedCard card = tableService.getMostVotedCard(10L);
 
         Assertions.assertNotNull(card);
     }

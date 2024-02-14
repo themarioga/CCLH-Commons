@@ -1,7 +1,5 @@
 package org.themarioga.cclh.commons.services.intf;
 
-import jakarta.transaction.Transactional;
-import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.models.*;
 
 public interface TableService {
@@ -16,9 +14,8 @@ public interface TableService {
 
     Table voteCard(Game game, Player player, Card card);
 
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
     void setNextBlackCard(Table table, Card nextBlackCard);
 
-    PlayedCard getMostVotedCard(Long gameId);
+    VotedCard getMostVotedCard(long gameId);
 
 }

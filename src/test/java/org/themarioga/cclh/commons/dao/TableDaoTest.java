@@ -185,7 +185,7 @@ class TableDaoTest extends BaseTest {
     @DatabaseSetup("classpath:dbunit/dao/setup/tableplayedcards.xml")
     @DatabaseSetup("classpath:dbunit/dao/setup/tableplayervotes.xml")
     void testGetMostVotedCard() {
-        PlayedCard card = tableDao.getMostVotedCard(0L);
+        VotedCard card = tableDao.getMostVotedCard(0L);
 
         Assertions.assertNotNull(card);
         Assertions.assertEquals(0, card.getCard().getId());
@@ -193,8 +193,8 @@ class TableDaoTest extends BaseTest {
 
     @Test
     @DatabaseSetup("classpath:dbunit/dao/setup/tableplayervotes.xml")
-    void getTableMaxPlayerVotes() {
-        VotedCard mostVotedCard = gameDao.getMostVotedCard(0L);
+    void testGetMostVotedCard2() {
+        VotedCard mostVotedCard = tableDao.getMostVotedCard(0L);
 
         Assertions.assertEquals(0L, mostVotedCard.getTable().getGame().getId());
         Assertions.assertEquals(0L, mostVotedCard.getCard().getId());

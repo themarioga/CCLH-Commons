@@ -400,7 +400,7 @@ public class GameServiceImpl implements GameService {
     public VotedCard getMostVotedCard(long gameId) {
         logger.debug("Getting game with room id: {}", gameId);
 
-        return gameDao.getMostVotedCard(gameId);
+        return tableService.getMostVotedCard(gameId);
     }
 
     private Card getBlackCardFromGameDeck(Game game) {

@@ -31,11 +31,6 @@ public class GameDaoImpl extends AbstractHibernateDao<Game> implements GameDao {
     }
 
     @Override
-    public VotedCard getMostVotedCard(long gameId) {
-        return getCurrentSession().createNativeQuery("SELECT *, count(card_id) as value_ocurrence FROM T_TABLE_PLAYERVOTES " + "WHERE game_id=:gameId GROUP BY card_id ORDER BY value_ocurrence", VotedCard.class).setParameter("gameId", gameId).setMaxResults(1).getSingleResultOrNull();
-    }
-
-    @Override
     public List<GameDeckCard> getGameDeckCards(long gameId, int cardNumber, CardTypeEnum cardTypeEnum) {
         return getCurrentSession().createNativeQuery("SELECT T_GAME_DECK.* FROM T_GAME_DECK INNER JOIN T_CARD on T_GAME_DECK.CARD_ID = T_CARD.ID WHERE game_id=:game_id and type=:type ORDER BY RAND()", GameDeckCard.class).setParameter("game_id", gameId).setParameter("type", cardTypeEnum).setMaxResults(cardNumber).getResultList();
     }

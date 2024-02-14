@@ -14,8 +14,6 @@ public interface GameDao extends InterfaceHibernateDao<Game> {
 
     Game getByCreator(User creator);
 
-    VotedCard getMostVotedCard(long gameId);
-
     List<GameDeckCard> getGameDeckCards(long gameId, int cardNumber, CardTypeEnum cardTypeEnum);
 
     Long countByRoom(Room room);
