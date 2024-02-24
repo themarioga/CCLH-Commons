@@ -1,15 +1,5 @@
 -- v1.0.0_1 - First version of database (basic tables)
 
--- Bot config
-
-DROP TABLE IF EXISTS t_configuration;
-CREATE TABLE IF NOT EXISTS t_configuration
-(
-    conf_key   TEXT NOT NULL,
-    conf_value TEXT NOT NULL,
-    PRIMARY KEY (conf_key)
-);
-
 -- Basic tables
 
 DROP TABLE IF EXISTS t_user;
@@ -64,19 +54,21 @@ CREATE TABLE IF NOT EXISTS t_card
 CREATE INDEX card_idx_id ON t_card (id);
 CREATE INDEX card_dictionary_idx_id ON t_card (dictionary_id);
 
--- Tables with inheritance
+-- Tables for games
 
 DROP TABLE IF EXISTS t_game;
 CREATE TABLE IF NOT EXISTS t_game
 (
-    id             BIGINT NOT NULL AUTO_INCREMENT,
-    room_id        BIGINT NOT NULL,
-    creator_id     BIGINT NOT NULL,
-    status         TINYINT NOT NULL,
-    type           TINYINT NOT NULL,
-    dictionary_id  BIGINT NOT NULL,
-    n_cards_to_win TINYINT NOT NULL,
-    n_players      TINYINT NOT NULL,
+    id                  BIGINT NOT NULL AUTO_INCREMENT,
+    room_id             BIGINT NOT NULL,
+    creator_id          BIGINT NOT NULL,
+    status              TINYINT NOT NULL,
+    type                TINYINT NOT NULL,
+    punctuation_type    TINYINT NOT NULL,
+    dictionary_id       BIGINT NOT NULL,
+    n_cards_to_win      TINYINT NOT NULL,
+    n_of_rounds         TINYINT NOT NULL,
+    n_players           TINYINT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (room_id) REFERENCES t_room (id),
     FOREIGN KEY (creator_id) REFERENCES t_user (id),
@@ -105,3 +97,13 @@ CREATE TABLE IF NOT EXISTS t_player
 CREATE INDEX player_idx_id ON t_player (id);
 CREATE INDEX player_user_idx_id ON t_player (user_id);
 CREATE INDEX player_game_idx_id ON t_player (game_id);
+
+-- Bot config
+
+DROP TABLE IF EXISTS t_configuration;
+CREATE TABLE IF NOT EXISTS t_configuration
+(
+    conf_key   TEXT NOT NULL,
+    conf_value TEXT NOT NULL,
+    PRIMARY KEY (conf_key)
+);

@@ -213,7 +213,7 @@ public class TableServiceImpl implements TableService {
 
     @Override
     @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
-    public VotedCard getMostVotedCard(long gameId) {
+    public PlayedCard getMostVotedCard(long gameId) {
         logger.debug("Getting most voted card of the table of the game {}", gameId);
 
         return tableDao.getMostVotedCard(gameId);
@@ -232,7 +232,7 @@ public class TableServiceImpl implements TableService {
     }
 
     private void incrementMostVotedCardPlayerPoints(Game game) {
-        VotedCard mostVotedCard = tableDao.getMostVotedCard(game.getId());
+        PlayedCard mostVotedCard = tableDao.getMostVotedCard(game.getId());
         Player mostVotedCardPlayer = mostVotedCard.getPlayer();
         mostVotedCardPlayer.setPoints(mostVotedCardPlayer.getPoints() + 1);
     }

@@ -6,10 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.themarioga.cclh.commons.dao.intf.GameDao;
-import org.themarioga.cclh.commons.enums.CardTypeEnum;
-import org.themarioga.cclh.commons.enums.ErrorEnum;
-import org.themarioga.cclh.commons.enums.GameStatusEnum;
-import org.themarioga.cclh.commons.enums.GameTypeEnum;
+import org.themarioga.cclh.commons.enums.*;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.game.*;
@@ -68,8 +65,10 @@ public class GameServiceImpl implements GameService {
         game.setCreationDate(new Date());
         game.setCreator(userService.getById(creatorId));
         game.setStatus(GameStatusEnum.CREATED);
-        game.setType(GameTypeEnum.DEMOCRACY);
-        game.setNumberOfCardsToWin(getDefaultNumberCardsToWin());
+        game.setType(getDefaultGameMode());
+        game.setPunctuationType(getDefaultGamePunctuationType());
+        game.setNumberOfCardsToWin(getDefaultGameLength());
+        game.setNumberOfRounds(getDefaultGameLength());
         game.setMaxNumberOfPlayers(getDefaultMaxNumberOfPlayers());
         game.setDictionary(dictionaryService.getDefaultDictionary());
 
@@ -117,8 +116,31 @@ public class GameServiceImpl implements GameService {
         // Check if the game has already started
         if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
 
+        // Set the game punctuation type
+        game.setPunctuationType(GamePunctuationTypeEnum.POINTS);
+
         // Set the number of cards to win
         game.setNumberOfCardsToWin(numberOfCards);
+
+        return gameDao.update(game);
+    }
+
+    @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    public Game setNumberOfRoundsToEnd(Game game, int numberOfRoundsToEnd) {
+        logger.debug("Setting number of rounds {} to game {}", numberOfRoundsToEnd, game);
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check if the game has already started
+        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
+
+        // Set the game punctuation type
+        game.setPunctuationType(GamePunctuationTypeEnum.ROUNDS);
+
+        // Set the number of cards to win
+        game.setNumberOfRounds(numberOfRoundsToEnd);
 
         return gameDao.update(game);
     }
@@ -277,7 +299,7 @@ public class GameServiceImpl implements GameService {
         tableService.endRound(game);
 
         // Send status to ended
-        if (Objects.equals(game.getTable().getCurrentRoundNumber(), game.getNumberOfCardsToWin())) {
+        if (checkIfGameIsOver(game)) {
             game.setStatus(GameStatusEnum.ENDED);
         }
 
@@ -395,7 +417,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
-    public VotedCard getMostVotedCard(long gameId) {
+    public PlayedCard getMostVotedCard(long gameId) {
         logger.debug("Getting game with room id: {}", gameId);
 
         return tableService.getMostVotedCard(gameId);
@@ -426,12 +448,29 @@ public class GameServiceImpl implements GameService {
         }
     }
 
-    private int getMinNumberOfPlayers() {
-        return Integer.parseInt(configurationService.getConfiguration("game_min_number_of_players"));
+    private boolean checkIfGameIsOver(Game game) {
+        if (game.getPunctuationType() == GamePunctuationTypeEnum.ROUNDS) {
+	        return Objects.equals(game.getTable().getCurrentRoundNumber(), game.getNumberOfRounds());
+        } else {
+            Optional<Player> maxVotedPlayer = game.getPlayers().stream().max(Comparator.comparing(Player::getPoints));
+	        return maxVotedPlayer.isPresent() && Objects.equals(maxVotedPlayer.get().getPoints(), game.getNumberOfCardsToWin());
+        }
     }
 
-    private int getDefaultNumberCardsToWin() {
-        return Integer.parseInt(configurationService.getConfiguration("game_default_number_cards_to_win"));
+    private GameTypeEnum getDefaultGameMode() {
+        return GameTypeEnum.getEnum(Integer.parseInt(configurationService.getConfiguration("game_default_game_type")));
+    }
+
+    private GamePunctuationTypeEnum getDefaultGamePunctuationType() {
+        return GamePunctuationTypeEnum.getEnum(Integer.parseInt(configurationService.getConfiguration("game_default_game_punctuation_type")));
+    }
+
+    private int getDefaultGameLength() {
+        return Integer.parseInt(configurationService.getConfiguration("game_default_game_legth"));
+    }
+
+    private int getMinNumberOfPlayers() {
+        return Integer.parseInt(configurationService.getConfiguration("game_min_number_of_players"));
     }
 
     private int getDefaultMaxNumberOfPlayers() {

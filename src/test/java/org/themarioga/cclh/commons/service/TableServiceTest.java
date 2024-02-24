@@ -25,9 +25,9 @@ class TableServiceTest extends BaseTest {
     @DatabaseSetup("classpath:dbunit/service/setup/tableplayedcards.xml")
     @DatabaseSetup("classpath:dbunit/service/setup/tableplayervotes.xml")
     void testGetMostVotedCard() {
-        VotedCard card = tableService.getMostVotedCard(10L);
+        PlayedCard mostVotedCard = tableService.getMostVotedCard(10L);
 
-        Assertions.assertNotNull(card);
+        Assertions.assertNotNull(mostVotedCard);
     }
 
 }

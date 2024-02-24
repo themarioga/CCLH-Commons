@@ -13,8 +13,9 @@ public class TableDaoImpl extends AbstractHibernateDao<Table> implements TableDa
     }
 
     @Override
-    public VotedCard getMostVotedCard(long gameId) {
-        return getCurrentSession().createNativeQuery("SELECT *, count(card_id) as value_ocurrence FROM T_TABLE_PLAYERVOTES " + "WHERE game_id=:gameId GROUP BY card_id ORDER BY value_ocurrence", VotedCard.class).setParameter("gameId", gameId).setMaxResults(1).getSingleResultOrNull();
+    public PlayedCard getMostVotedCard(long gameId) {
+        return getCurrentSession()
+                .createNativeQuery("SELECT * FROM T_TABLE_PLAYEDCARDS WHERE CARD_ID = (SELECT CARD_ID FROM (SELECT CARD_ID, count(card_id) as value_ocurrence FROM T_TABLE_PLAYERVOTES WHERE game_id=:game_id GROUP BY card_id ORDER BY value_ocurrence DESC LIMIT 1))", PlayedCard.class).setParameter("game_id", gameId).getSingleResultOrNull();
     }
 
 }

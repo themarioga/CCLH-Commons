@@ -3,8 +3,6 @@ package org.themarioga.cclh.commons.services.intf;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
 import org.themarioga.cclh.commons.models.*;
 
-import java.util.List;
-
 public interface GameService {
 
     Game create(long roomId, String roomName, long creatorId);
@@ -14,6 +12,8 @@ public interface GameService {
     Game setType(Game game, GameTypeEnum type);
 
     Game setNumberOfCardsToWin(Game game, int numberOfCardsToWin);
+
+    Game setNumberOfRoundsToEnd(Game game, int numberOfRoundsToEnd);
 
     Game setMaxNumberOfPlayers(Game game, int maxNumberOfPlayers);
 
@@ -39,6 +39,6 @@ public interface GameService {
 
     Game getByRoomId(long roomId);
 
-    VotedCard getMostVotedCard(long gameId);
+    PlayedCard getMostVotedCard(long gameId);
 
 }

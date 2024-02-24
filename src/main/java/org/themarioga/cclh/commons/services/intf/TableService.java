@@ -16,6 +16,6 @@ public interface TableService {
 
     void setNextBlackCard(Table table, Card nextBlackCard);
 
-    VotedCard getMostVotedCard(long gameId);
+    PlayedCard getMostVotedCard(long gameId);
 
 }

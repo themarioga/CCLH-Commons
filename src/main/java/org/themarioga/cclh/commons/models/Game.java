@@ -1,6 +1,7 @@
 package org.themarioga.cclh.commons.models;
 
 import jakarta.persistence.*;
+import org.themarioga.cclh.commons.enums.GamePunctuationTypeEnum;
 import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
 
@@ -19,8 +20,12 @@ public class Game extends Base {
     private GameStatusEnum status;
     @Column(name = "type", nullable = false)
     private GameTypeEnum type;
+    @Column(name = "punctuation_type", nullable = false)
+    private GamePunctuationTypeEnum punctuationType;
     @Column(name = "n_cards_to_win", nullable = false)
     private Integer numberOfCardsToWin;
+    @Column(name = "n_of_rounds", nullable = false)
+    private Integer numberOfRounds;
     @Column(name = "n_players", nullable = false)
     private Integer maxNumberOfPlayers;
 
@@ -63,6 +68,14 @@ public class Game extends Base {
         this.type = type;
     }
 
+    public GamePunctuationTypeEnum getPunctuationType() {
+        return punctuationType;
+    }
+
+    public void setPunctuationType(GamePunctuationTypeEnum punctuationType) {
+        this.punctuationType = punctuationType;
+    }
+
     public Integer getMaxNumberOfPlayers() {
         return maxNumberOfPlayers;
     }
@@ -77,6 +90,14 @@ public class Game extends Base {
 
     public void setNumberOfCardsToWin(Integer numberOfCardsToWin) {
         this.numberOfCardsToWin = numberOfCardsToWin;
+    }
+
+    public Integer getNumberOfRounds() {
+        return numberOfRounds;
+    }
+
+    public void setNumberOfRounds(Integer numberOfRounds) {
+        this.numberOfRounds = numberOfRounds;
     }
 
     public GameStatusEnum getStatus() {
