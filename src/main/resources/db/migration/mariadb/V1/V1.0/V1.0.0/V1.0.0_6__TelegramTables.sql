@@ -1,7 +1,7 @@
 -- v1.0.0_6 - Telegram tables
 
-DROP TABLE IF EXISTS T_TELEGRAM_GAME;
-CREATE TABLE IF NOT EXISTS T_TELEGRAM_GAME
+DROP TABLE IF EXISTS t_telegram_game;
+CREATE TABLE IF NOT EXISTS t_telegram_game
 (
     game_id                 BIGINT NOT NULL,
     group_message_id        BIGINT NOT NULL,
@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS T_TELEGRAM_GAME
     FOREIGN KEY (game_id) REFERENCES t_game (id)
 );
 
-DROP TABLE IF EXISTS T_TELEGRAM_PLAYER;
-CREATE TABLE IF NOT EXISTS T_TELEGRAM_PLAYER
+DROP TABLE IF EXISTS t_telegram_player;
+CREATE TABLE IF NOT EXISTS t_telegram_player
 (
     player_id   BIGINT NOT NULL,
     message_id  BIGINT NOT NULL,
