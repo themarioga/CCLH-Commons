@@ -6,6 +6,7 @@ import org.themarioga.cclh.commons.enums.TableStatusEnum;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @jakarta.persistence.Table(name = "t_table")
@@ -90,7 +91,21 @@ public class Table implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Table table = (Table) o;
+        return Objects.equals(game, table.game) && status == table.status && Objects.equals(currentRoundNumber, table.currentRoundNumber) && Objects.equals(currentBlackCard, table.currentBlackCard) && Objects.equals(currentPresident, table.currentPresident);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(game, status, currentRoundNumber, currentBlackCard, currentPresident);
+    }
+
+    @Override
     public String toString() {
         return "GameStatus{status=" + status + ", currentRoundNumber=" + currentRoundNumber + '}';
     }
+
 }

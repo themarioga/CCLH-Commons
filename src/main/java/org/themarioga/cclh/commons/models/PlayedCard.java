@@ -3,6 +3,7 @@ package org.themarioga.cclh.commons.models;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @jakarta.persistence.Table(name = "t_table_playedcards")
@@ -43,6 +44,19 @@ public class PlayedCard implements Serializable {
 
     public void setCard(Card card) {
         this.card = card;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PlayedCard that = (PlayedCard) o;
+        return Objects.equals(table, that.table) && Objects.equals(player, that.player) && Objects.equals(card, that.card);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(table, player, card);
     }
 
 }

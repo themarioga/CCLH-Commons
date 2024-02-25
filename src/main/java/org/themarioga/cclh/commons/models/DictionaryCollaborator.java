@@ -3,6 +3,7 @@ package org.themarioga.cclh.commons.models;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @jakarta.persistence.Table(name = "t_dictionary_collaborators")
@@ -53,6 +54,19 @@ public class DictionaryCollaborator implements Serializable {
 
     public void setAccepted(Boolean accepted) {
         this.accepted = accepted;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DictionaryCollaborator that = (DictionaryCollaborator) o;
+        return Objects.equals(dictionary, that.dictionary) && Objects.equals(user, that.user) && Objects.equals(canEdit, that.canEdit) && Objects.equals(accepted, that.accepted);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dictionary, user, canEdit, accepted);
     }
 
     @Override

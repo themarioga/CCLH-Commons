@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.themarioga.cclh.commons.dao.intf.PlayerDao;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
+import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
+import org.themarioga.cclh.commons.exceptions.game.GameAlreadyStartedException;
 import org.themarioga.cclh.commons.exceptions.player.PlayerAlreadyExistsException;
 import org.themarioga.cclh.commons.exceptions.player.PlayerCannotPlayCardException;
 import org.themarioga.cclh.commons.models.*;
@@ -40,6 +42,10 @@ public class PlayerServiceImpl implements PlayerService {
 
         // Check game is not null
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check if the game is already started
+        if (game.getStatus() == GameStatusEnum.STARTED)
+            throw new GameAlreadyStartedException();
 
         // Check user is not null
         Assert.assertNotNull(userId, ErrorEnum.USER_NOT_FOUND);
