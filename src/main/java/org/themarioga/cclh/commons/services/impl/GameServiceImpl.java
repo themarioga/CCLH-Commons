@@ -59,11 +59,17 @@ public class GameServiceImpl implements GameService {
         // Check if this user already have a running game
         if (gameDao.countByCreator(userService.getById(creatorId)) > 0) throw new GameAlreadyExistsException();
 
+        // Get the creator
+        User creator = userService.getById(creatorId);
+
+        // Check if the creator exists
+        Assert.assertNotNull(creator, ErrorEnum.USER_NOT_FOUND);
+
         // Create game
         Game game = new Game();
         game.setRoom(room);
         game.setCreationDate(new Date());
-        game.setCreator(userService.getById(creatorId));
+        game.setCreator(creator);
         game.setStatus(GameStatusEnum.CREATED);
         game.setType(getDefaultGameMode());
         game.setPunctuationType(getDefaultGamePunctuationType());
