@@ -1,6 +1,7 @@
 package org.themarioga.cclh.commons.models;
 
 import jakarta.persistence.*;
+import org.hibernate.Hibernate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,8 +102,11 @@ public class Player extends Base {
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
-        if (!(object instanceof Player player)) return false;
-	    return Objects.equals(id, player.id);
+        if (object == null) return false;
+        if (Hibernate.getClass(this) != Hibernate.getClass(object)) {
+            return false;
+        }
+	    return Objects.equals(id, ((Player) object).id);
     }
 
     @Override
