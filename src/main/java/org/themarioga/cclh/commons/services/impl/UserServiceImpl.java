@@ -58,6 +58,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User rename(User user, String newName) {
+        logger.debug("Renaming user with ID {} to {}", user.getId(), newName);
+
+        user.setName(newName);
+
+        return userDao.update(user);
+    }
+
+    @Override
     @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
     public User getById(long id) {
         logger.debug("Getting user with ID: {}", id);

@@ -51,7 +51,8 @@ public class RoomServiceImpl implements RoomService {
                 roomFromBd.setActive(true);
                 return roomDao.update(roomFromBd);
             } else {
-                return roomFromBd;
+                roomFromBd.setName(name);
+                return roomDao.update(roomFromBd);
             }
         }
     }
