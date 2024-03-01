@@ -21,7 +21,7 @@ public interface GameService {
 
     Game addPlayer(Game game, Player player);
 
-    Game leaveGame(Game game, long userId);
+    Game removePlayer(Game game, Player player);
 
     Game startGame(Game game);
 

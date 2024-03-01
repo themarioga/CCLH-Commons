@@ -217,27 +217,26 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
-    public Game leaveGame(Game game, long userId) {
-        logger.debug("Removing player from user {} in game {}", userId, game);
+    public Game removePlayer(Game game, Player player) {
+        logger.debug("Removing player from user {} in game {}", player, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check the status of the game
-        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
+        if (game.getStatus() == GameStatusEnum.STARTED)
+            throw new GameAlreadyStartedException();
 
         // Game creator cannor leave
-        if (game.getCreator().getId() == userId) throw new GameCreatorCannotLeaveException();
-
-        // Get the player
-        Player player = playerService.findByUserId(userId);
+        if (Objects.equals(game.getCreator().getId(), player.getUser().getId()))
+            throw new GameCreatorCannotLeaveException();
 
         // Check if the user is not playing
-        if (player == null)
+        if (game.getPlayers().stream().noneMatch(p -> Objects.equals(p.getId(), player.getId())))
             throw new PlayerDoesntExistsException();
 
         // Remove a player
-        game.getPlayers().remove(player);
+        game.getPlayers().removeIf(p -> Objects.equals(p.getId(), player.getId()));
 
         return gameDao.update(game);
     }

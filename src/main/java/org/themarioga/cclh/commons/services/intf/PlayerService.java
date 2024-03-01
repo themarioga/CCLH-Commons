@@ -8,6 +8,8 @@ public interface PlayerService {
 
     Player create(Game game, long userId);
 
+    void delete(Player player);
+
     void transferWhiteCardsFromGameDeckToPlayerHand(Player player, List<GameDeckCard> cardsToTransfer);
 
     void removeCardFromHand(Player player, Card card);

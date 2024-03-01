@@ -101,9 +101,8 @@ public class Player extends Base {
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        Player card = (Player) object;
-        return Objects.equals(id, card.id);
+        if (!(object instanceof Player player)) return false;
+	    return Objects.equals(id, player.id);
     }
 
     @Override

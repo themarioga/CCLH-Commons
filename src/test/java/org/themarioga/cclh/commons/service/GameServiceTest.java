@@ -168,24 +168,24 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testLeaveGame() {
-        Game game = gameService.leaveGame(gameService.getByRoomId(0L), 1L);
+        Game game = gameService.removePlayer(gameService.getByRoomId(0L), 1L);
 
         Assertions.assertEquals(2L, game.getPlayers().size());
     }
 
     @Test
     void testLeaveGame_GameAlreadyStarted() {
-        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.leaveGame(gameService.getByRoomId(3L), 0L));
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.removePlayer(gameService.getByRoomId(3L), 0L));
     }
 
     @Test
     void testLeaveGame_CreatorLeave() {
-        Assertions.assertThrows(GameCreatorCannotLeaveException.class, () -> gameService.leaveGame(gameService.getByRoomId(0L), 0L));
+        Assertions.assertThrows(GameCreatorCannotLeaveException.class, () -> gameService.removePlayer(gameService.getByRoomId(0L), 0L));
     }
 
     @Test
     void testLeaveGame_PlayerNotInGame() {
-        Assertions.assertThrows(PlayerDoesntExistsException.class, () -> gameService.leaveGame(gameService.getByRoomId(0L), 5L));
+        Assertions.assertThrows(PlayerDoesntExistsException.class, () -> gameService.removePlayer(gameService.getByRoomId(0L), 5L));
     }
 
     @Test

@@ -72,6 +72,14 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    public void delete(Player player) {
+        logger.error("Delete player {}", player);
+
+        playerDao.delete(player);
+    }
+
+    @Override
+    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
     public void transferWhiteCardsFromGameDeckToPlayerHand(Player player, List<GameDeckCard> cardsToTransfer) {
         logger.debug("Transferring white cards from deck to hand from player {}", player);
 
