@@ -1,6 +1,8 @@
 package org.themarioga.cclh.commons.services.impl;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Card create(Card card) {
         logger.debug("Creating card: {}", card);
 
@@ -36,7 +38,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Card update(Card card) {
         logger.debug("Updating card: {}", card);
 
@@ -44,7 +46,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public void delete(Card card) {
         logger.debug("Delete card: {}", card);
 
@@ -52,7 +54,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public void deleteById(long id) {
         logger.debug("Delete card by ID: {}", id);
 
@@ -61,7 +63,7 @@ public class CardServiceImpl implements CardService {
 
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public Card findOne(long id) {
         logger.debug("Getting card with ID: {}", id);
 
@@ -69,7 +71,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public List<Card> findCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
         logger.debug("Getting cards by dictionary {} and type {}", dictionary, cardTypeEnum);
 
@@ -77,7 +79,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public long countCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
         logger.debug("Counting cards by dictionary {} and type {}", dictionary, cardTypeEnum);
 

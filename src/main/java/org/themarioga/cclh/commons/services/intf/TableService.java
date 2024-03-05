@@ -1,10 +1,15 @@
 package org.themarioga.cclh.commons.services.intf;
 
+import org.springframework.transaction.annotation.Transactional;
+import org.themarioga.cclh.commons.enums.TableStatusEnum;
+import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.models.*;
 
 public interface TableService {
 
     Table create(Game game);
+
+    Table setStatus(Game game, TableStatusEnum newStatus);
 
     Table startRound(Game game);
 
@@ -18,4 +23,7 @@ public interface TableService {
 
     PlayedCard getMostVotedCard(long gameId);
 
+    boolean checkIfEveryoneHavePlayedACard(Game game);
+
+    boolean checkIfEveryoneHaveVotedACard(Game game);
 }

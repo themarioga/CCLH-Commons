@@ -1,6 +1,8 @@
 package org.themarioga.cclh.commons.services.impl;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Dictionary create(Dictionary dictionary) {
         logger.debug("Creating dictionary: {}", dictionary);
 
@@ -39,7 +41,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Dictionary update(Dictionary dictionary) {
         logger.debug("Updating dictionary: {}", dictionary);
 
@@ -47,7 +49,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public void delete(Dictionary dictionary) {
         logger.debug("Delete dictionary: {}", dictionary);
 
@@ -55,7 +57,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public Dictionary findOne(long id) {
         logger.debug("Getting dictionary with ID: {}", id);
 
@@ -63,7 +65,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public List<Dictionary> getDictionariesPaginated(User creator, int firstResult, int maxResults) {
         logger.debug("Getting dictionary from {} to {}", firstResult, maxResults);
 
@@ -71,7 +73,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public Long getDictionaryCount(User creator) {
         logger.debug("Get dictionary count {}", creator);
 
@@ -79,7 +81,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public Dictionary getDefaultDictionary() {
         return dictionaryDao.findOne(Long.parseLong(configurationService.getConfiguration("game_default_dictionary_id")));
     }

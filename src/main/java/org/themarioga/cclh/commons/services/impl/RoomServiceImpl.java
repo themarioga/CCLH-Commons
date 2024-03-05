@@ -1,6 +1,8 @@
 package org.themarioga.cclh.commons.services.impl;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Room createOrReactivate(long id, String name) {
         logger.debug("Creating or reactivating room: {} ({})", id, name);
 
@@ -58,7 +60,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public Room getById(long id) {
         logger.debug("Getting room with ID: {}", id);
 

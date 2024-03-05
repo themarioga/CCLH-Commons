@@ -1,6 +1,8 @@
 package org.themarioga.cclh.commons.services.impl;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +48,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game create(long roomId, String roomName, long creatorId) {
         logger.debug("Creating game in room: {}({})", roomId, roomName);
 
@@ -82,7 +84,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game delete(Game game) {
         logger.debug("Deleting game: {}", game);
 
@@ -95,7 +97,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game setType(Game game, GameTypeEnum type) {
         logger.debug("Setting type {} to game {}", type, game);
 
@@ -112,7 +114,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game setNumberOfCardsToWin(Game game, int numberOfCards) {
         logger.debug("Setting number of cards {} to game {}", numberOfCards, game);
 
@@ -132,7 +134,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game setNumberOfRoundsToEnd(Game game, int numberOfRoundsToEnd) {
         logger.debug("Setting number of rounds {} to game {}", numberOfRoundsToEnd, game);
 
@@ -152,7 +154,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game setMaxNumberOfPlayers(Game game, int maxNumberOfPlayers) {
         logger.debug("Setting max number of players {} to game {}", maxNumberOfPlayers, game);
 
@@ -172,7 +174,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game setDictionary(Game game, long dictionaryId) {
         logger.debug("Setting dictionary {} to game {}", dictionaryId, game);
 
@@ -195,7 +197,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game addPlayer(Game game, Player player) {
         logger.debug("Adding player {} to game {}", player, game);
 
@@ -216,7 +218,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game removePlayer(Game game, Player player) {
         logger.debug("Removing player from user {} in game {}", player, game);
 
@@ -242,7 +244,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game startGame(Game game) {
         logger.debug("Starting game in room {}", game);
 
@@ -269,7 +271,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game startRound(Game game) {
         logger.debug("Starting round for game in room {}", game);
 
@@ -293,7 +295,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game endRound(Game game) {
         logger.debug("Ending round for game {}", game);
 
@@ -312,7 +314,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game voteForDeletion(Game game, long userId) {
         logger.debug("Player {} vote for the deletion of the game {}", userId, game);
 
@@ -345,7 +347,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game playCard(Game game, long userId, long cardId) {
         logger.debug("Player {} used the card {} of the game {}", userId, cardId, game);
 
@@ -371,11 +373,16 @@ public class GameServiceImpl implements GameService {
         // Let the table finish the job
         tableService.playCard(game, player, card);
 
+        // Check we need to proceed to voting
+        if (tableService.checkIfEveryoneHavePlayedACard(game)) {
+            tableService.setStatus(game, TableStatusEnum.VOTING);
+        }
+
         return gameDao.update(game);
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game voteForCard(Game game, long userId, long cardId) {
         logger.debug("Player {} vote for the card {} of the game {}", userId, cardId, game);
 
@@ -401,11 +408,16 @@ public class GameServiceImpl implements GameService {
         // Let the table finish the job
         tableService.voteCard(game, player, card);
 
+        // Check we need to end the round
+        if (tableService.checkIfEveryoneHaveVotedACard(game)) {
+            tableService.setStatus(game, TableStatusEnum.ENDING);
+        }
+
         return gameDao.update(game);
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public Game getByRoom(Room room) {
         logger.debug("Getting game with room: {}", room);
 
@@ -413,7 +425,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public Game getByRoomId(long roomId) {
         logger.debug("Getting game with room id: {}", roomId);
 
@@ -421,7 +433,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public PlayedCard getMostVotedCard(long gameId) {
         logger.debug("Getting game with room id: {}", gameId);
 

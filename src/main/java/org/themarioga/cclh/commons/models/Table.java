@@ -1,6 +1,8 @@
 package org.themarioga.cclh.commons.models;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OptimisticLocking;
+import org.springframework.data.jpa.repository.Lock;
 import org.themarioga.cclh.commons.enums.TableStatusEnum;
 
 import java.io.Serializable;

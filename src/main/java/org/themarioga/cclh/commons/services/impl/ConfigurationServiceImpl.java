@@ -1,6 +1,7 @@
 package org.themarioga.cclh.commons.services.impl;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public String getConfiguration(String key) {
         logger.debug("Getting configuration by key: {}", key);
 

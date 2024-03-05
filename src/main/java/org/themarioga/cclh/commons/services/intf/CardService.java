@@ -1,6 +1,6 @@
 package org.themarioga.cclh.commons.services.intf;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.cclh.commons.enums.CardTypeEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.models.*;

@@ -1,6 +1,8 @@
 package org.themarioga.cclh.commons.services.impl;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +38,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Player create(Game game, long userId) {
         logger.debug("Creating player from user {} in game {}", userId, game);
 
@@ -71,7 +73,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public void delete(Player player) {
         logger.error("Delete player {}", player);
 
@@ -79,7 +81,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public void transferWhiteCardsFromGameDeckToPlayerHand(Player player, List<GameDeckCard> cardsToTransfer) {
         logger.debug("Transferring white cards from deck to hand from player {}", player);
 
@@ -95,7 +97,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public void removeCardFromHand(Player player, Card card) {
         logger.debug("Removing card {} from the hand of the player {}", card, player);
 
@@ -109,7 +111,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public Player findById(long id) {
         logger.debug("Getting player with ID: {}", id);
 
@@ -117,7 +119,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public Player findByUser(User user) {
         logger.debug("Getting player with user: {}", user);
 
@@ -125,7 +127,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public Player findByUserId(long id) {
         logger.debug("Getting player with user ID: {}", id);
 

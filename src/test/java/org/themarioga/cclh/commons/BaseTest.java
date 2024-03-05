@@ -3,7 +3,7 @@ package org.themarioga.cclh.commons;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;

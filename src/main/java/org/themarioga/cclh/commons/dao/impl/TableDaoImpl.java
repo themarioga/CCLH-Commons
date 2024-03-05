@@ -18,4 +18,16 @@ public class TableDaoImpl extends AbstractHibernateDao<Table> implements TableDa
                 .createNativeQuery("SELECT * FROM t_table_playedcards WHERE game_id=:game_id and CARD_ID = (SELECT CARD_ID FROM (SELECT CARD_ID, count(card_id) as value_ocurrence FROM t_table_playervotes WHERE game_id=:game_id GROUP BY card_id ORDER BY value_ocurrence DESC LIMIT 1) as CIvo)", PlayedCard.class).setParameter("game_id", gameId).setMaxResults(1).getSingleResultOrNull();
     }
 
+    @Override
+    public int countPlayedCards(long gameId) {
+        return getCurrentSession()
+                .createNativeQuery("SELECT count(*) FROM t_table_playedcards WHERE game_id=:game_id", Integer.class).setParameter("game_id", gameId).getSingleResultOrNull();
+    }
+
+    @Override
+    public int countVotedCards(long gameId) {
+        return getCurrentSession()
+                .createNativeQuery("SELECT count(*) FROM t_table_playervotes WHERE game_id=:game_id", Integer.class).setParameter("game_id", gameId).getSingleResultOrNull();
+    }
+
 }

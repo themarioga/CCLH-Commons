@@ -8,4 +8,8 @@ public interface TableDao extends InterfaceHibernateDao<Table> {
 
     PlayedCard getMostVotedCard(long gameId);
 
+    int countPlayedCards(long gameId);
+
+    int countVotedCards(long gameId);
+
 }

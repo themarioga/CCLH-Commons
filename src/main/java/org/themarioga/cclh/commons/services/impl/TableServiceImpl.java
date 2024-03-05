@@ -1,10 +1,12 @@
 package org.themarioga.cclh.commons.services.impl;
 
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.cclh.commons.dao.intf.TableDao;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
@@ -36,7 +38,7 @@ public class TableServiceImpl implements TableService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Table create(Game game) {
         logger.debug("Creating table for game {}", game);
 
@@ -58,7 +60,25 @@ public class TableServiceImpl implements TableService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public Table setStatus(Game game, TableStatusEnum newStatus) {
+        logger.debug("Creating table for game {}", game);
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check table exists
+        Table table = game.getTable();
+        Assert.assertNotNull(table, ErrorEnum.GAME_NOT_FOUND);
+
+        // Set Status
+        table.setStatus(newStatus);
+
+        return tableDao.update(table);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Table startRound(Game game) {
         logger.debug("Starting round for the game {}", game);
 
@@ -88,7 +108,7 @@ public class TableServiceImpl implements TableService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Table endRound(Game game) {
         logger.debug("Ending round for the game {}", game);
 
@@ -103,6 +123,9 @@ public class TableServiceImpl implements TableService {
         if (table.getStatus() != TableStatusEnum.ENDING)
             throw new TableWrongStatusException();
 
+        // Increment the points of the most voted card
+        incrementMostVotedCardPlayerPoints(game);
+
         // Set the table mode to play
         table.setStatus(TableStatusEnum.STARTING);
 
@@ -115,7 +138,7 @@ public class TableServiceImpl implements TableService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Table playCard(Game game, Player player, Card card) {
         logger.debug("Player {} playing card {} for the game {}", player, card, game);
 
@@ -148,18 +171,11 @@ public class TableServiceImpl implements TableService {
         playedCard.setCard(card);
         table.getPlayedCards().add(playedCard);
 
-        // Check we need to proceed to voting
-        if (checkIfEveryoneHavePlayedACard(game, table)) {
-            table.setStatus(TableStatusEnum.VOTING);
-
-
-        }
-
         return tableDao.update(table);
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Table voteCard(Game game, Player player, Card card) {
         logger.debug("Player {} voting card {} for the game {}", player, card, game);
 
@@ -193,18 +209,11 @@ public class TableServiceImpl implements TableService {
         votedCard.setCard(card);
         table.getVotedCards().add(votedCard);
 
-        // Check we need to end the round
-        if (checkIfEveryoneHaveVotedACard(game, table)) {
-            table.setStatus(TableStatusEnum.ENDING);
-
-            incrementMostVotedCardPlayerPoints(game);
-        }
-
         return tableDao.update(table);
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRED, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public void setNextBlackCard(Table table, Card nextBlackCard) {
         logger.debug("Setting next black card to table {}", table);
 
@@ -212,11 +221,29 @@ public class TableServiceImpl implements TableService {
     }
 
     @Override
-    @Transactional(value = Transactional.TxType.SUPPORTS, rollbackOn = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public PlayedCard getMostVotedCard(long gameId) {
         logger.debug("Getting most voted card of the table of the game {}", gameId);
 
         return tableDao.getMostVotedCard(gameId);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    public boolean checkIfEveryoneHavePlayedACard(Game game) {
+        int cardsNeededToVote = game.getPlayers().size();
+        if (game.getType() == GameTypeEnum.DICTATORSHIP || game.getType() == GameTypeEnum.CLASSIC) cardsNeededToVote--;
+
+        return tableDao.countPlayedCards(game.getId()) == cardsNeededToVote;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    public boolean checkIfEveryoneHaveVotedACard(Game game) {
+        int votesNeededToEnd = game.getPlayers().size();
+        if (game.getType() == GameTypeEnum.DICTATORSHIP || game.getType() == GameTypeEnum.CLASSIC) votesNeededToEnd = 1;
+
+        return tableDao.countVotedCards(game.getId()) == votesNeededToEnd;
     }
 
     private void selectPlayerForRoundPresident(Game game) {
@@ -244,20 +271,6 @@ public class TableServiceImpl implements TableService {
         }
 
         return 0;
-    }
-
-    private boolean checkIfEveryoneHavePlayedACard(Game game, Table table) {
-        int cardsNeededToVote = game.getPlayers().size();
-        if (game.getType() == GameTypeEnum.DICTATORSHIP || game.getType() == GameTypeEnum.CLASSIC) cardsNeededToVote--;
-
-        return table.getPlayedCards().size() == cardsNeededToVote;
-    }
-
-    private boolean checkIfEveryoneHaveVotedACard(Game game, Table table) {
-        int cardsNeededToEnd = game.getPlayers().size();
-        if (game.getType() == GameTypeEnum.DICTATORSHIP || game.getType() == GameTypeEnum.CLASSIC) cardsNeededToEnd = 1;
-
-        return table.getVotedCards().size() == cardsNeededToEnd;
     }
 
 }
