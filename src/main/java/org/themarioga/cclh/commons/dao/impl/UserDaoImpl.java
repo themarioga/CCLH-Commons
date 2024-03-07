@@ -12,4 +12,9 @@ public class UserDaoImpl extends AbstractHibernateDao<User> implements UserDao {
         setClazz(User.class);
     }
 
+    @Override
+    public User getByUsername(String username) {
+        return getCurrentSession().createQuery("SELECT u FROM User u WHERE u.name LIKE :username", User.class).setParameter("username", "%" + username + "%").getSingleResultOrNull();
+    }
+
 }

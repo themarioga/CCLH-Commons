@@ -5,4 +5,6 @@ import org.themarioga.cclh.commons.models.User;
 
 public interface UserDao extends InterfaceHibernateDao<User> {
 
+	User getByUsername(String username);
+
 }

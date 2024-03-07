@@ -1,6 +1,5 @@
 package org.themarioga.cclh.commons.services.impl;
 
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
@@ -82,6 +81,19 @@ public class UserServiceImpl implements UserService {
         if (Boolean.FALSE.equals(user.getActive())) {
             logger.error("Error getting user with id {}: Not active.", id);
             throw new UserNotActiveException();
+        }
+
+        return user;
+    }
+
+    @Override
+    public User getByUsername(String username) {
+        logger.debug("Getting user with username: {}", username);
+
+        User user = userDao.getByUsername(username);
+        if (user == null) {
+            logger.error("Error getting user with username {}: Doesn't exists.", username);
+            throw new UserDoesntExistsException();
         }
 
         return user;

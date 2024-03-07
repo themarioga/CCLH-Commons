@@ -10,4 +10,6 @@ public interface UserService {
 
     User getById(long id);
 
+    User getByUsername(String username);
+
 }
