@@ -1,12 +1,11 @@
 package org.themarioga.cclh.commons.services.impl;
 
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.cclh.commons.dao.intf.RoomDao;
 import org.themarioga.cclh.commons.enums.ErrorEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
@@ -17,6 +16,7 @@ import org.themarioga.cclh.commons.services.intf.RoomService;
 import org.themarioga.cclh.commons.util.Assert;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class RoomServiceImpl implements RoomService {
@@ -61,6 +61,16 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    public Room setActive(Room room, boolean active) {
+        logger.debug("Activating/Deactivating room with ID {} to {}", room.getId(), active);
+
+        room.setActive(active);
+
+        return roomDao.update(room);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public Room getById(long id) {
         logger.debug("Getting room with ID: {}", id);
 
@@ -75,6 +85,14 @@ public class RoomServiceImpl implements RoomService {
         }
 
         return room;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    public List<Room> getAllRooms() {
+        logger.debug("Getting all rooms");
+
+        return roomDao.findAll();
     }
 
 }

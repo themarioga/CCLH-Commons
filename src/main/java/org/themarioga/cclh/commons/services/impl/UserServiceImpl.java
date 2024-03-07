@@ -17,6 +17,7 @@ import org.themarioga.cclh.commons.services.intf.UserService;
 import org.themarioga.cclh.commons.util.Assert;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -70,6 +71,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    public User setActive(User user, boolean active) {
+        logger.debug("Activating/Deactivating user with ID {} to {}", user.getId(), active);
+
+        user.setActive(active);
+
+        return userDao.update(user);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public User getById(long id) {
         logger.debug("Getting user with ID: {}", id);
 
@@ -87,6 +98,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public User getByUsername(String username) {
         logger.debug("Getting user with username: {}", username);
 
@@ -97,6 +109,14 @@ public class UserServiceImpl implements UserService {
         }
 
         return user;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    public List<User> getAllUsers() {
+        logger.debug("Getting all users");
+
+        return userDao.findAll();
     }
 
 }
