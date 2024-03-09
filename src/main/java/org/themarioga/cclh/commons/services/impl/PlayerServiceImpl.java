@@ -75,7 +75,7 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public void delete(Player player) {
-        logger.error("Delete player {}", player);
+        logger.debug("Delete player {}", player);
 
         playerDao.delete(player);
     }
