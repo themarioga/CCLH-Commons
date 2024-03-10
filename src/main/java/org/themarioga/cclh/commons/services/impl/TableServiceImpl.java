@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.cclh.commons.dao.intf.TableDao;
@@ -132,7 +131,6 @@ public class TableServiceImpl implements TableService {
         // Empty table
         table.getVotedCards().clear();
         table.getPlayedCards().clear();
-        table.setCurrentBlackCard(null);
 
         return tableDao.update(table);
     }
