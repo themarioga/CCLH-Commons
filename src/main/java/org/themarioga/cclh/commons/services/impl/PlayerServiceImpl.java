@@ -1,6 +1,5 @@
 package org.themarioga.cclh.commons.services.impl;
 
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
@@ -107,6 +106,16 @@ public class PlayerServiceImpl implements PlayerService {
             throw new PlayerCannotPlayCardException();
 
         player.getHand().remove(cards.get());
+        playerDao.update(player);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public void incrementPoints(Player player) {
+        logger.debug("Incrementing player's ({}) points", player);
+
+        player.setPoints(player.getPoints() + 1);
+
         playerDao.update(player);
     }
 

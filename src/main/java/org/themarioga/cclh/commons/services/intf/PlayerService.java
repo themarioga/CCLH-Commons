@@ -14,7 +14,9 @@ public interface PlayerService {
 
     void removeCardFromHand(Player player, Card card);
 
-    Player findById(long id);
+	void incrementPoints(Player player);
+
+	Player findById(long id);
 
     Player findByUser(User user);
 

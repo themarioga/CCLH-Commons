@@ -122,9 +122,6 @@ public class TableServiceImpl implements TableService {
         if (table.getStatus() != TableStatusEnum.ENDING)
             throw new TableWrongStatusException();
 
-        // Increment the points of the most voted card
-        incrementMostVotedCardPlayerPoints(game);
-
         // Set the table mode to play
         table.setStatus(TableStatusEnum.STARTING);
 
@@ -254,12 +251,6 @@ public class TableServiceImpl implements TableService {
         }
 
         game.getTable().setCurrentPresident(game.getPlayers().get(playerIndex));
-    }
-
-    private void incrementMostVotedCardPlayerPoints(Game game) {
-        PlayedCard mostVotedCard = tableDao.getMostVotedCard(game.getId());
-        Player mostVotedCardPlayer = mostVotedCard.getPlayer();
-        mostVotedCardPlayer.setPoints(mostVotedCardPlayer.getPoints() + 1);
     }
 
     private int getCurrentPresidentIndex(Game game) {
