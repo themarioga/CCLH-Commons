@@ -1,8 +1,6 @@
 package org.themarioga.cclh.commons.models;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.OptimisticLocking;
-import org.springframework.data.jpa.repository.Lock;
 import org.themarioga.cclh.commons.enums.TableStatusEnum;
 
 import java.io.Serializable;
@@ -107,7 +105,6 @@ public class Table implements Serializable {
 
     @Override
     public String toString() {
-        return "GameStatus{status=" + status + ", currentRoundNumber=" + currentRoundNumber + '}';
+        return "Table{" + "game=" + game.getId() + ", status=" + status + ", currentRoundNumber=" + currentRoundNumber + '}';
     }
-
 }

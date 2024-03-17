@@ -106,7 +106,7 @@ public class Player extends Base {
         if (Hibernate.getClass(this) != Hibernate.getClass(object)) {
             return false;
         }
-	    return Objects.equals(id, ((Player) object).id);
+        return Objects.equals(id, ((Player) object).id);
     }
 
     @Override

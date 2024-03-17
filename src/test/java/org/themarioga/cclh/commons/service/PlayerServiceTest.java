@@ -63,4 +63,29 @@ class PlayerServiceTest extends BaseTest {
         Assertions.assertEquals(0L, player.getUser().getId());
     }
 
+    @Test
+    void testDelete() {
+        playerService.delete(playerService.findByUserId(0L));
+    }
+
+    @Test
+    void testIncreasePoints() {
+        Player player = playerService.findByUserId(0L);
+
+        Assertions.assertEquals(0, player.getPoints());
+
+        playerService.incrementPoints(player);
+
+        Assertions.assertEquals(1, player.getPoints());
+    }
+
+    @Test
+    void testFindPlayerById() {
+        Player player = playerService.findById(10L);
+
+        Assertions.assertEquals(10L, player.getId());
+        Assertions.assertEquals(10L, player.getGame().getId());
+        Assertions.assertEquals(0L, player.getUser().getId());
+    }
+
 }

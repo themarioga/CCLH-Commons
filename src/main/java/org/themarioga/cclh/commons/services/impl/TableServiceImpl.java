@@ -229,7 +229,7 @@ public class TableServiceImpl implements TableService {
         int cardsNeededToVote = game.getPlayers().size();
         if (game.getType() == GameTypeEnum.DICTATORSHIP || game.getType() == GameTypeEnum.CLASSIC) cardsNeededToVote--;
 
-        return tableDao.countPlayedCards(game.getId()) == cardsNeededToVote;
+        return tableDao.countPlayedCards(game) == cardsNeededToVote;
     }
 
     @Override
@@ -238,7 +238,7 @@ public class TableServiceImpl implements TableService {
         int votesNeededToEnd = game.getPlayers().size();
         if (game.getType() == GameTypeEnum.DICTATORSHIP || game.getType() == GameTypeEnum.CLASSIC) votesNeededToEnd = 1;
 
-        return tableDao.countVotedCards(game.getId()) == votesNeededToEnd;
+        return tableDao.countVotedCards(game) == votesNeededToEnd;
     }
 
     private void selectPlayerForRoundPresident(Game game) {

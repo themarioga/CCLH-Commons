@@ -22,7 +22,7 @@ public interface InterfaceHibernateDao<T extends Serializable> {
 
     Long countAll();
 
-	EntityManager getEntityManager();
+    EntityManager getEntityManager();
 
-	Session getCurrentSession();
+    Session getCurrentSession();
 }

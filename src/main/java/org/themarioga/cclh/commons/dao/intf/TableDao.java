@@ -1,6 +1,7 @@
 package org.themarioga.cclh.commons.dao.intf;
 
 import org.themarioga.cclh.commons.dao.InterfaceHibernateDao;
+import org.themarioga.cclh.commons.models.Game;
 import org.themarioga.cclh.commons.models.PlayedCard;
 import org.themarioga.cclh.commons.models.Table;
 
@@ -8,8 +9,8 @@ public interface TableDao extends InterfaceHibernateDao<Table> {
 
     PlayedCard getMostVotedCard(long gameId);
 
-    int countPlayedCards(long gameId);
+    long countPlayedCards(Game game);
 
-    int countVotedCards(long gameId);
+    long countVotedCards(Game game);
 
 }

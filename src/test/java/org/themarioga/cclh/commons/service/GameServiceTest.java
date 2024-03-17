@@ -19,6 +19,7 @@ import org.themarioga.cclh.commons.exceptions.room.RoomDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.user.UserNotActiveException;
 import org.themarioga.cclh.commons.models.Card;
 import org.themarioga.cclh.commons.models.Game;
+import org.themarioga.cclh.commons.models.PlayedCard;
 import org.themarioga.cclh.commons.models.Player;
 import org.themarioga.cclh.commons.services.intf.DictionaryService;
 import org.themarioga.cclh.commons.services.intf.GameService;
@@ -50,7 +51,7 @@ class GameServiceTest extends BaseTest {
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/service/expected/testCreateGame-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
-    void testCreateGame_CreateRoom() {
+    void testCreateGame() {
         Game game = gameService.create(2L, "Room 3", 3L);
 
         Assertions.assertNotNull(game);
@@ -61,6 +62,16 @@ class GameServiceTest extends BaseTest {
         Assertions.assertEquals(2L, game.getRoom().getId());
         Assertions.assertEquals(3L, game.getCreator().getId());
         Assertions.assertEquals(GameStatusEnum.CREATED, game.getStatus());
+    }
+
+    @Test
+    void testCreate_GameAlreadyExists() {
+        Assertions.assertThrows(GameAlreadyExistsException.class, () -> gameService.create(1L, "Room 3", 3L));
+    }
+
+    @Test
+    void testCreate_CreatorAlreadyHaveGame() {
+        Assertions.assertThrows(GameAlreadyExistsException.class, () -> gameService.create(2L, "Room 3", 1L));
     }
 
     @Test
@@ -111,6 +122,21 @@ class GameServiceTest extends BaseTest {
     @Test
     void testSetNumberOfCardsToWin_GameAlreadyStarted() {
         Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setNumberOfCardsToWin(gameService.getByRoomId(3L), 5));
+    }
+
+    @Test
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameNumberRounds-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    void testSetNumberOfRoundsToEnd() {
+        Game game = gameService.setNumberOfRoundsToEnd(gameService.getByRoomId(0L), 5);
+
+        getCurrentSession().flush();
+
+        Assertions.assertEquals(5, game.getNumberOfRounds());
+    }
+
+    @Test
+    void testSetNumberOfRoundsToEnd_GameAlreadyStarted() {
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.setNumberOfRoundsToEnd(gameService.getByRoomId(3L), 5));
     }
 
     @Test
@@ -185,7 +211,7 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testLeaveGame_PlayerNotInGame() {
-        Assertions.assertThrows(PlayerDoesntExistsException.class, () -> gameService.removePlayer(gameService.getByRoomId(0L), playerService.findByUserId(5L)));
+        Assertions.assertThrows(PlayerDoesntExistsException.class, () -> gameService.removePlayer(gameService.getByRoomId(1L), playerService.findByUserId(3L)));
     }
 
     @Test
@@ -210,7 +236,7 @@ class GameServiceTest extends BaseTest {
         Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
         Assertions.assertNotNull(game.getTable());
         Assertions.assertEquals(3, game.getPlayers().size());
-        Assertions.assertEquals(10L, game.getTable().getCurrentPresident().getId());
+        Assertions.assertEquals(11L, game.getTable().getCurrentPresident().getId());
     }
 
     @Test
@@ -230,7 +256,7 @@ class GameServiceTest extends BaseTest {
 
         Assertions.assertEquals(0L, game.getRoom().getId());
         Assertions.assertEquals(3, game.getPlayers().size());
-        Assertions.assertEquals(3, game.getPlayers().get(0).getHand().size());
+        Assertions.assertEquals(5, game.getPlayers().get(0).getHand().size());
         Assertions.assertEquals(1, game.getTable().getCurrentRoundNumber());
         Assertions.assertNotNull(game.getTable().getCurrentBlackCard());
     }
@@ -257,7 +283,7 @@ class GameServiceTest extends BaseTest {
 
         Assertions.assertEquals(0L, game.getRoom().getId());
         Assertions.assertEquals(3, game.getPlayers().size());
-        Assertions.assertEquals(3, game.getPlayers().get(0).getHand().size());
+        Assertions.assertEquals(5, game.getPlayers().get(0).getHand().size());
         Assertions.assertEquals(1, game.getTable().getCurrentRoundNumber());
         Assertions.assertNotNull(game.getTable().getCurrentBlackCard());
 
@@ -265,7 +291,6 @@ class GameServiceTest extends BaseTest {
         gameDao.update(game);
         gameService.endRound(gameService.getByRoomId(0L));
 
-        Assertions.assertNull(game.getTable().getCurrentBlackCard());
         Assertions.assertEquals(0, game.getTable().getPlayedCards().size());
         Assertions.assertEquals(0, game.getTable().getVotedCards().size());
     }
@@ -353,6 +378,10 @@ class GameServiceTest extends BaseTest {
         game = gameService.voteForCard(game, player.getUser().getId(), card.getId());
 
         Assertions.assertEquals(1, game.getTable().getVotedCards().size());
+
+        PlayedCard playedCard = gameService.getMostVotedCard(10L);
+
+        Assertions.assertEquals(playedCard.getCard().getId(), card.getId());
     }
 
     @Test

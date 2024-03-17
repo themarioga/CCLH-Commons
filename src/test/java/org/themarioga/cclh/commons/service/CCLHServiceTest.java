@@ -31,6 +31,8 @@ class CCLHServiceTest extends BaseTest {
         gameService.addPlayer(game, playerService.create(game, 1L));
         gameService.addPlayer(game, playerService.create(game, 3L));
         gameService.startGame(game);
+        getCurrentSession().flush();
+        getCurrentSession().refresh(game);
         gameService.startRound(game);
         gameService.playCard(game, 0L, game.getPlayers().get(0).getHand().get(0).getCard().getId());
         gameService.playCard(game, 1L, game.getPlayers().get(1).getHand().get(0).getCard().getId());

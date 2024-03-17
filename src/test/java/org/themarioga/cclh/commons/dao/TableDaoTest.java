@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.dao.intf.*;
+import org.themarioga.cclh.commons.enums.GamePunctuationTypeEnum;
 import org.themarioga.cclh.commons.enums.TableStatusEnum;
 import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.enums.GameStatusEnum;
@@ -50,7 +51,9 @@ class TableDaoTest extends BaseTest {
 
         Game game = new Game();
         game.setType(GameTypeEnum.DICTATORSHIP);
+        game.setPunctuationType(GamePunctuationTypeEnum.ROUNDS);
         game.setMaxNumberOfPlayers(5);
+        game.setNumberOfRounds(5);
         game.setNumberOfCardsToWin(5);
         game.setStatus(GameStatusEnum.CREATED);
         game.setRoom(room);
@@ -188,14 +191,6 @@ class TableDaoTest extends BaseTest {
         PlayedCard mostVotedCard = tableDao.getMostVotedCard(0L);
 
         Assertions.assertNotNull(mostVotedCard);
-        Assertions.assertEquals(0, mostVotedCard.getCard().getId());
-    }
-
-    @Test
-    @DatabaseSetup("classpath:dbunit/dao/setup/tableplayervotes.xml")
-    void testGetMostVotedCard2() {
-        PlayedCard mostVotedCard = tableDao.getMostVotedCard(0L);
-
         Assertions.assertEquals(0L, mostVotedCard.getTable().getGame().getId());
         Assertions.assertEquals(0L, mostVotedCard.getCard().getId());
     }

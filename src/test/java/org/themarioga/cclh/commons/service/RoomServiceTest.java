@@ -10,6 +10,8 @@ import org.themarioga.cclh.commons.exceptions.room.RoomNotActiveException;
 import org.themarioga.cclh.commons.models.Room;
 import org.themarioga.cclh.commons.services.intf.RoomService;
 
+import java.util.List;
+
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/room.xml")
 class RoomServiceTest extends BaseTest {
@@ -44,6 +46,18 @@ class RoomServiceTest extends BaseTest {
         Assertions.assertNotNull(room);
         Assertions.assertEquals(0L, room.getId());
         Assertions.assertEquals("First", room.getName());
+        Assertions.assertEquals(true, room.getActive());
+    }
+
+    @Test
+    void testSetActive() {
+        List<Room> roomList = roomService.getAllRooms();
+
+        Room room = roomService.setActive(roomList.get(2), true);
+
+        Assertions.assertNotNull(room);
+        Assertions.assertEquals(2L, room.getId());
+        Assertions.assertEquals("Third", room.getName());
         Assertions.assertEquals(true, room.getActive());
     }
 

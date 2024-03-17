@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.dao.intf.*;
+import org.themarioga.cclh.commons.enums.GamePunctuationTypeEnum;
 import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.enums.GameStatusEnum;
 import org.themarioga.cclh.commons.enums.GameTypeEnum;
@@ -43,7 +44,9 @@ class GameDaoTest extends BaseTest {
 
         Game game = new Game();
         game.setType(GameTypeEnum.DICTATORSHIP);
+        game.setPunctuationType(GamePunctuationTypeEnum.ROUNDS);
         game.setMaxNumberOfPlayers(5);
+        game.setNumberOfRounds(5);
         game.setNumberOfCardsToWin(5);
         game.setStatus(GameStatusEnum.CREATED);
         game.setRoom(room);

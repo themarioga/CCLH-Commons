@@ -14,20 +14,17 @@ public class TableDaoImpl extends AbstractHibernateDao<Table> implements TableDa
 
     @Override
     public PlayedCard getMostVotedCard(long gameId) {
-        return getCurrentSession()
-                .createNativeQuery("SELECT * FROM t_table_playedcards WHERE game_id=:game_id and CARD_ID = (SELECT CARD_ID FROM (SELECT CARD_ID, count(card_id) as value_ocurrence FROM t_table_playervotes WHERE game_id=:game_id GROUP BY card_id ORDER BY value_ocurrence DESC LIMIT 1) as CIvo)", PlayedCard.class).setParameter("game_id", gameId).setMaxResults(1).getSingleResultOrNull();
+        return getCurrentSession().createNativeQuery("SELECT * FROM t_table_playedcards WHERE game_id=:game_id and CARD_ID = (SELECT CARD_ID FROM (SELECT CARD_ID, count(card_id) as value_ocurrence FROM t_table_playervotes WHERE game_id=:game_id GROUP BY card_id ORDER BY value_ocurrence DESC LIMIT 1) as CIvo)", PlayedCard.class).setParameter("game_id", gameId).setMaxResults(1).getSingleResultOrNull();
     }
 
     @Override
-    public int countPlayedCards(long gameId) {
-        return getCurrentSession()
-                .createNativeQuery("SELECT count(*) FROM t_table_playedcards WHERE game_id=:game_id", Integer.class).setParameter("game_id", gameId).getSingleResultOrNull();
+    public long countPlayedCards(Game game) {
+        return getCurrentSession().createQuery("SELECT count(p) FROM PlayedCard p WHERE p.table=:table", Long.class).setParameter("table", game.getTable()).getSingleResultOrNull();
     }
 
     @Override
-    public int countVotedCards(long gameId) {
-        return getCurrentSession()
-                .createNativeQuery("SELECT count(*) FROM t_table_playervotes WHERE game_id=:game_id", Integer.class).setParameter("game_id", gameId).getSingleResultOrNull();
+    public long countVotedCards(Game game) {
+        return getCurrentSession().createQuery("SELECT count(v) FROM VotedCard v WHERE v.table=:table", Long.class).setParameter("table", game.getTable()).getSingleResultOrNull();
     }
 
 }

@@ -1,6 +1,5 @@
 package org.themarioga.cclh.commons.services.impl;
 
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
@@ -225,6 +224,9 @@ public class GameServiceImpl implements GameService {
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
+        // Check player exists
+        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+
         // Check the status of the game
         if (game.getStatus() == GameStatusEnum.STARTED)
             throw new GameAlreadyStartedException();
@@ -443,7 +445,7 @@ public class GameServiceImpl implements GameService {
     private Card getBlackCardFromGameDeck(Game game) {
         logger.debug("Getting black card from deck to table {}", game);
 
-        GameDeckCard nextBlackCard = gameDao.getGameDeckCards(game.getId(), 1, CardTypeEnum.BLACK).get(0);
+        GameDeckCard nextBlackCard = gameDao.getGameDeckCards(game, 1, CardTypeEnum.BLACK).get(0);
         game.getDeckCards().remove(nextBlackCard);
 
         return nextBlackCard.getCard();
@@ -456,7 +458,7 @@ public class GameServiceImpl implements GameService {
             if (player.getHand().size() < cardsInHand) {
                 int missingCards = Math.min(cardsInHand - player.getHand().size(), player.getGame().getDeckCards().size());
 
-                List<GameDeckCard> cardsToTransfer = new ArrayList<>(gameDao.getGameDeckCards(player.getGame().getId(), missingCards, CardTypeEnum.WHITE));
+                List<GameDeckCard> cardsToTransfer = new ArrayList<>(gameDao.getGameDeckCards(player.getGame(), missingCards, CardTypeEnum.WHITE));
 
                 playerService.transferWhiteCardsFromGameDeckToPlayerHand(player, cardsToTransfer);
 
@@ -467,10 +469,10 @@ public class GameServiceImpl implements GameService {
 
     private boolean checkIfGameIsOver(Game game) {
         if (game.getPunctuationType() == GamePunctuationTypeEnum.ROUNDS) {
-	        return Objects.equals(game.getTable().getCurrentRoundNumber(), game.getNumberOfRounds());
+            return Objects.equals(game.getTable().getCurrentRoundNumber(), game.getNumberOfRounds());
         } else {
             Optional<Player> maxVotedPlayer = game.getPlayers().stream().max(Comparator.comparing(Player::getPoints));
-	        return maxVotedPlayer.isPresent() && Objects.equals(maxVotedPlayer.get().getPoints(), game.getNumberOfCardsToWin());
+            return maxVotedPlayer.isPresent() && Objects.equals(maxVotedPlayer.get().getPoints(), game.getNumberOfCardsToWin());
         }
     }
 

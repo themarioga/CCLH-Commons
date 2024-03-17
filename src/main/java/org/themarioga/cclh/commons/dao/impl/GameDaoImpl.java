@@ -17,7 +17,7 @@ public class GameDaoImpl extends AbstractHibernateDao<Game> implements GameDao {
 
     @Override
     public void transferCardsToGameDeck(Game game) {
-        getCurrentSession().createNativeQuery("INSERT INTO t_game_deck SELECT :game_id AS game_id, id as card_id FROM t_card WHERE dictionary_id=:dictionary_id").setParameter("game_id", game.getId()).setParameter("dictionary_id", game.getDictionary().getId()).executeUpdate();
+        getCurrentSession().createQuery("INSERT INTO GameDeckCard(game, card) SELECT :game AS game, c FROM Card c WHERE dictionary=:dictionary").setParameter("game", game).setParameter("dictionary", game.getDictionary()).executeUpdate();
     }
 
     @Override
@@ -31,8 +31,8 @@ public class GameDaoImpl extends AbstractHibernateDao<Game> implements GameDao {
     }
 
     @Override
-    public List<GameDeckCard> getGameDeckCards(long gameId, int cardNumber, CardTypeEnum cardTypeEnum) {
-        return getCurrentSession().createNativeQuery("SELECT t_game_deck.* FROM t_game_deck INNER JOIN t_card on t_game_deck.CARD_ID = t_card.ID WHERE game_id=:game_id and type=:type ORDER BY RAND()", GameDeckCard.class).setParameter("game_id", gameId).setParameter("type", cardTypeEnum).setMaxResults(cardNumber).getResultList();
+    public List<GameDeckCard> getGameDeckCards(Game game, int cardNumber, CardTypeEnum cardTypeEnum) {
+        return getCurrentSession().createQuery("SELECT g FROM GameDeckCard g INNER JOIN Card c on g.card = c WHERE g.game=:game and c.type=:type ORDER BY RAND()", GameDeckCard.class).setParameter("game", game).setParameter("type", cardTypeEnum).setMaxResults(cardNumber).getResultList();
     }
 
     @Override

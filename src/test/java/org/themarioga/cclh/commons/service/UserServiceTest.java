@@ -14,6 +14,8 @@ import org.themarioga.cclh.commons.models.User;
 import org.themarioga.cclh.commons.services.intf.TableService;
 import org.themarioga.cclh.commons.services.intf.UserService;
 
+import java.util.List;
+
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")
 class UserServiceTest extends BaseTest {
 
@@ -59,6 +61,30 @@ class UserServiceTest extends BaseTest {
     }
 
     @Test
+    void testRename() {
+        User user = userService.getById(0L);
+
+        userService.rename(user, "Newname");
+
+        Assertions.assertNotNull(user);
+        Assertions.assertEquals(0L, user.getId());
+        Assertions.assertEquals("Newname", user.getName());
+        Assertions.assertEquals(true, user.getActive());
+    }
+
+    @Test
+    void testSetActive() {
+        User user = userService.getById(0L);
+
+        userService.setActive(user, false);
+
+        Assertions.assertNotNull(user);
+        Assertions.assertEquals(0L, user.getId());
+        Assertions.assertEquals("First", user.getName());
+        Assertions.assertEquals(false, user.getActive());
+    }
+
+    @Test
     void testGetById() {
         User user = userService.getById(0L);
 
@@ -76,6 +102,23 @@ class UserServiceTest extends BaseTest {
     @Test
     void testGetById_NotActive() {
         Assertions.assertThrows(UserNotActiveException.class, () -> userService.getById(2L));
+    }
+
+    @Test
+    void testGetByUsername() {
+        User user = userService.getByUsername("First");
+
+        Assertions.assertNotNull(user);
+        Assertions.assertEquals(0L, user.getId());
+        Assertions.assertEquals("First", user.getName());
+        Assertions.assertEquals(true, user.getActive());
+    }
+
+    @Test
+    void testGetAllUsers() {
+        List<User> userList = userService.getAllUsers();
+
+        Assertions.assertEquals(7, userList.size());
     }
 
 }

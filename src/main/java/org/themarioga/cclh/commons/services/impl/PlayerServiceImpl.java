@@ -100,7 +100,7 @@ public class PlayerServiceImpl implements PlayerService {
     public void removeCardFromHand(Player player, Card card) {
         logger.debug("Removing card {} from the hand of the player {}", card, player);
 
-        Optional<PlayerHandCard> cards = player.getHand().stream().filter(playerHandCard -> playerHandCard.getCard().equals(card)).findFirst();
+        Optional<PlayerHandCard> cards = player.getHand().stream().filter(playerHandCard -> playerHandCard.getCard().getId().equals(card.getId())).findFirst();
 
         if (cards.isEmpty())
             throw new PlayerCannotPlayCardException();

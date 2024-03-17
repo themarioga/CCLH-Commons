@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
 <dataset>
-    <T_GAME id="0" type="2" N_PLAYERS="5" N_CARDS_TO_WIN="5" status="0" room_id="0" creator_id="0" dictionary_id="0"/>
+    <T_GAME ID="0" TYPE="2" PUNCTUATION_TYPE="0" N_PLAYERS="5" N_CARDS_TO_WIN="5" N_OF_ROUNDS="0" STATUS="0" ROOM_ID="0" CREATOR_ID="0" DICTIONARY_ID="0"/>
 </dataset>
