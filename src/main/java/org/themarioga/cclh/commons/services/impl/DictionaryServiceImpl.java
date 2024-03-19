@@ -78,10 +78,19 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    public List<Dictionary> getUserDictionaries(User creator) {
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    public List<Dictionary> getDictionariesByCreator(User creator) {
         logger.debug("Getting dictionaries with user: {}", creator);
 
-        return dictionaryDao.getUserDictionaries(creator);
+        return dictionaryDao.getDictionariesByCreator(creator);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    public List<Dictionary> getDictionariesByCreatorOrCollaborator(User creator) {
+        logger.debug("Getting dictionaries with user/collaborator: {}", creator);
+
+        return dictionaryDao.getDictionariesByCreatorOrCollaborator(creator);
     }
 
     @Override

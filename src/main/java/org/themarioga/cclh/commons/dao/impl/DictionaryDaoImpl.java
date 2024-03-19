@@ -16,7 +16,12 @@ public class DictionaryDaoImpl extends AbstractHibernateDao<Dictionary> implemen
     }
 
     @Override
-    public List<Dictionary> getUserDictionaries(User user) {
+    public List<Dictionary> getDictionariesByCreator(User user) {
+        return getCurrentSession().createQuery("SELECT t FROM Dictionary t WHERE t.creator=:user", Dictionary.class).setParameter("user", user).getResultList();
+    }
+
+    @Override
+    public List<Dictionary> getDictionariesByCreatorOrCollaborator(User user) {
         return getCurrentSession().createQuery("SELECT t FROM Dictionary t WHERE t.creator=:user or t IN (SELECT c.dictionary FROM DictionaryCollaborator c WHERE c.user=:user)", Dictionary.class).setParameter("user", user).getResultList();
     }
 

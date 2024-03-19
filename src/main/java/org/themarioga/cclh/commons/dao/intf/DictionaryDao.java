@@ -8,7 +8,9 @@ import java.util.List;
 
 public interface DictionaryDao extends InterfaceHibernateDao<Dictionary> {
 
-    List<Dictionary> getUserDictionaries(User creator);
+	List<Dictionary> getDictionariesByCreator(User user);
+
+	List<Dictionary> getDictionariesByCreatorOrCollaborator(User creator);
 
     List<Dictionary> getDictionariesPaginated(User creator, int firstResult, int maxResults);
 
