@@ -1,12 +1,11 @@
 package org.themarioga.cclh.commons.services.impl;
 
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.cclh.commons.dao.intf.DictionaryDao;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.models.Dictionary;
@@ -62,6 +61,13 @@ public class DictionaryServiceImpl implements DictionaryService {
         logger.debug("Getting dictionary with ID: {}", id);
 
         return dictionaryDao.findOne(id);
+    }
+
+    @Override
+    public List<Dictionary> getUserDictionaries(User creator) {
+        logger.debug("Getting dictionaries with user: {}", creator);
+
+        return dictionaryDao.getUserDictionaries(creator);
     }
 
     @Override

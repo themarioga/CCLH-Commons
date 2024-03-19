@@ -6,6 +6,7 @@ import org.themarioga.cclh.commons.dao.intf.DictionaryDao;
 import org.themarioga.cclh.commons.models.Dictionary;
 import org.themarioga.cclh.commons.models.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -13,6 +14,11 @@ public class DictionaryDaoImpl extends AbstractHibernateDao<Dictionary> implemen
 
     public DictionaryDaoImpl() {
         setClazz(Dictionary.class);
+    }
+
+    @Override
+    public List<Dictionary> getUserDictionaries(User user) {
+        return getCurrentSession().createQuery("SELECT t FROM Dictionary t WHERE t.creator=:user or t IN (SELECT c.dictionary FROM DictionaryCollaborator c WHERE c.user=:user)", Dictionary.class).setParameter("user", user).getResultList();
     }
 
     @Override

@@ -15,6 +15,8 @@ public interface DictionaryService {
 
     Dictionary findOne(long id);
 
+    List<Dictionary> getUserDictionaries(User creator);
+
     List<Dictionary> getDictionariesPaginated(User creator, int firstResult, int maxResults);
 
     Long getDictionaryCount(User creator);
