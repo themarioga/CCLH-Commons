@@ -6,7 +6,6 @@ import org.themarioga.cclh.commons.dao.intf.DictionaryDao;
 import org.themarioga.cclh.commons.models.Dictionary;
 import org.themarioga.cclh.commons.models.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -29,6 +28,11 @@ public class DictionaryDaoImpl extends AbstractHibernateDao<Dictionary> implemen
     @Override
     public Long getDictionaryCount(User creator) {
         return getCurrentSession().createQuery("SELECT count(*) FROM Dictionary t WHERE t.published=true and (t.shared=true or (t.shared=false and t.creator=:creator))", Long.class).setParameter("creator", creator).getSingleResult();
+    }
+
+    @Override
+    public Long countDictionariesByName(String name) {
+        return getCurrentSession().createQuery("SELECT count(d) FROM Dictionary d WHERE d.name LIKE :name", Long.class).setParameter("name", name).getSingleResult();
     }
 
 }

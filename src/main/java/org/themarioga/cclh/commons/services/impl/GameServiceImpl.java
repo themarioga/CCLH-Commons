@@ -69,7 +69,6 @@ public class GameServiceImpl implements GameService {
         // Create game
         Game game = new Game();
         game.setRoom(room);
-        game.setCreationDate(new Date());
         game.setCreator(creator);
         game.setStatus(GameStatusEnum.CREATED);
         game.setType(getDefaultGameMode());
@@ -78,6 +77,7 @@ public class GameServiceImpl implements GameService {
         game.setNumberOfRounds(getDefaultGameLength());
         game.setMaxNumberOfPlayers(getDefaultMaxNumberOfPlayers());
         game.setDictionary(dictionaryService.getDefaultDictionary());
+        game.setCreationDate(new Date());
 
         return gameDao.create(game);
     }

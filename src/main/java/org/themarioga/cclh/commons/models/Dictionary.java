@@ -21,7 +21,7 @@ public class Dictionary extends Base {
     private Boolean published;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "creator_id", referencedColumnName = "id")
+    @JoinColumn(name = "creator_id", referencedColumnName = "id", nullable = false)
     private User creator;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

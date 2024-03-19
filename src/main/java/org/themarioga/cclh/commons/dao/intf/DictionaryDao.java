@@ -13,4 +13,6 @@ public interface DictionaryDao extends InterfaceHibernateDao<Dictionary> {
     List<Dictionary> getDictionariesPaginated(User creator, int firstResult, int maxResults);
 
     Long getDictionaryCount(User creator);
+
+	Long countDictionariesByName(String name);
 }

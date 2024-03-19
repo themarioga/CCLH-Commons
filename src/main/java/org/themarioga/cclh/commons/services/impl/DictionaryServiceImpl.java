@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.cclh.commons.dao.intf.DictionaryDao;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
+import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryAlreadyExistsException;
 import org.themarioga.cclh.commons.models.Dictionary;
 import org.themarioga.cclh.commons.models.User;
 import org.themarioga.cclh.commons.services.intf.ConfigurationService;
@@ -32,19 +33,32 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public Dictionary create(Dictionary dictionary) {
-        logger.debug("Creating dictionary: {}", dictionary);
+    public Dictionary create(String name, User creator) {
+        logger.debug("Creating dictionary: {}", name);
 
+        if (dictionaryDao.countDictionariesByName(name) > 0)
+            throw new DictionaryAlreadyExistsException();
+
+        Dictionary dictionary = new Dictionary();
+        dictionary.setName(name);
+        dictionary.setCreator(creator);
+        dictionary.setPublished(false);
+        dictionary.setShared(false);
         dictionary.setCreationDate(new Date());
         return dictionaryDao.create(dictionary);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public Dictionary update(Dictionary dictionary) {
-        logger.debug("Updating dictionary: {}", dictionary);
+    public void setName(Dictionary dictionary, String newName) {
+        logger.debug("Setting name {} to dictionary {}", newName, dictionary);
 
-        return dictionaryDao.update(dictionary);
+        if (dictionaryDao.countDictionariesByName(newName) > 0)
+            throw new DictionaryAlreadyExistsException();
+
+        dictionary.setName(newName);
+
+        dictionaryDao.update(dictionary);
     }
 
     @Override

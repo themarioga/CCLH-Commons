@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface DictionaryService {
 
-    Dictionary create(Dictionary dictionary);
+	Dictionary create(String name, User creator);
 
-    Dictionary update(Dictionary dictionary);
+	void setName(Dictionary dictionary, String newName);
 
     void delete(Dictionary dictionary);
 
