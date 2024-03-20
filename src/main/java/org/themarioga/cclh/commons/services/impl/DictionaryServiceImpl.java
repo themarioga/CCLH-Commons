@@ -10,6 +10,7 @@ import org.themarioga.cclh.commons.dao.intf.DictionaryDao;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryAlreadyExistsException;
 import org.themarioga.cclh.commons.models.Dictionary;
+import org.themarioga.cclh.commons.models.DictionaryCollaborator;
 import org.themarioga.cclh.commons.models.User;
 import org.themarioga.cclh.commons.services.intf.ConfigurationService;
 import org.themarioga.cclh.commons.services.intf.DictionaryService;
@@ -45,6 +46,14 @@ public class DictionaryServiceImpl implements DictionaryService {
         dictionary.setPublished(false);
         dictionary.setShared(false);
         dictionary.setCreationDate(new Date());
+
+        DictionaryCollaborator dictionaryCollaborator = new DictionaryCollaborator();
+        dictionaryCollaborator.setDictionary(dictionary);
+        dictionaryCollaborator.setUser(creator);
+        dictionaryCollaborator.setAccepted(true);
+        dictionaryCollaborator.setCanEdit(true);
+        dictionary.getCollaborators().add(dictionaryCollaborator);
+
         return dictionaryDao.create(dictionary);
     }
 
@@ -107,6 +116,14 @@ public class DictionaryServiceImpl implements DictionaryService {
         logger.debug("Get dictionary count {}", creator);
 
         return dictionaryDao.getDictionaryCount(creator);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    public boolean isDictionaryCollaborator(Dictionary dictionary, User user) {
+        logger.debug("isDictionaryCollaborator {}", user);
+
+        return dictionaryDao.isDictionaryCollaborator(dictionary, user);
     }
 
     @Override

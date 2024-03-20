@@ -27,5 +27,8 @@ public interface DictionaryService {
 
     Long getDictionaryCount(User creator);
 
-    Dictionary getDefaultDictionary();
+	@Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+	boolean isDictionaryCollaborator(Dictionary dictionary, User user);
+
+	Dictionary getDefaultDictionary();
 }

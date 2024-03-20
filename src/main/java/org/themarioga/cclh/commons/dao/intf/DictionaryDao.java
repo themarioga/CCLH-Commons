@@ -17,4 +17,7 @@ public interface DictionaryDao extends InterfaceHibernateDao<Dictionary> {
     Long getDictionaryCount(User creator);
 
 	Long countDictionariesByName(String name);
+
+	boolean isDictionaryCollaborator(Dictionary dictionary, User user);
+
 }
