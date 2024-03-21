@@ -79,6 +79,23 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public DictionaryCollaborator addCollaborator(Dictionary dictionary, User user) {
+        logger.debug("Add dictionary collaborator: {} {}", dictionary, user);
+
+        DictionaryCollaborator dictionaryCollaborator = new DictionaryCollaborator();
+        dictionaryCollaborator.setDictionary(dictionary);
+        dictionaryCollaborator.setUser(user);
+        dictionaryCollaborator.setAccepted(false);
+        dictionaryCollaborator.setCanEdit(false);
+        dictionary.getCollaborators().add(dictionaryCollaborator);
+
+        dictionaryDao.update(dictionary);
+
+        return dictionaryCollaborator;
+    }
+
+    @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public Dictionary findOne(long id) {
         logger.debug("Getting dictionary with ID: {}", id);

@@ -1,9 +1,7 @@
 package org.themarioga.cclh.commons.services.intf;
 
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.models.Dictionary;
+import org.themarioga.cclh.commons.models.DictionaryCollaborator;
 import org.themarioga.cclh.commons.models.User;
 
 import java.util.List;
@@ -16,9 +14,10 @@ public interface DictionaryService {
 
     void delete(Dictionary dictionary);
 
+	DictionaryCollaborator addCollaborator(Dictionary dictionary, User user);
+
     Dictionary findOne(long id);
 
-	@Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
 	List<Dictionary> getDictionariesByCreator(User creator);
 
 	List<Dictionary> getDictionariesByCreatorOrCollaborator(User creator);
@@ -27,7 +26,6 @@ public interface DictionaryService {
 
     Long getDictionaryCount(User creator);
 
-	@Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
 	boolean isDictionaryCollaborator(Dictionary dictionary, User user);
 
 	Dictionary getDefaultDictionary();
