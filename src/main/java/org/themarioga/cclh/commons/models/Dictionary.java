@@ -24,10 +24,6 @@ public class Dictionary extends Base {
     @JoinColumn(name = "creator_id", referencedColumnName = "id", nullable = false)
     private User creator;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "t_card", joinColumns = @JoinColumn(name = "dictionary_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "id", nullable = false))
-    private List<Card> cards = new ArrayList<>(0);
-
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "dictionary", orphanRemoval = true)
     private List<DictionaryCollaborator> collaborators = new ArrayList<>(0);
 
@@ -69,14 +65,6 @@ public class Dictionary extends Base {
 
     public void setCreator(User creator) {
         this.creator = creator;
-    }
-
-    public List<Card> getCards() {
-        return cards;
-    }
-
-    public void setCards(List<Card> cards) {
-        this.cards = cards;
     }
 
     public List<DictionaryCollaborator> getCollaborators() {

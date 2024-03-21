@@ -135,12 +135,4 @@ class DictionaryDaoTest extends BaseTest {
         Assertions.assertEquals(true, dictionary.getCollaborators().get(0).getAccepted());
     }
 
-    @Test
-    @DatabaseSetup("classpath:dbunit/dao/setup/card.xml")
-    void getDictionaryCards() {
-        Dictionary dictionary = dictionaryDao.findOne(0L);
-
-        Assertions.assertEquals(1, dictionary.getCards().size());
-    }
-
 }
