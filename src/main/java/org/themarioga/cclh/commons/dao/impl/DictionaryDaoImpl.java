@@ -42,6 +42,11 @@ public class DictionaryDaoImpl extends AbstractHibernateDao<Dictionary> implemen
 
     @Override
     public boolean isDictionaryCollaborator(Dictionary dictionary, User user) {
+        return getCurrentSession().createQuery("SELECT count(c) FROM DictionaryCollaborator c WHERE c.dictionary=:dictionary and c.user=:user", Long.class).setParameter("dictionary", dictionary).setParameter("user", user).getSingleResultOrNull() > 0;
+    }
+
+    @Override
+    public boolean isDictionaryActiveCollaborator(Dictionary dictionary, User user) {
         return getCurrentSession().createQuery("SELECT count(c) FROM DictionaryCollaborator c WHERE c.dictionary=:dictionary and c.user=:user and accepted=true and canEdit=true", Long.class).setParameter("dictionary", dictionary).setParameter("user", user).getSingleResultOrNull() > 0;
     }
 

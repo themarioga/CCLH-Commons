@@ -27,18 +27,19 @@ public enum ErrorEnum {
     CARD_ALREADY_PLAYED(24L, "Carta ya jugada"),
     CARD_ALREADY_VOTED(25L, "Carta ya votada"),
     DICTIONARY_NOT_FOUND(26L, "Diccionario no encontrado"),
-    DICTIONARY_NOT_FILLED(27L, "Diccionario no completado"),
-    DICTIONARY_ALREADY_EXISTS(28L, "Diccionario ya existe"),
-    DICTIONARY_ALREADY_FILLED(29L, "Diccionario ya completado"),
-    PLAYER_NOT_FOUND(30L, "Jugador no encontrado"),
-    PLAYER_ALREADY_EXISTS(31L, "Jugador ya existente"),
-    PLAYER_ALREADY_PLAYED_CARD(32L, "El jugador ya ha jugado"),
-    PLAYER_ALREADY_VOTED_CARD(33L, "El jugador ya ha votado"),
-    PLAYER_ALREADY_VOTED_DELETION(34L, "El jugador ya ha votado"),
-    PLAYER_CANNOT_PLAY_CARD(35L, "El jugador no puede jugar esa carta"),
-    PLAYER_CANNOT_VOTE_CARD(36L, "El jugador no puede votar"),
-    PLAYER_CANNOT_VOTE_DELETION(37L, "El jugador no puede votar"),
-    TABLE_WRONG_STATUS(38L, "Mesa en estado incorrecto");
+    DICTIONARY_NOT_YOURS(27L, "Diccionario no encontrado"),
+    DICTIONARY_NOT_FILLED(28L, "Diccionario no completado"),
+    DICTIONARY_ALREADY_EXISTS(29L, "Diccionario ya existe"),
+    DICTIONARY_ALREADY_FILLED(30L, "Diccionario ya completado"),
+    PLAYER_NOT_FOUND(31L, "Jugador no encontrado"),
+    PLAYER_ALREADY_EXISTS(32L, "Jugador ya existente"),
+    PLAYER_ALREADY_PLAYED_CARD(33L, "El jugador ya ha jugado"),
+    PLAYER_ALREADY_VOTED_CARD(34L, "El jugador ya ha votado"),
+    PLAYER_ALREADY_VOTED_DELETION(35L, "El jugador ya ha votado"),
+    PLAYER_CANNOT_PLAY_CARD(36L, "El jugador no puede jugar esa carta"),
+    PLAYER_CANNOT_VOTE_CARD(37L, "El jugador no puede votar"),
+    PLAYER_CANNOT_VOTE_DELETION(38L, "El jugador no puede votar"),
+    TABLE_WRONG_STATUS(39L, "Mesa en estado incorrecto");
 
     final Long errorCode;
     final String errorDesc;

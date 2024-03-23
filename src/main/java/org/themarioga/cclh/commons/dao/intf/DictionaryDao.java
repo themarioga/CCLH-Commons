@@ -20,4 +20,6 @@ public interface DictionaryDao extends InterfaceHibernateDao<Dictionary> {
 
 	boolean isDictionaryCollaborator(Dictionary dictionary, User user);
 
+	boolean isDictionaryActiveCollaborator(Dictionary dictionary, User user);
+
 }
