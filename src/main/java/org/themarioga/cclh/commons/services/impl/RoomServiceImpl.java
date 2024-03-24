@@ -60,7 +60,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Room setActive(Room room, boolean active) {
         logger.debug("Activating/Deactivating room with ID {} to {}", room.getId(), active);
 
