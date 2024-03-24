@@ -10,6 +10,7 @@ import org.themarioga.cclh.commons.dao.intf.CardDao;
 import org.themarioga.cclh.commons.enums.CardTypeEnum;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.exceptions.card.CardAlreadyExistsException;
+import org.themarioga.cclh.commons.exceptions.card.CardTextExcededLength;
 import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryAlreadyFilledException;
 import org.themarioga.cclh.commons.models.*;
 import org.themarioga.cclh.commons.services.intf.CardService;
@@ -42,6 +43,10 @@ public class CardServiceImpl implements CardService {
 
         checkDictionaryAlreadyFilled(dictionary, type);
 
+        if ((type == CardTypeEnum.WHITE && text.length() > getDictionaryWhiteCardMaxLength()) ||
+                (type == CardTypeEnum.BLACK && text.length() > getDictionaryBlackCardMaxLength()))
+            throw new CardTextExcededLength();
+
         Card card = new Card();
         card.setDictionary(dictionary);
         card.setText(text);
@@ -58,6 +63,10 @@ public class CardServiceImpl implements CardService {
 
         if (cardDao.checkCardExistsByDictionaryTypeAndText(card.getDictionary(), card.getType(), newText))
             throw new CardAlreadyExistsException();
+
+        if ((card.getType() == CardTypeEnum.WHITE && newText.length() > getDictionaryWhiteCardMaxLength()) ||
+                (card.getType() == CardTypeEnum.BLACK && newText.length() > getDictionaryBlackCardMaxLength()))
+            throw new CardTextExcededLength();
 
         card.setText(newText);
 
