@@ -184,7 +184,7 @@ public class GameServiceImpl implements GameService {
         if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
 
         // Find the dictionary
-        Dictionary dictionary = dictionaryService.findOne(dictionaryId);
+        Dictionary dictionary = dictionaryService.getDictionaryById(dictionaryId);
 
         // Check if the dictionary exists
         if (dictionary == null) throw new DictionaryDoesntExistsException();
@@ -367,7 +367,7 @@ public class GameServiceImpl implements GameService {
         Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
 
         // Get the card
-        Card card = cardService.findOne(cardId);
+        Card card = cardService.getCardById(cardId);
 
         // Check user exists
         Assert.assertNotNull(card, ErrorEnum.CARD_NOT_FOUND);
@@ -402,7 +402,7 @@ public class GameServiceImpl implements GameService {
         Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
 
         // Get the carc
-        Card card = cardService.findOne(cardId);
+        Card card = cardService.getCardById(cardId);
 
         // Check user exists
         Assert.assertNotNull(card, ErrorEnum.CARD_NOT_FOUND);

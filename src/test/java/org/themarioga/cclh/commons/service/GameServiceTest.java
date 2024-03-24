@@ -161,7 +161,7 @@ class GameServiceTest extends BaseTest {
 
         getCurrentSession().flush();
 
-        Assertions.assertEquals(dictionaryService.findOne(1L), game.getDictionary());
+        Assertions.assertEquals(dictionaryService.getDictionaryById(1L), game.getDictionary());
     }
 
     @Test

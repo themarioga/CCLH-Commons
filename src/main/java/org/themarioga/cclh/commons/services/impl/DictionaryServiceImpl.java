@@ -8,13 +8,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.cclh.commons.dao.intf.DictionaryDao;
 import org.themarioga.cclh.commons.exceptions.ApplicationException;
-import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryAlreadyExistsException;
-import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryCollaboratorAlreadyExists;
-import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryCollaboratorDoesntExists;
-import org.themarioga.cclh.commons.exceptions.dictionary.DictionaryMaxCollaboratorsReached;
+import org.themarioga.cclh.commons.exceptions.dictionary.*;
 import org.themarioga.cclh.commons.models.Dictionary;
 import org.themarioga.cclh.commons.models.DictionaryCollaborator;
 import org.themarioga.cclh.commons.models.User;
+import org.themarioga.cclh.commons.services.intf.CardService;
 import org.themarioga.cclh.commons.services.intf.ConfigurationService;
 import org.themarioga.cclh.commons.services.intf.DictionaryService;
 
@@ -30,11 +28,14 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     private final DictionaryDao dictionaryDao;
     private final ConfigurationService configurationService;
+    private final CardService cardService;
 
     @Autowired
-    public DictionaryServiceImpl(DictionaryDao dictionaryDao, ConfigurationService configurationService) {
+    public DictionaryServiceImpl(DictionaryDao dictionaryDao, ConfigurationService configurationService,
+                                 CardService cardService) {
         this.dictionaryDao = dictionaryDao;
         this.configurationService = configurationService;
+        this.cardService = cardService;
     }
 
     @Override
@@ -71,6 +72,22 @@ public class DictionaryServiceImpl implements DictionaryService {
             throw new DictionaryAlreadyExistsException();
 
         dictionary.setName(newName);
+
+        dictionaryDao.update(dictionary);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public void togglePublished(Dictionary dictionary) {
+        logger.debug("Toggling published to dictionary {}", dictionary);
+
+        if (Boolean.TRUE.equals(dictionary.getShared()))
+            throw new DictionaryAlreadySharedException();
+
+        if (!cardService.checkDictionaryCanBePublished(dictionary))
+            throw new DictionaryNotCompletedException();
+
+        dictionary.setPublished(!dictionary.getPublished());
 
         dictionaryDao.update(dictionary);
     }
@@ -152,7 +169,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public Dictionary findOne(long id) {
+    public Dictionary getDictionaryById(long id) {
         logger.debug("Getting dictionary with ID: {}", id);
 
         return dictionaryDao.findOne(id);

@@ -13,9 +13,12 @@ public interface DictionaryService {
 
 	Dictionary create(String name, User creator);
 
-	void setName(Dictionary dictionary, String newName);
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+	void togglePublished(Dictionary dictionary);
 
-    void delete(Dictionary dictionary);
+	void delete(Dictionary dictionary);
+
+	void setName(Dictionary dictionary, String newName);
 
 	DictionaryCollaborator addCollaborator(Dictionary dictionary, User user);
 
@@ -25,7 +28,7 @@ public interface DictionaryService {
 
 	void removeCollaborator(Dictionary dictionary, User user);
 
-    Dictionary findOne(long id);
+    Dictionary getDictionaryById(long id);
 
 	List<Dictionary> getDictionariesByCreator(User creator);
 
@@ -35,13 +38,11 @@ public interface DictionaryService {
 
     Long getDictionaryCount(User creator);
 
-	@Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
 	boolean isDictionaryCollaborator(Dictionary dictionary, User user);
 
 	boolean isDictionaryActiveCollaborator(Dictionary dictionary, User user);
 
 	Dictionary getDefaultDictionary();
 
-	@Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
 	int getDictionaryMaxCollaborators();
 }
