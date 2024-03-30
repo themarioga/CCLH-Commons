@@ -94,6 +94,19 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public void toggleShared(Dictionary dictionary) {
+        logger.debug("Toggling shared to dictionary {}", dictionary);
+
+        if (Boolean.FALSE.equals(dictionary.getPublished()))
+            throw new DictionaryNotPublishedException();
+
+        dictionary.setShared(!dictionary.getShared());
+
+        dictionaryDao.update(dictionary);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public void delete(Dictionary dictionary) {
         logger.debug("Delete dictionary: {}", dictionary);
 
@@ -147,6 +160,9 @@ public class DictionaryServiceImpl implements DictionaryService {
         Optional<DictionaryCollaborator> collaborator = dictionary.getCollaborators().stream().filter(dictionaryCollaborator -> Objects.equals(dictionaryCollaborator.getUser().getId(), user.getId())).findFirst();
 
         if (collaborator.isEmpty())
+            throw new DictionaryCollaboratorDoesntExists();
+
+        if (Boolean.FALSE.equals(collaborator.get().getAccepted()))
             throw new DictionaryCollaboratorDoesntExists();
 
         collaborator.ifPresent(dictionaryCollaborator -> dictionaryCollaborator.setCanEdit(!dictionaryCollaborator.getCanEdit()));

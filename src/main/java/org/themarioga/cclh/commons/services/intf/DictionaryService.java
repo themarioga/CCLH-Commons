@@ -16,6 +16,9 @@ public interface DictionaryService {
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
 	void togglePublished(Dictionary dictionary);
 
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+	void toggleShared(Dictionary dictionary);
+
 	void delete(Dictionary dictionary);
 
 	void setName(Dictionary dictionary, String newName);
