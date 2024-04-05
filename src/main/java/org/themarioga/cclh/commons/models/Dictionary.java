@@ -24,6 +24,10 @@ public class Dictionary extends Base {
     @JoinColumn(name = "creator_id", referencedColumnName = "id", nullable = false)
     private User creator;
 
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "lang_id", referencedColumnName = "id", nullable = false)
+    private Lang lang;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "dictionary", orphanRemoval = true)
     private List<DictionaryCollaborator> collaborators = new ArrayList<>(0);
 
@@ -65,6 +69,14 @@ public class Dictionary extends Base {
 
     public void setCreator(User creator) {
         this.creator = creator;
+    }
+
+    public Lang getLang() {
+        return lang;
+    }
+
+    public void setLang(Lang lang) {
+        this.lang = lang;
     }
 
     public List<DictionaryCollaborator> getCollaborators() {

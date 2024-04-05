@@ -11,6 +11,7 @@ import org.themarioga.cclh.commons.exceptions.ApplicationException;
 import org.themarioga.cclh.commons.exceptions.dictionary.*;
 import org.themarioga.cclh.commons.models.Dictionary;
 import org.themarioga.cclh.commons.models.DictionaryCollaborator;
+import org.themarioga.cclh.commons.models.Lang;
 import org.themarioga.cclh.commons.models.User;
 import org.themarioga.cclh.commons.services.intf.CardService;
 import org.themarioga.cclh.commons.services.intf.ConfigurationService;
@@ -31,8 +32,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     private final CardService cardService;
 
     @Autowired
-    public DictionaryServiceImpl(DictionaryDao dictionaryDao, ConfigurationService configurationService,
-                                 CardService cardService) {
+    public DictionaryServiceImpl(DictionaryDao dictionaryDao, ConfigurationService configurationService, CardService cardService) {
         this.dictionaryDao = dictionaryDao;
         this.configurationService = configurationService;
         this.cardService = cardService;
@@ -49,6 +49,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         Dictionary dictionary = new Dictionary();
         dictionary.setName(name);
         dictionary.setCreator(creator);
+        dictionary.setLang(creator.getLang());
         dictionary.setPublished(false);
         dictionary.setShared(false);
         dictionary.setCreationDate(new Date());
@@ -72,6 +73,16 @@ public class DictionaryServiceImpl implements DictionaryService {
             throw new DictionaryAlreadyExistsException();
 
         dictionary.setName(newName);
+
+        dictionaryDao.update(dictionary);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public void setLanguage(Dictionary dictionary, Lang lang) {
+        logger.debug("Setting lang {} to dictionary {}", lang, dictionary);
+
+        dictionary.setLang(lang);
 
         dictionaryDao.update(dictionary);
     }
@@ -180,7 +191,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         if (collaborator.isEmpty())
             throw new DictionaryCollaboratorDoesntExists();
 
-	    collaborator.ifPresent(dictionaryCollaborator -> dictionary.getCollaborators().remove(dictionaryCollaborator));
+        collaborator.ifPresent(dictionaryCollaborator -> dictionary.getCollaborators().remove(dictionaryCollaborator));
     }
 
     @Override

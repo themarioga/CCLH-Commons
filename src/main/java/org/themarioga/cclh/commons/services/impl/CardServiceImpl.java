@@ -43,8 +43,7 @@ public class CardServiceImpl implements CardService {
 
         checkDictionaryAlreadyFilled(dictionary, type);
 
-        if ((type == CardTypeEnum.WHITE && text.length() > getDictionaryWhiteCardMaxLength()) ||
-                (type == CardTypeEnum.BLACK && text.length() > getDictionaryBlackCardMaxLength()))
+        if ((type == CardTypeEnum.WHITE && text.length() > getDictionaryWhiteCardMaxLength()) || (type == CardTypeEnum.BLACK && text.length() > getDictionaryBlackCardMaxLength()))
             throw new CardTextExcededLength();
 
         Card card = new Card();
@@ -64,8 +63,7 @@ public class CardServiceImpl implements CardService {
         if (cardDao.checkCardExistsByDictionaryTypeAndText(card.getDictionary(), card.getType(), newText))
             throw new CardAlreadyExistsException();
 
-        if ((card.getType() == CardTypeEnum.WHITE && newText.length() > getDictionaryWhiteCardMaxLength()) ||
-                (card.getType() == CardTypeEnum.BLACK && newText.length() > getDictionaryBlackCardMaxLength()))
+        if ((card.getType() == CardTypeEnum.WHITE && newText.length() > getDictionaryWhiteCardMaxLength()) || (card.getType() == CardTypeEnum.BLACK && newText.length() > getDictionaryBlackCardMaxLength()))
             throw new CardTextExcededLength();
 
         card.setText(newText);

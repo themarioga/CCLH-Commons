@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.dao.intf.DictionaryDao;
+import org.themarioga.cclh.commons.dao.intf.LanguageDao;
 import org.themarioga.cclh.commons.dao.intf.UserDao;
 import org.themarioga.cclh.commons.models.Dictionary;
 import org.themarioga.cclh.commons.models.DictionaryCollaborator;
@@ -15,6 +16,7 @@ import org.themarioga.cclh.commons.models.User;
 
 import java.util.List;
 
+@DatabaseSetup("classpath:dbunit/dao/setup/lang.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/user.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/dictionary.xml")
 class DictionaryDaoTest extends BaseTest {
@@ -23,6 +25,8 @@ class DictionaryDaoTest extends BaseTest {
     private UserDao userDao;
     @Autowired
     private DictionaryDao dictionaryDao;
+    @Autowired
+    private LanguageDao languageDao;
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/dictionary/testCreateDictionary-expected.xml", table = "T_DICTIONARY", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
@@ -34,6 +38,7 @@ class DictionaryDaoTest extends BaseTest {
         dictionary.setShared(true);
         dictionary.setPublished(true);
         dictionary.setCreator(user);
+        dictionary.setLang(languageDao.getLanguage("es"));
 
         dictionaryDao.create(dictionary);
         getCurrentSession().flush();

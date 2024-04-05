@@ -13,6 +13,7 @@ import org.themarioga.cclh.commons.models.Room;
 
 import java.util.List;
 
+@DatabaseSetup("classpath:dbunit/dao/setup/lang.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/user.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/room.xml")
 class RoomDaoTest extends BaseTest {

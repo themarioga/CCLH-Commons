@@ -15,6 +15,7 @@ import org.themarioga.cclh.commons.enums.GameTypeEnum;
 
 import java.util.List;
 
+@DatabaseSetup("classpath:dbunit/dao/setup/lang.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/user.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/room.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/dictionary.xml")

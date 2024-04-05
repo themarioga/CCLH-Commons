@@ -3,28 +3,30 @@ package org.themarioga.cclh.commons.service;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.exceptions.user.UserAlreadyExistsException;
 import org.themarioga.cclh.commons.exceptions.user.UserDoesntExistsException;
 import org.themarioga.cclh.commons.exceptions.user.UserNotActiveException;
-import org.themarioga.cclh.commons.models.PlayedCard;
 import org.themarioga.cclh.commons.models.User;
-import org.themarioga.cclh.commons.services.intf.TableService;
+import org.themarioga.cclh.commons.services.intf.LanguageService;
 import org.themarioga.cclh.commons.services.intf.UserService;
 
 import java.util.List;
 
+@DatabaseSetup("classpath:dbunit/service/setup/lang.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")
 class UserServiceTest extends BaseTest {
 
     @Autowired
     UserService userService;
 
+    @Autowired
+    LanguageService languageService;
+
     @Test
     void testCreateOrReactivate() {
-        User user = userService.createOrReactivate(10L, "Test");
+        User user = userService.createOrReactivate(10L, "Test", languageService.getDefaultLanguage());
 
         Assertions.assertNotNull(user);
         Assertions.assertEquals(10L, user.getId());
@@ -34,7 +36,7 @@ class UserServiceTest extends BaseTest {
 
     @Test
     void testCreateOrReactivate_Reactivate() {
-        User user = userService.createOrReactivate(2L, "Third");
+        User user = userService.createOrReactivate(2L, "Third", languageService.getDefaultLanguage());
 
         Assertions.assertNotNull(user);
         Assertions.assertEquals(2L, user.getId());
@@ -45,7 +47,7 @@ class UserServiceTest extends BaseTest {
     @Test
     void testCreateOrReactivate_AlreadyActive() {
         Assertions.assertThrows(UserAlreadyExistsException.class, () -> {
-            userService.createOrReactivate(0L, "First");
+            userService.createOrReactivate(0L, "First", languageService.getDefaultLanguage());
 
             Assertions.fail();
         });
@@ -54,7 +56,7 @@ class UserServiceTest extends BaseTest {
     @Test
     void testCreateOrReactivate_AlreadyExists() {
         Assertions.assertThrows(UserAlreadyExistsException.class, () -> {
-            userService.createOrReactivate(1L, "Second");
+            userService.createOrReactivate(1L, "Second", languageService.getDefaultLanguage());
 
             Assertions.fail();
         });

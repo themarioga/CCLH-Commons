@@ -7,16 +7,20 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
+import org.themarioga.cclh.commons.dao.intf.LanguageDao;
 import org.themarioga.cclh.commons.dao.intf.UserDao;
 import org.themarioga.cclh.commons.models.User;
 
 import java.util.List;
 
+@DatabaseSetup("classpath:dbunit/dao/setup/lang.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/user.xml")
 class UserDaoTest extends BaseTest {
 
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private LanguageDao languageDao;
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/user/testCreateUser-expected.xml", table = "T_USER", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
@@ -25,6 +29,7 @@ class UserDaoTest extends BaseTest {
         user.setId(2L);
         user.setName("Test user");
         user.setActive(true);
+        user.setLang(languageDao.getLanguage("es"));
 
         userDao.create(user);
         getCurrentSession().flush();

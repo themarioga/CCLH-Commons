@@ -9,6 +9,7 @@ import org.themarioga.cclh.commons.models.Game;
 import org.themarioga.cclh.commons.services.intf.GameService;
 import org.themarioga.cclh.commons.services.intf.PlayerService;
 
+@DatabaseSetup("classpath:dbunit/service/setup/lang.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/room.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/dictionary.xml")

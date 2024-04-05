@@ -12,6 +12,7 @@ import org.themarioga.cclh.commons.services.intf.RoomService;
 
 import java.util.List;
 
+@DatabaseSetup("classpath:dbunit/service/setup/lang.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/room.xml")
 class RoomServiceTest extends BaseTest {

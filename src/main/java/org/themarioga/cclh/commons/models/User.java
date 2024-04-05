@@ -14,6 +14,9 @@ public class User extends Base {
     private String name;
     @Column(name = "active", nullable = false)
     private Boolean active;
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "lang_id", referencedColumnName = "id", nullable = false)
+    private Lang lang;
 
     public Long getId() {
         return id;
@@ -37,6 +40,14 @@ public class User extends Base {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public Lang getLang() {
+        return lang;
+    }
+
+    public void setLang(Lang lang) {
+        this.lang = lang;
     }
 
     @Override

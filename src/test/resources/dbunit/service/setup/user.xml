@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
 <dataset>
-    <T_USER ID="0" NAME="First" ACTIVE="true"/>
-    <T_USER ID="1" NAME="Second" ACTIVE="true"/>
-    <T_USER ID="2" NAME="Third" ACTIVE="false"/>
-    <T_USER ID="3" NAME="Fourth" ACTIVE="true"/>
-    <T_USER ID="4" NAME="Fifth" ACTIVE="true"/>
-    <T_USER ID="5" NAME="Sixth" ACTIVE="true"/>
-    <T_USER ID="6" NAME="Seventh" ACTIVE="true"/>
+    <T_USER ID="0" NAME="First" ACTIVE="true" LANG_ID="es"/>
+    <T_USER ID="1" NAME="Second" ACTIVE="true" LANG_ID="es"/>
+    <T_USER ID="2" NAME="Third" ACTIVE="false" LANG_ID="es"/>
+    <T_USER ID="3" NAME="Fourth" ACTIVE="true" LANG_ID="es"/>
+    <T_USER ID="4" NAME="Fifth" ACTIVE="true" LANG_ID="es"/>
+    <T_USER ID="5" NAME="Sixth" ACTIVE="true" LANG_ID="es"/>
+    <T_USER ID="6" NAME="Seventh" ACTIVE="true" LANG_ID="es"/>
 </dataset>

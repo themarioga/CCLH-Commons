@@ -15,6 +15,7 @@ import org.themarioga.cclh.commons.models.Dictionary;
 
 import java.util.List;
 
+@DatabaseSetup("classpath:dbunit/dao/setup/lang.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/user.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/dictionary.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/card.xml")

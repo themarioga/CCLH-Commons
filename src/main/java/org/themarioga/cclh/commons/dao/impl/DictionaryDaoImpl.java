@@ -27,12 +27,12 @@ public class DictionaryDaoImpl extends AbstractHibernateDao<Dictionary> implemen
 
     @Override
     public List<Dictionary> getDictionariesPaginated(User creator, int firstResult, int maxResults) {
-        return getCurrentSession().createQuery("SELECT t FROM Dictionary t WHERE t.published=true and (t.shared=true or (t.shared=false and t.creator=:creator))", Dictionary.class).setParameter("creator", creator).setFirstResult(firstResult).setMaxResults(maxResults).getResultList();
+        return getCurrentSession().createQuery("SELECT t FROM Dictionary t WHERE t.lang=:lang and t.published=true and (t.shared=true or (t.shared=false and t.creator=:creator))", Dictionary.class).setParameter("lang", creator.getLang()).setParameter("creator", creator).setFirstResult(firstResult).setMaxResults(maxResults).getResultList();
     }
 
     @Override
     public Long getDictionaryCount(User creator) {
-        return getCurrentSession().createQuery("SELECT count(*) FROM Dictionary t WHERE t.published=true and (t.shared=true or (t.shared=false and t.creator=:creator))", Long.class).setParameter("creator", creator).getSingleResult();
+        return getCurrentSession().createQuery("SELECT count(*) FROM Dictionary t WHERE t.lang=:lang and t.published=true and (t.shared=true or (t.shared=false and t.creator=:creator))", Long.class).setParameter("lang", creator.getLang()).setParameter("creator", creator).getSingleResult();
     }
 
     @Override

@@ -35,6 +35,6 @@ public interface CardService {
 
     int getDictionaryBlackCardMaxLength();
 
-	@Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-	boolean checkDictionaryCanBePublished(Dictionary dictionary);
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    boolean checkDictionaryCanBePublished(Dictionary dictionary);
 }

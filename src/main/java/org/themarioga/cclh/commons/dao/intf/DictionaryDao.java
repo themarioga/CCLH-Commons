@@ -8,18 +8,18 @@ import java.util.List;
 
 public interface DictionaryDao extends InterfaceHibernateDao<Dictionary> {
 
-	List<Dictionary> getDictionariesByCreator(User user);
+    List<Dictionary> getDictionariesByCreator(User user);
 
-	List<Dictionary> getDictionariesByCreatorOrCollaborator(User creator);
+    List<Dictionary> getDictionariesByCreatorOrCollaborator(User creator);
 
     List<Dictionary> getDictionariesPaginated(User creator, int firstResult, int maxResults);
 
     Long getDictionaryCount(User creator);
 
-	Long countDictionariesByName(String name);
+    Long countDictionariesByName(String name);
 
-	boolean isDictionaryCollaborator(Dictionary dictionary, User user);
+    boolean isDictionaryCollaborator(Dictionary dictionary, User user);
 
-	boolean isDictionaryActiveCollaborator(Dictionary dictionary, User user);
+    boolean isDictionaryActiveCollaborator(Dictionary dictionary, User user);
 
 }

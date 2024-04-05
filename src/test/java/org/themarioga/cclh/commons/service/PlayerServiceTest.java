@@ -1,20 +1,16 @@
 package org.themarioga.cclh.commons.service;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.github.springtestdbunit.annotation.ExpectedDatabase;
-import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.cclh.commons.BaseTest;
 import org.themarioga.cclh.commons.dao.intf.PlayerDao;
-import org.themarioga.cclh.commons.enums.CardTypeEnum;
-import org.themarioga.cclh.commons.models.*;
+import org.themarioga.cclh.commons.models.Game;
+import org.themarioga.cclh.commons.models.Player;
 import org.themarioga.cclh.commons.services.intf.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
+@DatabaseSetup("classpath:dbunit/service/setup/lang.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/room.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/dictionary.xml")

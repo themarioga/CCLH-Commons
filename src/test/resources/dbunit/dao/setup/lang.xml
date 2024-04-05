@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
 <dataset>
-    <T_DICTIONARY ID="0" NAME="Otro nombre" SHARED="false" PUBLISHED="false" CREATOR_ID="0" LANG_ID="es"/>
+    <T_LANG ID="es" NAME="Español"/>
+    <T_LANG ID="EN" NAME="English"/>
 </dataset>

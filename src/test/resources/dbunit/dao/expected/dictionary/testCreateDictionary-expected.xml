@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
 <dataset>
-    <T_DICTIONARY id="0" name="First" shared="true" published="true" creator_id="0"/>
-    <T_DICTIONARY id="1" name="Test deck" shared="true" published="true" creator_id="0"/>
+    <T_DICTIONARY ID="0" NAME="First" SHARED="true" PUBLISHED="true" CREATOR_ID="0" LANG_ID="es"/>
+    <T_DICTIONARY ID="1" NAME="Test deck" SHARED="true" PUBLISHED="true" CREATOR_ID="0" LANG_ID="es"/>
 </dataset>
