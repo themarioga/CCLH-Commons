@@ -10,7 +10,7 @@
     </parent>
     <groupId>org.themarioga</groupId>
     <artifactId>CCLH-Commons</artifactId>
-    <version>1.0</version>
+    <version>2.0.0</version>
     <name>CCLH-Commons</name>
     <description>Commons part for CCLH bots</description>
     <properties>
