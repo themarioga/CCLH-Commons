@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
+<!DOCTYPE dataset SYSTEM "src/test/resources/cahschema.dtd">
 <dataset>
-    <T_TABLE GAME_ID="10" STATUS="0" ROUND_NUMBER="0" />
+    <T_TABLE GAME_ID="0" DICTIONARY_ID="0" N_CARDS_TO_WIN="0" N_MAX_PLAYERS="0" N_MAX_ROUNDS="0" PUNCTUATION_MODE="0" VOTATION_MODE="0"/>
 </dataset>

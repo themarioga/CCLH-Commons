@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
+<!DOCTYPE dataset SYSTEM "src/test/resources/cahschema.dtd">
 <dataset>
-    <T_DICTIONARY ID="0" NAME="Otro nombre" SHARED="false" PUBLISHED="false" CREATOR_ID="0" LANG_ID="es"/>
+    <Dictionary ID="0" NAME="Otro nombre" SHARED="false" PUBLISHED="false" CREATOR_ID="0" LANG_ID="es"/>
 </dataset>

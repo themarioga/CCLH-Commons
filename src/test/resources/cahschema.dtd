@@ -1,0 +1,83 @@
+<!ELEMENT dataset (
+        Configuration*,
+        CAHGame*,
+        Lang*,
+        CAHPlayer*,
+        Room*,
+        Tag*,
+        T_user*,
+        Dictionary*,
+        Card*)>
+
+        <!ELEMENT Configuration EMPTY>
+        <!ATTLIST Configuration
+                CONF_KEY CDATA #REQUIRED
+                CONF_VALUE CDATA #REQUIRED
+                >
+
+        <!ELEMENT CAHGame EMPTY>
+        <!ATTLIST CAHGame
+                ID CDATA #IMPLIED
+                ROOM_ID CDATA #REQUIRED
+                CREATOR_ID CDATA #REQUIRED
+                STATUS CDATA #REQUIRED
+                VOTATION_MODE CDATA #REQUIRED
+                PUNCTUATION_MODE CDATA #REQUIRED
+                NUMBER_OF_POINTS_TO_WIN CDATA #REQUIRED
+                NUMBER_OF_ROUNDS CDATA #REQUIRED
+                MAX_NUMBER_OF_PLAYERS CDATA #REQUIRED
+                DICTIONARY_ID CDATA #REQUIRED
+                >
+
+        <!ELEMENT Lang EMPTY>
+        <!ATTLIST Lang
+                ID CDATA #REQUIRED
+                NAME CDATA #REQUIRED
+                >
+
+        <!ELEMENT CAHPlayer EMPTY>
+        <!ATTLIST CAHPlayer
+                ID CDATA #REQUIRED
+                JOIN_ORDER CDATA #REQUIRED
+                GAME_ID CDATA #REQUIRED
+                USER_ID CDATA #REQUIRED
+                >
+
+        <!ELEMENT Room EMPTY>
+        <!ATTLIST Room
+                ID CDATA #REQUIRED
+                NAME CDATA #REQUIRED
+                ACTIVE CDATA #REQUIRED
+                >
+
+        <!ELEMENT Tag EMPTY>
+        <!ATTLIST Tag
+                ID CDATA #REQUIRED
+                NAME CDATA #REQUIRED
+                >
+
+        <!ELEMENT T_user EMPTY>
+        <!ATTLIST T_user
+                ID CDATA #REQUIRED
+                NAME CDATA #REQUIRED
+                ACTIVE CDATA #REQUIRED
+                LANG_ID CDATA #REQUIRED
+                >
+
+        <!ELEMENT Dictionary EMPTY>
+        <!ATTLIST Dictionary
+                ID CDATA #REQUIRED
+                NAME CDATA #REQUIRED
+                SHARED CDATA #REQUIRED
+                PUBLISHED CDATA #REQUIRED
+                LANG_ID CDATA #REQUIRED
+                CREATOR_ID CDATA #REQUIRED
+                >
+
+        <!ELEMENT Card EMPTY>
+        <!ATTLIST Card
+                ID CDATA #REQUIRED
+                TEXT CDATA #REQUIRED
+                TYPE CDATA #REQUIRED
+                DICTIONARY_ID CDATA #REQUIRED
+                >

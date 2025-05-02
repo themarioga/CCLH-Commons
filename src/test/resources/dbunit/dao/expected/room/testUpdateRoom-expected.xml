@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
+<!DOCTYPE dataset SYSTEM "src/test/resources/cahschema.dtd">
 <dataset>
-    <T_ROOM id="0" name="Otro nombre" active="false" />
-    <T_ROOM id="1" name="Second" active="true" />
+    <Room ID="0" NAME="Otro nombre" ACTIVE="false" />
+    <Room ID="1" NAME="Second" ACTIVE="true" />
 </dataset>

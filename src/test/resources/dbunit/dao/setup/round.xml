@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE dataset SYSTEM "src/test/resources/cahschema.dtd">
+<dataset>
+    <T_ROUND ID="0" TABLE_ID="0" BLACKCARD_ID="0" ROUND_NUMBER="0" STATUS="0"/>
+</dataset>

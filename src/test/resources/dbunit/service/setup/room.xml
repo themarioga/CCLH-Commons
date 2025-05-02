@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
+<!DOCTYPE dataset SYSTEM "src/test/resources/cahschema.dtd">
 <dataset>
-    <T_ROOM ID="0" NAME="First" ACTIVE="true" />
-    <T_ROOM ID="1" NAME="Second" ACTIVE="true" />
-    <T_ROOM ID="2" NAME="Third" ACTIVE="false" />
-    <T_ROOM ID="3" NAME="Fourth" ACTIVE="true" />
-    <T_ROOM ID="4" NAME="Fifth" ACTIVE="true" />
+    <Room ID="0" NAME="First" ACTIVE="true" />
+    <Room ID="1" NAME="Second" ACTIVE="true" />
+    <Room ID="2" NAME="Third" ACTIVE="false" />
+    <Room ID="3" NAME="Fourth" ACTIVE="true" />
+    <Room ID="4" NAME="Fifth" ACTIVE="true" />
 </dataset>

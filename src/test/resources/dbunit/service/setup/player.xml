@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
+<!DOCTYPE dataset SYSTEM "src/test/resources/cahschema.dtd">
 <dataset>
-    <T_PLAYER ID="10" USER_ID="0" GAME_ID="10" JOIN_ORDER="0" POINTS="0"/>
-    <T_PLAYER ID="11" USER_ID="1" GAME_ID="10" JOIN_ORDER="1" POINTS="0"/>
-    <T_PLAYER ID="12" USER_ID="3" GAME_ID="10" JOIN_ORDER="2" POINTS="0"/>
+    <CAHPlayer ID="10" USER_ID="0" GAME_ID="10" JOIN_ORDER="0" />
+    <CAHPlayer ID="11" USER_ID="1" GAME_ID="10" JOIN_ORDER="1" />
+    <CAHPlayer ID="12" USER_ID="3" GAME_ID="10" JOIN_ORDER="2" />
 </dataset>

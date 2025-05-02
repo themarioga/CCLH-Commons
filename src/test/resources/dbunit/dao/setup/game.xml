@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
+<!DOCTYPE dataset SYSTEM "src/test/resources/cahschema.dtd">
 <dataset>
-    <T_GAME ID="0" TYPE="0" PUNCTUATION_TYPE="0" N_PLAYERS="0" N_CARDS_TO_WIN="0" N_OF_ROUNDS="0" STATUS="0" ROOM_ID="0" CREATOR_ID="0" DICTIONARY_ID="0"/>
+    <CAHGame ID="0" STATUS="0" ROOM_ID="0" CREATOR_ID="0" DICTIONARY_ID="0" MAX_NUMBER_OF_PLAYERS="1" NUMBER_OF_POINTS_TO_WIN="1"
+             NUMBER_OF_ROUNDS="1" PUNCTUATION_MODE="1" VOTATION_MODE="1" />
 </dataset>

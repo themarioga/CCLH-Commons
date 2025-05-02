@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dataset>
-    <t_dictionary_collaborators user_id="0" dictionary_id="0" can_edit="true" accepted="true" />
+    <dictionary_collaborator user_id="0" dictionary_id="0" can_edit="true" accepted="true" />
 </dataset>

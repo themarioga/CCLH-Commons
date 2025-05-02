@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
+<!DOCTYPE dataset SYSTEM "src/test/resources/cahschema.dtd">
 <dataset>
-    <T_CARD ID="0" TEXT="First" TYPE="0" DICTIONARY_ID="0"/>
+    <Card ID="0" TEXT="First" TYPE="0" DICTIONARY_ID="0"/>
 </dataset>

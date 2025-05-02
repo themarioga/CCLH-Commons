@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE dataset SYSTEM "src/test/resources/schema.dtd">
+<!DOCTYPE dataset SYSTEM "src/test/resources/cahschema.dtd">
 <dataset>
-    <T_USER ID="0" NAME="Otro nombre" ACTIVE="false" LANG_ID="es"/>
-    <T_USER ID="1" NAME="Second" ACTIVE="true" LANG_ID="es"/>
+    <T_user ID="0" NAME="Otro nombre" ACTIVE="false" LANG_ID="es"/>
+    <T_user ID="1" NAME="Second" ACTIVE="true" LANG_ID="es"/>
 </dataset>

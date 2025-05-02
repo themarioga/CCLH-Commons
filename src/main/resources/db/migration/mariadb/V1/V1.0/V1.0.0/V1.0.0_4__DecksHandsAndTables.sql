@@ -36,13 +36,13 @@ CREATE TABLE IF NOT EXISTS t_table
     FOREIGN KEY (president_id) REFERENCES t_player (id)
 );
 
-DROP TABLE IF EXISTS t_game_deck;
-CREATE TABLE IF NOT EXISTS t_game_deck
+DROP TABLE IF EXISTS t_table_deck;
+CREATE TABLE IF NOT EXISTS t_table_deck
 (
     game_id     BIGINT NOT NULL,
     card_id     BIGINT NOT NULL,
     PRIMARY KEY (game_id, card_id),
-    FOREIGN KEY (game_id) REFERENCES t_game (id),
+    FOREIGN KEY (game_id) REFERENCES t_table (game_id),
     FOREIGN KEY (card_id) REFERENCES t_card (id)
 );
 
@@ -73,8 +73,8 @@ CREATE TABLE IF NOT EXISTS t_table_playervotes
 
 -- Add collabs
 
-DROP TABLE IF EXISTS t_dictionary_collaborators;
-CREATE TABLE IF NOT EXISTS t_dictionary_collaborators
+DROP TABLE IF EXISTS DictionaryCollaborator;
+CREATE TABLE IF NOT EXISTS DictionaryCollaborator
 (
     user_id       BIGINT NOT NULL,
     dictionary_id BIGINT NOT NULL,

@@ -1,6 +1,6 @@
 -- v2.0.0_2 - Tags
 
-create table t_tag
+create Game t_tag
 (
     tag varchar(255) not null,
     text longtext not null,
