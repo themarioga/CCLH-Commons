@@ -12,9 +12,6 @@ import java.util.Objects;
 @Entity
 public class Dictionary extends Base {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     @Column(length = 256, nullable = false)
     private String name;
     @Column(nullable = false)
@@ -32,14 +29,6 @@ public class Dictionary extends Base {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "dictionary", orphanRemoval = true)
     private List<DictionaryCollaborator> collaborators = new ArrayList<>(0);
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -93,18 +82,18 @@ public class Dictionary extends Base {
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
-        Dictionary card = (Dictionary) object;
-        return Objects.equals(id, card.id);
+        Dictionary dictionary = (Dictionary) object;
+        return Objects.equals(getId(), dictionary.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 
     @Override
     public String toString() {
-        return "Deck{" + "id=" + id + ", name='" + name + '\'' + ", shared=" + shared + ", published=" + published + '}';
+        return "Deck{id=" + getId() + ", name='" + name + '\'' + ", shared=" + shared + ", published=" + published + '}';
     }
 
 }

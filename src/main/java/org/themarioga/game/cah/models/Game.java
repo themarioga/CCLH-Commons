@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name = "CAHGame")
+@Entity
 public class Game extends org.themarioga.game.commons.models.Game implements Serializable {
 
     @Column(nullable = false)

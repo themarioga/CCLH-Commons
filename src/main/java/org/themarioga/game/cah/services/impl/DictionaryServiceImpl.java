@@ -17,10 +17,7 @@ import org.themarioga.game.cah.models.DictionaryCollaborator;
 import org.themarioga.game.cah.services.intf.CardService;
 import org.themarioga.game.cah.services.intf.DictionaryService;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class DictionaryServiceImpl implements DictionaryService {
@@ -61,7 +58,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         dictionaryCollaborator.setCanEdit(true);
         dictionary.getCollaborators().add(dictionaryCollaborator);
 
-        return dictionaryDao.create(dictionary);
+        return dictionaryDao.createOrUpdate(dictionary);
     }
 
     @Override
@@ -74,7 +71,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         dictionary.setName(newName);
 
-        dictionaryDao.update(dictionary);
+        dictionaryDao.createOrUpdate(dictionary);
     }
 
     @Override
@@ -84,7 +81,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         dictionary.setLang(lang);
 
-        dictionaryDao.update(dictionary);
+        dictionaryDao.createOrUpdate(dictionary);
     }
 
     @Override
@@ -100,7 +97,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         dictionary.setPublished(!dictionary.getPublished());
 
-        dictionaryDao.update(dictionary);
+        dictionaryDao.createOrUpdate(dictionary);
     }
 
     @Override
@@ -113,7 +110,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         dictionary.setShared(!dictionary.getShared());
 
-        dictionaryDao.update(dictionary);
+        dictionaryDao.createOrUpdate(dictionary);
     }
 
     @Override
@@ -143,7 +140,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         dictionaryCollaborator.setCanEdit(false);
         dictionary.getCollaborators().add(dictionaryCollaborator);
 
-        dictionaryDao.update(dictionary);
+        dictionaryDao.createOrUpdate(dictionary);
 
         return dictionaryCollaborator;
     }
@@ -196,7 +193,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public Dictionary getDictionaryById(long id) {
+    public Dictionary getDictionaryById(UUID id) {
         logger.debug("Getting dictionary with ID: {}", id);
 
         return dictionaryDao.findOne(id);
@@ -253,7 +250,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public Dictionary getDefaultDictionary() {
-        return dictionaryDao.findOne(Long.parseLong(configurationService.getConfiguration("game_default_dictionary_id")));
+        return dictionaryDao.findOne(UUID.fromString(configurationService.getConfiguration("game_default_dictionary_id")));
     }
 
     @Override

@@ -6,6 +6,7 @@ import org.themarioga.game.cah.models.Dictionary;
 import org.themarioga.game.cah.models.DictionaryCollaborator;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface DictionaryService {
 
@@ -29,7 +30,7 @@ public interface DictionaryService {
 
     void removeCollaborator(Dictionary dictionary, User user);
 
-    Dictionary getDictionaryById(long id);
+    Dictionary getDictionaryById(UUID id);
 
     List<Dictionary> getDictionariesByCreator(User creator);
 

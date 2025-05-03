@@ -21,7 +21,9 @@ import org.themarioga.game.commons.models.Player;
 import org.themarioga.game.commons.models.Room;
 import org.themarioga.game.commons.models.User;
 
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @DatabaseSetup("classpath:dbunit/dao/setup/lang.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/user.xml")
@@ -42,11 +44,11 @@ class GameDaoTest extends BaseTest {
     private DictionaryDao dictionaryDao;
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testCreateGame-expected.xml", table = "CAHGame", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testCreateGame-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void createGame() {
-        Room room = roomDao.findOne(1L);
-        User creator = userDao.findOne(1L);
-        Dictionary dictionary = dictionaryDao.findOne(0L);
+        Room room = roomDao.findOne(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        User creator = userDao.findOne(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        Dictionary dictionary = dictionaryDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         Game game = new Game();
         game.setStatus(GameStatusEnum.CREATED);
@@ -58,29 +60,29 @@ class GameDaoTest extends BaseTest {
         game.setNumberOfRounds(1);
         game.setPunctuationMode(PunctuationModeEnum.POINTS);
         game.setVotationMode(VotationModeEnum.DEMOCRACY);
+        game.setCreationDate(new Date());
 
-        gameDao.create(game);
+        game = gameDao.createOrUpdate(game);
+        getCurrentSession().flush();
 
-        Assertions.assertEquals(1L, game.getId());
-
-        playerDao.getCurrentSession().flush();
+        Assertions.assertNotNull(game.getId());
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testUpdateGame-expected.xml", table = "CAHGame", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testUpdateGame-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void updateGame() {
-        Game game = gameDao.findOne(0L);
+        Game game = gameDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
         game.setStatus(GameStatusEnum.STARTED);
 
-        gameDao.update(game);
+        gameDao.createOrUpdate(game);
         getCurrentSession().flush();
 
-        Assertions.assertEquals(0L, game.getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getId());
     }
 
     @Test
     void deleteGame() {
-        Game game = gameDao.findOne(0L);
+        Game game = gameDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         gameDao.delete(game);
 
@@ -91,21 +93,21 @@ class GameDaoTest extends BaseTest {
 
     @Test
     void findGame() {
-        Game game = gameDao.findOne(0L);
+        Game game = gameDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-        Assertions.assertEquals(0L, game.getId());
-        Assertions.assertEquals(0, game.getRoom().getId());
-        Assertions.assertEquals(0, game.getCreator().getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getRoom().getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getCreator().getId());
         Assertions.assertEquals(GameStatusEnum.CREATED, game.getStatus());
     }
 
     @Test
     void getByRoomId() {
-        Game game = (Game) gameDao.getByRoom(roomDao.findOne(0L));
+        Game game = (Game) gameDao.getByRoom(roomDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
-        Assertions.assertEquals(0L, game.getId());
-        Assertions.assertEquals(0, game.getRoom().getId());
-        Assertions.assertEquals(0, game.getCreator().getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getRoom().getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getCreator().getId());
         Assertions.assertEquals(GameStatusEnum.CREATED, game.getStatus());
     }
 
@@ -115,9 +117,9 @@ class GameDaoTest extends BaseTest {
 
         Assertions.assertEquals(1, games.size());
 
-        Assertions.assertEquals(0L, games.get(0).getId());
-        Assertions.assertEquals(0, games.get(0).getRoom().getId());
-        Assertions.assertEquals(0, games.get(0).getCreator().getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), games.get(0).getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), games.get(0).getRoom().getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), games.get(0).getCreator().getId());
         Assertions.assertEquals(GameStatusEnum.CREATED, games.get(0).getStatus());
     }
 
@@ -132,12 +134,12 @@ class GameDaoTest extends BaseTest {
     @DatabaseSetup("classpath:dbunit/dao/setup/player.xml")
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testUpdateGameDeletionVotes-expected.xml", table = "game_deletion_votes", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void addDeletionVoteToTable() {
-        Game game = gameDao.findOne(0L);
-        Player player = playerDao.findOne(0L);
+        Game game = gameDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        Player player = playerDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         game.getDeletionVotes().add(player);
 
-        gameDao.update(game);
+        gameDao.createOrUpdate(game);
         getCurrentSession().flush();
 
         Assertions.assertEquals(1, game.getDeletionVotes().size());
@@ -147,9 +149,9 @@ class GameDaoTest extends BaseTest {
     @DatabaseSetup("classpath:dbunit/dao/setup/player.xml")
     @DatabaseSetup("classpath:dbunit/dao/setup/gamedeletionvotes.xml")
     void getTableDeletionVotes() {
-        Game game = gameDao.findOne(0L);
+        Game game = gameDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-        Assertions.assertEquals(0L, game.getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getId());
 
         Assertions.assertNotNull(game.getDeletionVotes());
         Assertions.assertEquals(1, game.getDeletionVotes().size());
@@ -158,7 +160,7 @@ class GameDaoTest extends BaseTest {
     @Test
     @DatabaseSetup("classpath:dbunit/dao/setup/player.xml")
     void findPlayersInGame() {
-        Game game = gameDao.findOne(0L);
+        Game game = gameDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         Assertions.assertEquals(1, game.getPlayers().size());
     }

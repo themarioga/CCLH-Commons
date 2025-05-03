@@ -6,7 +6,7 @@ import org.themarioga.game.cah.models.DeckCard;
 
 import java.util.List;
 
-public interface PlayerService extends org.themarioga.game.commons.services.intf.PlayerService {
+public interface PlayerService extends org.themarioga.game.commons.services.intf.PlayerService<Player> {
 
     void transferWhiteCardsFromGameDeckToPlayerHand(Player player, List<DeckCard> cardsToTransfer);
 

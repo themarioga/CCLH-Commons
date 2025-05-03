@@ -26,17 +26,17 @@ class CAHServiceTest extends BaseTest {
     @Test
     @Disabled
     void completeTableTest() {
-        Game game = gameService.create(0L, "Habitación", 0L);
-        gameService.setVotationMode(game, VotationModeEnum.DEMOCRACY);
-        gameService.setNumberOfPointsToWin(game, 3);
-        gameService.setDictionary(game, 0L);
+//        Game game = gameService.create(0L, "Habitación", 0L);
+//        gameService.setVotationMode(game, VotationModeEnum.DEMOCRACY);
+//        gameService.setNumberOfPointsToWin(game, 3);
+//        gameService.setDictionary(game, 0L);
 //        tableService.addPlayer(table, playerService.create(table, 0L));
 //        tableService.addPlayer(table, playerService.create(table, 1L));
 //        tableService.addPlayer(table, playerService.create(table, 3L));
 //        tableService.startGame(table);
-        getCurrentSession().flush();
-        getCurrentSession().refresh(game);
-        gameService.startRound(game);
+//        getCurrentSession().flush();
+//        getCurrentSession().refresh(game);
+//        gameService.startRound(game);
 //        tableService.playCard(table, 0L, table.getGame().getPlayers().get(0).getHand().get(0).getCard().getId());
 //        tableService.playCard(table, 1L, table.getGame().getPlayers().get(1).getHand().get(0).getCard().getId());
 //        tableService.playCard(table, 3L, table.getGame().getPlayers().get(2).getHand().get(0).getCard().getId());
@@ -44,7 +44,7 @@ class CAHServiceTest extends BaseTest {
 //        tableService.voteForCard(table, 1L, table.getPlayedCards().get(0).getCard().getId());
 //        tableService.voteForCard(table, 3L, table.getPlayedCards().get(0).getCard().getId());
 //        gameService.endRound(game);
-        gameService.startRound(game);
+//        gameService.startRound(game);
 //        tableService.playCard(table, 0L, table.getGame().getPlayers().get(0).getHand().get(0).getCard().getId());
 //        tableService.playCard(table, 1L, table.getGame().getPlayers().get(1).getHand().get(0).getCard().getId());
 //        tableService.playCard(table, 3L, table.getGame().getPlayers().get(2).getHand().get(0).getCard().getId());

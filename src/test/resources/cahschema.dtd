@@ -1,11 +1,11 @@
 <!ELEMENT dataset (
         Configuration*,
-        CAHGame*,
+        Game*,
         Lang*,
-        CAHPlayer*,
+        Player*,
         Room*,
         Tag*,
-        T_user*,
+        Users*,
         Dictionary*,
         Card*)>
 
@@ -15,8 +15,8 @@
                 CONF_VALUE CDATA #REQUIRED
                 >
 
-        <!ELEMENT CAHGame EMPTY>
-        <!ATTLIST CAHGame
+        <!ELEMENT Game EMPTY>
+        <!ATTLIST Game
                 ID CDATA #IMPLIED
                 ROOM_ID CDATA #REQUIRED
                 CREATOR_ID CDATA #REQUIRED
@@ -27,6 +27,7 @@
                 NUMBER_OF_ROUNDS CDATA #REQUIRED
                 MAX_NUMBER_OF_PLAYERS CDATA #REQUIRED
                 DICTIONARY_ID CDATA #REQUIRED
+                CREATION_DATE CDATA #REQUIRED
                 >
 
         <!ELEMENT Lang EMPTY>
@@ -35,12 +36,13 @@
                 NAME CDATA #REQUIRED
                 >
 
-        <!ELEMENT CAHPlayer EMPTY>
-        <!ATTLIST CAHPlayer
+        <!ELEMENT Player EMPTY>
+        <!ATTLIST Player
                 ID CDATA #REQUIRED
                 JOIN_ORDER CDATA #REQUIRED
                 GAME_ID CDATA #REQUIRED
                 USER_ID CDATA #REQUIRED
+                CREATION_DATE CDATA #REQUIRED
                 >
 
         <!ELEMENT Room EMPTY>
@@ -48,6 +50,7 @@
                 ID CDATA #REQUIRED
                 NAME CDATA #REQUIRED
                 ACTIVE CDATA #REQUIRED
+                CREATION_DATE CDATA #REQUIRED
                 >
 
         <!ELEMENT Tag EMPTY>
@@ -56,12 +59,13 @@
                 NAME CDATA #REQUIRED
                 >
 
-        <!ELEMENT T_user EMPTY>
-        <!ATTLIST T_user
+        <!ELEMENT Users EMPTY>
+        <!ATTLIST Users
                 ID CDATA #REQUIRED
                 NAME CDATA #REQUIRED
                 ACTIVE CDATA #REQUIRED
                 LANG_ID CDATA #REQUIRED
+                CREATION_DATE CDATA #REQUIRED
                 >
 
         <!ELEMENT Dictionary EMPTY>
@@ -72,6 +76,7 @@
                 PUBLISHED CDATA #REQUIRED
                 LANG_ID CDATA #REQUIRED
                 CREATOR_ID CDATA #REQUIRED
+                CREATION_DATE CDATA #REQUIRED
                 >
 
         <!ELEMENT Card EMPTY>
@@ -80,4 +85,5 @@
                 TEXT CDATA #REQUIRED
                 TYPE CDATA #REQUIRED
                 DICTIONARY_ID CDATA #REQUIRED
+                CREATION_DATE CDATA #REQUIRED
                 >

@@ -14,7 +14,9 @@ import org.themarioga.game.commons.dao.intf.LanguageDao;
 import org.themarioga.game.commons.dao.intf.UserDao;
 import org.themarioga.game.commons.models.User;
 
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @DatabaseSetup("classpath:dbunit/dao/setup/lang.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/user.xml")
@@ -31,7 +33,7 @@ class DictionaryDaoTest extends BaseTest {
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/dictionary/testCreateDictionary-expected.xml", table = "dictionary", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void createDictionary() {
-        User user = userDao.findOne(0L);
+        User user = userDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         Dictionary dictionary = new Dictionary();
         dictionary.setName("Test deck");
@@ -39,30 +41,31 @@ class DictionaryDaoTest extends BaseTest {
         dictionary.setPublished(true);
         dictionary.setCreator(user);
         dictionary.setLang(languageDao.getLanguage("es"));
+        dictionary.setCreationDate(new Date());
 
-        dictionaryDao.create(dictionary);
+        dictionary = dictionaryDao.createOrUpdate(dictionary);
         getCurrentSession().flush();
 
-        Assertions.assertEquals(1L, dictionary.getId());
+        Assertions.assertNotNull(dictionary.getId());
     }
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/dictionary/testUpdateDictionary-expected.xml", table = "dictionary", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void updateDictionary() {
-        Dictionary dictionary = dictionaryDao.findOne(0L);
+        Dictionary dictionary = dictionaryDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
         dictionary.setName("Otro nombre");
         dictionary.setShared(false);
         dictionary.setPublished(false);
 
-        dictionaryDao.update(dictionary);
+        dictionaryDao.createOrUpdate(dictionary);
         getCurrentSession().flush();
 
-        Assertions.assertEquals(0L, dictionary.getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), dictionary.getId());
     }
 
     @Test
     void deleteDictionary() {
-        Dictionary dictionary = dictionaryDao.findOne(0L);
+        Dictionary dictionary = dictionaryDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         dictionaryDao.delete(dictionary);
 
@@ -73,9 +76,9 @@ class DictionaryDaoTest extends BaseTest {
 
     @Test
     void findDictionary() {
-        Dictionary dictionary = dictionaryDao.findOne(0L);
+        Dictionary dictionary = dictionaryDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-        Assertions.assertEquals(0L, dictionary.getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), dictionary.getId());
         Assertions.assertEquals("First", dictionary.getName());
         Assertions.assertEquals(true, dictionary.getShared());
         Assertions.assertEquals(true, dictionary.getPublished());
@@ -87,7 +90,7 @@ class DictionaryDaoTest extends BaseTest {
 
         Assertions.assertEquals(1, dictionaries.size());
 
-        Assertions.assertEquals(0L, dictionaries.get(0).getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), dictionaries.get(0).getId());
         Assertions.assertEquals("First", dictionaries.get(0).getName());
         Assertions.assertEquals(true, dictionaries.get(0).getShared());
         Assertions.assertEquals(true, dictionaries.get(0).getPublished());
@@ -103,8 +106,8 @@ class DictionaryDaoTest extends BaseTest {
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/dictionary/testCreateDictionaryCollaborators-expected.xml", table = "dictionary_collaborator", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void addDictionaryCollaborator() {
-        Dictionary dictionary = dictionaryDao.findOne(0L);
-        User user = userDao.findOne(0L);
+        Dictionary dictionary = dictionaryDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        User user = userDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         DictionaryCollaborator dictionaryCollaborator = new DictionaryCollaborator();
         dictionaryCollaborator.setDictionary(dictionary);
@@ -113,7 +116,7 @@ class DictionaryDaoTest extends BaseTest {
         dictionaryCollaborator.setCanEdit(true);
         dictionary.getCollaborators().add(dictionaryCollaborator);
 
-        dictionaryDao.update(dictionary);
+        dictionaryDao.createOrUpdate(dictionary);
         getCurrentSession().flush();
 
         Assertions.assertEquals(1, dictionary.getCollaborators().size());
@@ -123,10 +126,10 @@ class DictionaryDaoTest extends BaseTest {
     @DatabaseSetup("classpath:dbunit/dao/setup/dictionarycollaborators.xml")
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/dictionary/testUpdateDictionaryCollaborators-expected.xml", table = "dictionary_collaborator", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void updateDictionaryCollaborator() {
-        Dictionary dictionary = dictionaryDao.findOne(0L);
+        Dictionary dictionary = dictionaryDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
         dictionary.getCollaborators().get(0).setAccepted(false);
 
-        dictionaryDao.update(dictionary);
+        dictionaryDao.createOrUpdate(dictionary);
         getCurrentSession().flush();
 
         Assertions.assertEquals(1, dictionary.getCollaborators().size());
@@ -135,7 +138,7 @@ class DictionaryDaoTest extends BaseTest {
     @Test
     @DatabaseSetup("classpath:dbunit/dao/setup/dictionarycollaborators.xml")
     void getDictionaryCollaborators() {
-        Dictionary dictionary = dictionaryDao.findOne(0L);
+        Dictionary dictionary = dictionaryDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         Assertions.assertEquals(true, dictionary.getCollaborators().get(0).getAccepted());
     }

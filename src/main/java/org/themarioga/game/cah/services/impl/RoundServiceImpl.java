@@ -60,7 +60,7 @@ public class RoundServiceImpl implements RoundService {
             selectPlayerForRoundPresident(round);
         }
 
-        return roundDao.create(round);
+        return roundDao.createOrUpdate(round);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class RoundServiceImpl implements RoundService {
         playedCard.setCard(card);
         round.getPlayedCards().add(playedCard);
 
-        return roundDao.update(round);
+        return roundDao.createOrUpdate(round);
     }
 
     @Override
@@ -142,7 +142,7 @@ public class RoundServiceImpl implements RoundService {
         votedCard.setCard(card);
         round.getVotedCards().add(votedCard);
 
-        return roundDao.update(round);
+        return roundDao.createOrUpdate(round);
     }
 
     @Override

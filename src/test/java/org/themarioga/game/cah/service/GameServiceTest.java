@@ -20,6 +20,10 @@ import org.themarioga.game.commons.exceptions.player.PlayerDoesntExistsException
 import org.themarioga.game.commons.exceptions.room.RoomDoesntExistsException;
 import org.themarioga.game.commons.exceptions.user.UserNotActiveException;
 import org.themarioga.game.commons.models.Game;
+import org.themarioga.game.commons.models.User;
+import org.themarioga.game.commons.services.intf.UserService;
+
+import java.util.UUID;
 
 @DatabaseSetup("classpath:dbunit/service/setup/lang.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")
@@ -28,151 +32,169 @@ import org.themarioga.game.commons.models.Game;
 @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/game.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/player.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/table.xml")
 class GameServiceTest extends BaseTest {
 
+    @Autowired
+    UserService userService;
     @Autowired
     GameService gameService;
     @Autowired
     PlayerService playerService;
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testCreateGame-expected.xml", table = "CAHGame", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testCreateGame-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testCreateGame() {
-        Game game = gameService.create(2L, "Room 3", 3L);
+        User creator = userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+
+        Game game = gameService.create("Room 3", creator);
 
         Assertions.assertNotNull(game);
         Assertions.assertNotNull(game.getId());
         Assertions.assertNotNull(game.getRoom().getId());
         Assertions.assertNotNull(game.getCreator().getId());
 
-        Assertions.assertEquals(2L, game.getRoom().getId());
-        Assertions.assertEquals(3L, game.getCreator().getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getRoom().getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getCreator().getId());
         Assertions.assertEquals(GameStatusEnum.CREATED, game.getStatus());
     }
 
     @Test
     void testCreate_GameAlreadyExists() {
-        Assertions.assertThrows(GameAlreadyExistsException.class, () -> gameService.create(1L, "Room 3", 3L));
+        User creator = userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+
+        Assertions.assertThrows(GameAlreadyExistsException.class, () -> gameService.create("Room 3", creator));
     }
 
     @Test
     void testCreate_CreatorAlreadyHaveGame() {
-        Assertions.assertThrows(GameAlreadyExistsException.class, () -> gameService.create(2L, "Room 3", 1L));
+        User creator = userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+
+        Assertions.assertThrows(GameAlreadyExistsException.class, () -> gameService.create("Room 3", creator));
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testDeleteGame-expected.xml", table = "CAHGame", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testDeleteGame-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testDeleteGame() {
-        gameService.delete(gameService.getByRoomId(0L));
+        gameService.delete(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
-        Game game = gameService.getByRoomId(0L);
+        Game game = gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         Assertions.assertNull(game);
     }
 
     @Test
     void testDelete_RoomNotExists() {
-        Assertions.assertThrows(RoomDoesntExistsException.class, () -> gameService.delete(gameService.getByRoomId(70L)));
+        Assertions.assertThrows(RoomDoesntExistsException.class, () -> gameService.delete(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
     @Test
     void testDelete_GameNotExists() {
-        Assertions.assertThrows(ApplicationException.class, () -> gameService.delete(gameService.getByRoomId(4L)));
+        Assertions.assertThrows(ApplicationException.class, () -> gameService.delete(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
     @Test
     void testAddPlayer() {
-        Game game = gameService.getByRoomId(1L);
-        gameService.addPlayer(game, playerService.create(game, 4L));
+        org.themarioga.game.cah.models.Game game = gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        User creator = userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        gameService.addPlayer(game, playerService.create(game, creator));
 
         Assertions.assertEquals(1L, game.getPlayers().size());
     }
 
     @Test
     void testAddPlayer_UserNotActive() {
-        Assertions.assertThrows(UserNotActiveException.class, () -> gameService.addPlayer(gameService.getByRoomId(0L), playerService.findByUserId(2L)));
+        Assertions.assertThrows(UserNotActiveException.class, () -> gameService.addPlayer(
+                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findByUserId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
     @Test
     void testLeaveGame() {
-        Game game = gameService.removePlayer(gameService.getByRoomId(0L), playerService.findByUserId(1L));
+        Game game = gameService.removePlayer(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findByUserId(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
         Assertions.assertEquals(2L, game.getPlayers().size());
     }
 
     @Test
     void testLeaveGame_GameAlreadyStarted() {
-        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.removePlayer(gameService.getByRoomId(3L), playerService.findByUserId(0L)));
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.removePlayer(
+                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findByUserId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
     @Test
     void testLeaveGame_CreatorLeave() {
-        Assertions.assertThrows(GameCreatorCannotLeaveException.class, () -> gameService.removePlayer(gameService.getByRoomId(0L), playerService.findByUserId(0L)));
+        Assertions.assertThrows(GameCreatorCannotLeaveException.class, () -> gameService.removePlayer(
+                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findByUserId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
     @Test
     void testLeaveGame_PlayerNotInGame() {
-        Assertions.assertThrows(PlayerDoesntExistsException.class, () -> gameService.removePlayer(gameService.getByRoomId(1L), playerService.findByUserId(3L)));
+        Assertions.assertThrows(PlayerDoesntExistsException.class, () -> gameService.removePlayer(
+                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findByUserId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
     @Test
     void testStartGame_GameAlreadyStarted() {
-        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.startGame(gameService.getByRoomId(3L)));
+        Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.startGame(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
     @Test
     void testEndGame() {
-        Game game = gameService.startGame(gameService.getByRoomId(0L));
+        Game game = gameService.startGame(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
-        Assertions.assertEquals(0L, game.getRoom().getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getRoom().getId());
         Assertions.assertEquals(3, game.getPlayers().size());
         Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
 
-        game = gameService.endGame(gameService.getByRoomId(0L));
+        game = gameService.endGame(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
-        Assertions.assertEquals(0L, game.getRoom().getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getRoom().getId());
         Assertions.assertEquals(3, game.getPlayers().size());
         Assertions.assertEquals(GameStatusEnum.ENDING, game.getStatus());
     }
 
     @Test
     void testVoteDeletion_vote() {
-        gameService.startGame(gameService.getByRoomId(0L));
-        Game game = gameService.voteForDeletion(gameService.getByRoomId(0L), 0L);
+        gameService.startGame(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+        Game game = gameService.voteForDeletion(
+                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
         Assertions.assertNotNull(game);
         Assertions.assertNotNull(game.getDeletionVotes().get(0));
-        Assertions.assertEquals(10L, game.getDeletionVotes().get(0).getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getDeletionVotes().get(0).getId());
     }
 
     @Test
     void testVoteDeletion_delete() {
-        gameService.startGame(gameService.getByRoomId(0L));
-        gameService.voteForDeletion(gameService.getByRoomId(0L), 1L);
-        Game game = gameService.voteForDeletion(gameService.getByRoomId(0L), 0L);
+        gameService.startGame(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+        gameService.voteForDeletion(
+                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+        Game game = gameService.voteForDeletion(
+                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
         Assertions.assertNotNull(game);
         Assertions.assertNotNull(game.getDeletionVotes().get(0));
-        Assertions.assertEquals(11L, game.getDeletionVotes().get(0).getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getDeletionVotes().get(0).getId());
         Assertions.assertEquals(GameStatusEnum.DELETING, game.getStatus());
     }
 
     @Test
     void testLeaveGame_GameNotStarted() {
-        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.voteForDeletion(gameService.getByRoomId(0L), 0L));
+        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.voteForDeletion(
+                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
     @Test
     void testVoteDeletion_PlayerAlreadyVoted() {
-        gameService.startGame(gameService.getByRoomId(0L));
-        gameService.voteForDeletion(gameService.getByRoomId(0L), 1L);
+        gameService.startGame(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+        gameService.voteForDeletion(
+                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
-        Assertions.assertThrows(PlayerAlreadyVotedDeleteException.class, () -> gameService.voteForDeletion(gameService.getByRoomId(0L), 1L));
+        Assertions.assertThrows(PlayerAlreadyVotedDeleteException.class, () -> gameService.voteForDeletion(
+                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameNumberPlayers-expected.xml", table = "T_GAME", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameNumberPlayers-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetMaxNumberOfPlayers() {
 //        Table table = tableService.setMaxNumberOfPlayers(tableService.getByRoomId(0L), 5);
 //
@@ -187,8 +209,8 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/service/setup/tableplayedcards.xml")
-    @DatabaseSetup("classpath:dbunit/service/setup/tableplayervotes.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/roundplayedcards.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/roundplayervotes.xml")
     void testGetMostVotedCard() {
 //        PlayedCard mostVotedCard = gameService.get(10L);
 //

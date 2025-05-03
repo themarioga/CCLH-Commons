@@ -30,13 +30,13 @@ import org.themarioga.game.commons.models.Player;
 import org.themarioga.game.commons.models.Room;
 import org.themarioga.game.commons.models.User;
 import org.themarioga.game.commons.services.intf.ConfigurationService;
-import org.themarioga.game.commons.services.intf.PlayerService;
 import org.themarioga.game.commons.services.intf.RoomService;
 import org.themarioga.game.commons.services.intf.UserService;
 import org.themarioga.game.commons.util.Assert;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class GameServiceImpl implements GameService {
@@ -46,17 +46,15 @@ public class GameServiceImpl implements GameService {
     private final GameDao gameDao;
     private final UserService userService;
     private final RoomService roomService;
-    private final PlayerService playerService;
     private final RoundService roundService;
     private final DictionaryService dictionaryService;
     private final ConfigurationService configurationService;
 
     @Autowired
-    public GameServiceImpl(GameDao gameDao, UserService userService, RoomService roomService, PlayerService playerService, RoundService roundService, DictionaryService dictionaryService, ConfigurationService configurationService) {
+    public GameServiceImpl(GameDao gameDao, UserService userService, RoomService roomService, RoundService roundService, DictionaryService dictionaryService, ConfigurationService configurationService) {
         this.gameDao = gameDao;
         this.userService = userService;
         this.roomService = roomService;
-        this.playerService = playerService;
         this.roundService = roundService;
         this.dictionaryService = dictionaryService;
         this.configurationService = configurationService;
@@ -64,20 +62,17 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public Game create(long roomId, String roomName, long creatorId) {
-        logger.debug("Creating game for room {}", roomId);
+    public Game create(String roomName, User creator) {
+        logger.debug("Creating game for room {}", roomName);
 
         // Create or load room
-        Room room = roomService.createOrReactivate(roomId, roomName);
+        Room room = roomService.createOrReactivate(roomName);
 
         // Check if a game already exists in this room
-        if (gameDao.countByRoom(roomService.getById(roomId)) > 0) throw new GameAlreadyExistsException();
+        if (gameDao.countByRoom(room) > 0) throw new GameAlreadyExistsException();
 
         // Check if this user already have a running game
-        if (gameDao.countByCreator(userService.getById(creatorId)) > 0) throw new GameAlreadyExistsException();
-
-        // Get the creator
-        User creator = userService.getById(creatorId);
+        if (gameDao.countByCreator(creator) > 0) throw new GameAlreadyExistsException();
 
         // Check if the creator exists
         Assert.assertNotNull(creator, ErrorEnum.USER_NOT_FOUND);
@@ -97,25 +92,25 @@ public class GameServiceImpl implements GameService {
         game.setCreationDate(new Date());
         game.setMaxNumberOfPlayers(getDefaultMaxNumberOfPlayers());
 
-        return gameDao.create(game);
+        return gameDao.createOrUpdate(game);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public org.themarioga.game.commons.models.Game delete(org.themarioga.game.commons.models.Game game) {
+    public Game delete(Game game) {
         logger.debug("Deleting game: {}", game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
-        gameDao.delete((Game) game);
+        gameDao.delete(game);
 
         return game;
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public org.themarioga.game.commons.models.Game setStatus(org.themarioga.game.commons.models.Game game, GameStatusEnum gameStatusEnum) {
+    public Game setStatus(Game game, GameStatusEnum gameStatusEnum) {
         logger.debug("Setting status {} to game: {}", gameStatusEnum, game);
 
         // Check game exists
@@ -124,7 +119,7 @@ public class GameServiceImpl implements GameService {
         // Set the status
         game.setStatus(gameStatusEnum);
 
-        return gameDao.update((Game) game);
+        return gameDao.createOrUpdate(game);
     }
 
     @Override
@@ -141,7 +136,7 @@ public class GameServiceImpl implements GameService {
         // Set the type to game
         game.setVotationMode(type);
 
-        return gameDao.update(game);
+        return gameDao.createOrUpdate(game);
     }
 
     @Override
@@ -162,7 +157,7 @@ public class GameServiceImpl implements GameService {
         // Set the max number of players
         game.setMaxNumberOfPlayers(maxNumberOfPlayers);
 
-        return gameDao.update(game);
+        return gameDao.createOrUpdate(game);
     }
 
     @Override
@@ -182,7 +177,7 @@ public class GameServiceImpl implements GameService {
         // Set the number of cards to win
         game.setNumberOfPointsToWin(numberOfCards);
 
-        return gameDao.update(game);
+        return gameDao.createOrUpdate(game);
     }
 
     @Override
@@ -202,13 +197,13 @@ public class GameServiceImpl implements GameService {
         // Set the number of cards to win
         game.setNumberOfRounds(numberOfRoundsToEnd);
 
-        return gameDao.update(game);
+        return gameDao.createOrUpdate(game);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public Game setDictionary(Game game, long dictionaryId) {
-        logger.debug("Setting dictionary {} to game {}", dictionaryId, game);
+    public Game setDictionary(Game game, Dictionary dictionary) {
+        logger.debug("Setting dictionary {} to game {}", dictionary, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
@@ -216,21 +211,18 @@ public class GameServiceImpl implements GameService {
         // Check if the game has already started
         if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
 
-        // Find the dictionary
-        Dictionary dictionary = dictionaryService.getDictionaryById(dictionaryId);
-
         // Check if the dictionary exists
         if (dictionary == null) throw new DictionaryDoesntExistsException();
 
         // Set the dictionary
         game.setDictionary(dictionary);
 
-        return gameDao.update(game);
+        return gameDao.createOrUpdate(game);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public org.themarioga.game.commons.models.Game addPlayer(org.themarioga.game.commons.models.Game game, Player player) {
+    public Game addPlayer(Game game, Player player) {
         logger.debug("Adding player {} to game {}", player, game);
 
         // Check game exists
@@ -242,12 +234,12 @@ public class GameServiceImpl implements GameService {
         // Add player to game
         game.getPlayers().add(player);
 
-        return gameDao.update((Game) game);
+        return gameDao.createOrUpdate(game);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public org.themarioga.game.commons.models.Game removePlayer(org.themarioga.game.commons.models.Game game, Player player) {
+    public Game removePlayer(Game game, Player player) {
         logger.debug("Removing player from user {} in game {}", player, game);
 
         // Check game exists
@@ -271,12 +263,12 @@ public class GameServiceImpl implements GameService {
         // Remove a player
         game.getPlayers().removeIf(p -> Objects.equals(p.getId(), player.getId()));
 
-        return gameDao.update((Game) game);
+        return gameDao.createOrUpdate(game);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public org.themarioga.game.commons.models.Game startGame(org.themarioga.game.commons.models.Game game) {
+    public Game startGame(Game game) {
         logger.debug("Starting game in room {}", game);
 
         // Check game exists
@@ -288,12 +280,12 @@ public class GameServiceImpl implements GameService {
         // Change game status
         game.setStatus(GameStatusEnum.STARTED);
 
-        return gameDao.update((Game) game);
+        return gameDao.createOrUpdate(game);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public org.themarioga.game.commons.models.Game endGame(org.themarioga.game.commons.models.Game game) {
+    public Game endGame(Game game) {
         logger.debug("Ending game {}", game);
 
         // Check game exists
@@ -302,13 +294,13 @@ public class GameServiceImpl implements GameService {
         // Set the ended status
         game.setStatus(GameStatusEnum.ENDING);
 
-        return gameDao.update((Game) game);
+        return gameDao.createOrUpdate(game);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public org.themarioga.game.commons.models.Game voteForDeletion(org.themarioga.game.commons.models.Game game, long userId) {
-        logger.debug("Player {} vote for the deletion of the game {}", userId, game);
+    public Game voteForDeletion(Game game, Player player) {
+        logger.debug("Player {} vote for the deletion of the game {}", player, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
@@ -316,9 +308,6 @@ public class GameServiceImpl implements GameService {
         // Check if game is started
         if (game.getStatus() != GameStatusEnum.STARTED)
             throw new GameNotStartedException();
-
-        // Get the player
-        Player player = playerService.findByUserId(userId);
 
         // Check player exists
         Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
@@ -335,7 +324,7 @@ public class GameServiceImpl implements GameService {
             game.setStatus(GameStatusEnum.DELETING);
         }
 
-        return gameDao.update((Game) game);
+        return gameDao.createOrUpdate(game);
     }
 
     @Override
@@ -356,7 +345,7 @@ public class GameServiceImpl implements GameService {
             game.setCurrentRound(roundService.createRound(game, game.getCurrentRound().getRoundNumber() + 1));
         }
 
-        return gameDao.update(game);
+        return gameDao.createOrUpdate(game);
     }
 
     @Override
@@ -368,18 +357,18 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public org.themarioga.game.commons.models.Game getByRoom(Room room) {
+    public Game getByRoom(Room room) {
         logger.debug("Getting game with room: {}", room);
 
-        return gameDao.getByRoom(room);
+        return (Game) gameDao.getByRoom(room);
     }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public org.themarioga.game.commons.models.Game getByRoomId(long roomId) {
+    public Game getByRoomId(UUID roomId) {
         logger.debug("Getting game with room id: {}", roomId);
 
-        return gameDao.getByRoom(roomService.getById(roomId));
+        return (Game) gameDao.getByRoom(roomService.getById(roomId));
     }
 
     private VotationModeEnum getDefaultGameMode() {

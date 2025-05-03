@@ -18,6 +18,7 @@ import org.themarioga.game.cah.services.intf.CardService;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CardServiceImpl implements CardService {
@@ -52,7 +53,7 @@ public class CardServiceImpl implements CardService {
         card.setType(type);
         card.setCreationDate(new Date());
 
-        return cardDao.create(card);
+        return cardDao.createOrUpdate(card);
     }
 
     @Override
@@ -68,7 +69,7 @@ public class CardServiceImpl implements CardService {
 
         card.setText(newText);
 
-        cardDao.update(card);
+        cardDao.createOrUpdate(card);
     }
 
     @Override
@@ -81,7 +82,7 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public Card getCardById(long id) {
+    public Card getCardById(UUID id) {
         logger.debug("Getting card with ID: {}", id);
 
         return cardDao.findOne(id);

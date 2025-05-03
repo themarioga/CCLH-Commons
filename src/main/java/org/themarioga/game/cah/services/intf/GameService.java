@@ -1,11 +1,12 @@
 package org.themarioga.game.cah.services.intf;
 
 import org.themarioga.game.cah.enums.VotationModeEnum;
+import org.themarioga.game.cah.models.Dictionary;
 import org.themarioga.game.cah.models.Game;
 
-public interface GameService extends org.themarioga.game.commons.services.intf.GameService {
+import java.util.UUID;
 
-    Game create(long roomId, String roomName, long creatorId);
+public interface GameService extends org.themarioga.game.commons.services.intf.GameService<Game> {
 
     Game setVotationMode(Game game, VotationModeEnum type);
 
@@ -15,7 +16,7 @@ public interface GameService extends org.themarioga.game.commons.services.intf.G
 
     Game setNumberOfRoundsToEnd(Game game, int numberOfRoundsToEnd);
 
-    Game setDictionary(Game game, long dictionaryId);
+    Game setDictionary(Game game, Dictionary dictionary);
 
     Game startRound(Game game);
 

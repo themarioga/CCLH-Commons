@@ -13,7 +13,9 @@ import org.themarioga.game.cah.enums.CardTypeEnum;
 import org.themarioga.game.cah.models.Card;
 import org.themarioga.game.cah.models.Dictionary;
 
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @DatabaseSetup("classpath:dbunit/dao/setup/lang.xml")
 @DatabaseSetup("classpath:dbunit/dao/setup/user.xml")
@@ -29,34 +31,36 @@ class CardDaoTest extends BaseTest {
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/card/testCreateCard-expected.xml", table = "Card", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void createCard() {
-        Dictionary dictionary = dictionaryDao.findOne(0L);
+        Dictionary dictionary = dictionaryDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         Card card = new Card();
         card.setText("Test card");
         card.setType(CardTypeEnum.WHITE);
         card.setDictionary(dictionary);
+        card.setCreationDate(new Date());
 
-        cardDao.create(card);
+        card = cardDao.createOrUpdate(card);
+        getCurrentSession().flush();
 
-        Assertions.assertEquals(1L, card.getId());
+        Assertions.assertNotNull(card.getId());
     }
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/card/testUpdateCard-expected.xml", table = "Card", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void updateCard() {
-        Card card = cardDao.findOne(0L);
+        Card card = cardDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
         card.setText("Test card");
         card.setType(CardTypeEnum.WHITE);
 
-        cardDao.update(card);
+        cardDao.createOrUpdate(card);
         getCurrentSession().flush();
 
-        Assertions.assertEquals(0L, card.getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), card.getId());
     }
 
     @Test
     void deleteCard() {
-        Card card = cardDao.findOne(0L);
+        Card card = cardDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         cardDao.delete(card);
 
@@ -67,12 +71,12 @@ class CardDaoTest extends BaseTest {
 
     @Test
     void findCard() {
-        Card card = cardDao.findOne(0L);
+        Card card = cardDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-        Assertions.assertEquals(0L, card.getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), card.getId());
         Assertions.assertEquals("First", card.getText());
         Assertions.assertEquals(CardTypeEnum.BLACK, card.getType());
-        Assertions.assertEquals(0, card.getDictionary().getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), card.getDictionary().getId());
     }
 
     @Test
@@ -81,10 +85,10 @@ class CardDaoTest extends BaseTest {
 
         Assertions.assertEquals(1, cards.size());
 
-        Assertions.assertEquals(0L, cards.get(0).getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), cards.get(0).getId());
         Assertions.assertEquals("First", cards.get(0).getText());
         Assertions.assertEquals(CardTypeEnum.BLACK, cards.get(0).getType());
-        Assertions.assertEquals(0, cards.get(0).getDictionary().getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), cards.get(0).getDictionary().getId());
     }
 
     @Test
@@ -97,7 +101,7 @@ class CardDaoTest extends BaseTest {
     @Test
     @DatabaseSetup("classpath:dbunit/dao/setup/card.xml")
     void testFindCardsByDictionaryIdAndType() {
-        Dictionary dictionary = dictionaryDao.findOne(0L);
+        Dictionary dictionary = dictionaryDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         List<Card> cards = cardDao.findCardsByDictionaryIdAndType(dictionary, CardTypeEnum.BLACK);
         int cardNumber = cardDao.countCardsByDictionaryIdAndType(dictionary, CardTypeEnum.BLACK);

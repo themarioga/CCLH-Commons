@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE dataset SYSTEM "src/test/resources/cahschema.dtd">
 <dataset>
-    <T_user ID="0" NAME="First" ACTIVE="true" LANG_ID="es"/>
-    <T_user ID="1" NAME="Second" ACTIVE="true" LANG_ID="es"/>
-    <T_user ID="2" NAME="Third" ACTIVE="false" LANG_ID="es"/>
-    <T_user ID="3" NAME="Fourth" ACTIVE="true" LANG_ID="es"/>
-    <T_user ID="4" NAME="Fifth" ACTIVE="true" LANG_ID="es"/>
-    <T_user ID="5" NAME="Sixth" ACTIVE="true" LANG_ID="es"/>
-    <T_user ID="6" NAME="Seventh" ACTIVE="true" LANG_ID="es"/>
+    <Users ID="00000000-0000-0000-0000-000000000000" NAME="First" ACTIVE="true" LANG_ID="es" CREATION_DATE="[now]"/>
+    <Users ID="11111111-1111-1111-1111-111111111111" NAME="Second" ACTIVE="true" LANG_ID="es" CREATION_DATE="[now]"/>
+    <Users ID="22222222-2222-2222-2222-222222222222" NAME="Third" ACTIVE="false" LANG_ID="es" CREATION_DATE="[now]"/>
+    <Users ID="33333333-3333-3333-3333-333333333333" NAME="Fourth" ACTIVE="true" LANG_ID="es" CREATION_DATE="[now]"/>
+    <Users ID="44444444-4444-4444-4444-444444444444" NAME="Fifth" ACTIVE="true" LANG_ID="es" CREATION_DATE="[now]"/>
+    <Users ID="55555555-5555-5555-5555-555555555555" NAME="Sixth" ACTIVE="true" LANG_ID="es" CREATION_DATE="[now]"/>
+    <Users ID="66666666-6666-6666-6666-666666666666" NAME="Seventh" ACTIVE="true" LANG_ID="es" CREATION_DATE="[now]"/>
 </dataset>

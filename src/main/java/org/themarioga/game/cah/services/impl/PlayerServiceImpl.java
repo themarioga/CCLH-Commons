@@ -26,6 +26,7 @@ import org.themarioga.game.commons.util.Assert;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class PlayerServiceImpl implements PlayerService {
@@ -43,8 +44,8 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public org.themarioga.game.commons.models.Player create(Game game, long userId) {
-        logger.debug("Creating player from user {} in game {}", userId, game);
+    public Player create(Game game, User user) {
+        logger.debug("Creating player from user {} in game {}", user, game);
 
         // Check game is not null
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
@@ -54,12 +55,6 @@ public class PlayerServiceImpl implements PlayerService {
             throw new GameAlreadyStartedException();
 
         // Check user is not null
-        Assert.assertNotNull(userId, ErrorEnum.USER_NOT_FOUND);
-
-        // Get the user
-        User user = userService.getById(userId);
-
-        // Check user exists
         Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
 
         // Check if the user is already playing
@@ -72,15 +67,15 @@ public class PlayerServiceImpl implements PlayerService {
         player.setUser(user);
         player.setJoinOrder(game.getPlayers().size());
         player.setCreationDate(new Date());
-        return playerDao.create(player);
+        return playerDao.createOrUpdate(player);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public void delete(org.themarioga.game.commons.models.Player player) {
+    public void delete(Player player) {
         logger.debug("Delete player {}", player);
 
-        playerDao.delete((Player) player);
+        playerDao.delete(player);
     }
 
     @Override
@@ -96,7 +91,7 @@ public class PlayerServiceImpl implements PlayerService {
             player.getHand().add(playerHandCard);
         }
 
-        playerDao.update(player);
+        playerDao.createOrUpdate(player);
     }
 
     @Override
@@ -106,7 +101,7 @@ public class PlayerServiceImpl implements PlayerService {
 
         player.setPoints(player.getPoints() + 1);
 
-        playerDao.update(player);
+        playerDao.createOrUpdate(player);
     }
 
     @Override
@@ -120,12 +115,12 @@ public class PlayerServiceImpl implements PlayerService {
             throw new PlayerCannotPlayCardException();
 
         player.getHand().remove(cards.get());
-        playerDao.update(player);
+        playerDao.createOrUpdate(player);
     }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public org.themarioga.game.commons.models.Player findById(long id) {
+    public Player findById(UUID id) {
         logger.debug("Getting player with ID: {}", id);
 
         return playerDao.findOne(id);
@@ -133,18 +128,18 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public org.themarioga.game.commons.models.Player findByUser(User user) {
+    public Player findByUser(User user) {
         logger.debug("Getting player with user: {}", user);
 
-        return playerDao.findPlayerByUser(user);
+        return (Player) playerDao.findPlayerByUser(user);
     }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public org.themarioga.game.commons.models.Player findByUserId(long id) {
-        logger.debug("Getting player with user ID: {}", id);
+    public Player findByUserId(UUID userId) {
+        logger.debug("Getting player with user ID: {}", userId);
 
-        return playerDao.findPlayerByUser(userService.getById(id));
+        return (Player) playerDao.findPlayerByUser(userService.getById(userId));
     }
 
 }

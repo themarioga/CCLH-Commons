@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE dataset SYSTEM "src/test/resources/cahschema.dtd">
 <dataset>
-    <card id="0" text="First" type="0" dictionary_id="0"/>
-    <card id="1" text="Test card" type="1" dictionary_id="0"/>
+    <card text="First" type="0" dictionary_id="00000000-0000-0000-0000-000000000000"/>
+    <card text="Test card" type="1" dictionary_id="00000000-0000-0000-0000-000000000000"/>
 </dataset>

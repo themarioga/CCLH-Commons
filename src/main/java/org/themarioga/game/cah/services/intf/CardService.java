@@ -8,6 +8,7 @@ import org.themarioga.game.cah.models.Card;
 import org.themarioga.game.cah.models.Dictionary;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface CardService {
 
@@ -17,7 +18,7 @@ public interface CardService {
 
     void delete(Card card);
 
-    Card getCardById(long id);
+    Card getCardById(UUID id);
 
     List<Card> findCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum);
 

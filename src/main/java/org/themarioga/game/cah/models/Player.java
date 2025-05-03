@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name = "CAHPlayer")
+@Entity(name = "Player")
 public class Player extends org.themarioga.game.commons.models.Player implements Serializable {
 
     @Column

@@ -9,9 +9,6 @@ import java.util.Objects;
 @Entity
 public class Card extends Base {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     @Column(length = 1, nullable = false)
     private CardTypeEnum type;
     @Column(length = 256, nullable = false)
@@ -20,14 +17,6 @@ public class Card extends Base {
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn()
     private Dictionary dictionary;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public CardTypeEnum getType() {
         return type;
@@ -58,17 +47,17 @@ public class Card extends Base {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         Card card = (Card) object;
-        return Objects.equals(id, card.id);
+        return Objects.equals(getId(), card.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 
     @Override
     public String toString() {
-        return "Card{" + "id=" + id + ", type=" + type + ", text='" + text + '\'' + '}';
+        return "Card{id=" + getId() + ", type=" + type + ", text='" + text + '\'' + '}';
     }
 
 }
