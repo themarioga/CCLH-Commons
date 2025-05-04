@@ -20,12 +20,10 @@ import org.themarioga.game.cah.services.intf.RoundService;
 import org.themarioga.game.commons.enums.ErrorEnum;
 import org.themarioga.game.commons.enums.GameStatusEnum;
 import org.themarioga.game.commons.exceptions.ApplicationException;
-import org.themarioga.game.commons.exceptions.game.GameAlreadyExistsException;
-import org.themarioga.game.commons.exceptions.game.GameAlreadyStartedException;
-import org.themarioga.game.commons.exceptions.game.GameCreatorCannotLeaveException;
-import org.themarioga.game.commons.exceptions.game.GameNotStartedException;
+import org.themarioga.game.commons.exceptions.game.*;
 import org.themarioga.game.commons.exceptions.player.PlayerAlreadyVotedDeleteException;
 import org.themarioga.game.commons.exceptions.player.PlayerDoesntExistsException;
+import org.themarioga.game.commons.exceptions.room.RoomAlreadyExistsException;
 import org.themarioga.game.commons.models.Player;
 import org.themarioga.game.commons.models.Room;
 import org.themarioga.game.commons.models.User;
@@ -44,16 +42,14 @@ public class GameServiceImpl implements GameService {
     private final Logger logger = LoggerFactory.getLogger(GameServiceImpl.class);
 
     private final GameDao gameDao;
-    private final UserService userService;
     private final RoomService roomService;
     private final RoundService roundService;
     private final DictionaryService dictionaryService;
     private final ConfigurationService configurationService;
 
     @Autowired
-    public GameServiceImpl(GameDao gameDao, UserService userService, RoomService roomService, RoundService roundService, DictionaryService dictionaryService, ConfigurationService configurationService) {
+    public GameServiceImpl(GameDao gameDao, RoomService roomService, RoundService roundService, DictionaryService dictionaryService, ConfigurationService configurationService) {
         this.gameDao = gameDao;
-        this.userService = userService;
         this.roomService = roomService;
         this.roundService = roundService;
         this.dictionaryService = dictionaryService;
@@ -66,13 +62,21 @@ public class GameServiceImpl implements GameService {
         logger.debug("Creating game for room {}", roomName);
 
         // Create or load room
-        Room room = roomService.createOrReactivate(roomName);
+        Room room;
+        try {
+            room = roomService.createOrReactivate(roomName);
+        } catch (RoomAlreadyExistsException e) {
+            room = roomService.getRoomName(roomName);
+        }
+
+        // Check if the room exists
+        Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
 
         // Check if a game already exists in this room
         if (gameDao.countByRoom(room) > 0) throw new GameAlreadyExistsException();
 
         // Check if this user already have a running game
-        if (gameDao.countByCreator(creator) > 0) throw new GameAlreadyExistsException();
+        if (gameDao.countByCreator(creator) > 0) throw new GameCreatorAlreadyExistsException();
 
         // Check if the creator exists
         Assert.assertNotNull(creator, ErrorEnum.USER_NOT_FOUND);
@@ -380,7 +384,7 @@ public class GameServiceImpl implements GameService {
     }
 
     private int getDefaultGameLength() {
-        return Integer.parseInt(configurationService.getConfiguration("game_default_game_legth"));
+        return Integer.parseInt(configurationService.getConfiguration("game_default_game_length"));
     }
 
     private int getMinNumberOfPlayers() {

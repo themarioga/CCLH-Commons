@@ -38,7 +38,7 @@ class PlayerServiceTest extends BaseTest {
     @Test
     void testCreate() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-        User user = userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        User user = userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444"));
 
         Player player = playerService.create(game, user);
 
@@ -59,8 +59,6 @@ class PlayerServiceTest extends BaseTest {
     void testCreate_Duplicated() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
         User user = userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
-
-        playerService.create(game, user);
 
         Assertions.assertThrows(PlayerAlreadyExistsException.class, () -> playerService.create(game, user));
     }
