@@ -29,7 +29,6 @@ import org.themarioga.game.commons.models.Room;
 import org.themarioga.game.commons.models.User;
 import org.themarioga.game.commons.services.intf.ConfigurationService;
 import org.themarioga.game.commons.services.intf.RoomService;
-import org.themarioga.game.commons.services.intf.UserService;
 import org.themarioga.game.commons.util.Assert;
 
 import java.util.Date;
@@ -66,7 +65,7 @@ public class GameServiceImpl implements GameService {
         try {
             room = roomService.createOrReactivate(roomName);
         } catch (RoomAlreadyExistsException e) {
-            room = roomService.getRoomName(roomName);
+            room = roomService.getByName(roomName);
         }
 
         // Check if the room exists
@@ -155,7 +154,11 @@ public class GameServiceImpl implements GameService {
         if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
 
         // Check if the game has more players than the max we want to set
-        if (game.getMaxNumberOfPlayers() < game.getPlayers().size())
+        if (maxNumberOfPlayers < game.getPlayers().size())
+            throw new GameAlreadyFilledException();
+
+        // Check if max number of players is less than min
+        if (maxNumberOfPlayers < getMinNumberOfPlayers())
             throw new GameAlreadyFilledException();
 
         // Set the max number of players
@@ -212,11 +215,11 @@ public class GameServiceImpl implements GameService {
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
+        // Check game exists
+        Assert.assertNotNull(dictionary, ErrorEnum.DICTIONARY_NOT_FOUND);
+
         // Check if the game has already started
         if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
-
-        // Check if the dictionary exists
-        if (dictionary == null) throw new DictionaryDoesntExistsException();
 
         // Set the dictionary
         game.setDictionary(dictionary);
@@ -234,6 +237,10 @@ public class GameServiceImpl implements GameService {
 
         // Check player exists
         Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+
+        // Check if game is already filled
+        if (game.getPlayers().size() + 1 > game.getMaxNumberOfPlayers())
+            throw new GameAlreadyFilledException();
 
         // Add player to game
         game.getPlayers().add(player);
@@ -315,6 +322,10 @@ public class GameServiceImpl implements GameService {
 
         // Check player exists
         Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+
+        // Check player if from this game
+        if (!game.getPlayers().contains(player))
+            throw new PlayerDoesntExistsException();
 
         // Check player not voted already
         if (game.getDeletionVotes().contains(player))
