@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.game.cah.dao.intf.GameDao;
 import org.themarioga.game.cah.enums.PunctuationModeEnum;
 import org.themarioga.game.cah.enums.VotationModeEnum;
-import org.themarioga.game.cah.exceptions.dictionary.DictionaryDoesntExistsException;
 import org.themarioga.game.cah.exceptions.game.GameAlreadyFilledException;
 import org.themarioga.game.cah.exceptions.game.GameNotFilledException;
 import org.themarioga.game.cah.models.Game;
@@ -288,8 +287,19 @@ public class GameServiceImpl implements GameService {
         // Check the status of the game
         if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
 
+        // Check the players are more than min
+        if (game.getPlayers().size() < getMinNumberOfPlayers())
+            throw new GameNotFilledException();
+
+        // Check the players are less than max
+        if (game.getPlayers().size() > game.getMaxNumberOfPlayers())
+            throw new GameAlreadyFilledException();
+
         // Change game status
         game.setStatus(GameStatusEnum.STARTED);
+
+        // Transfer cards to deck
+        gameDao.transferCardsFromDictionaryToDeck(game);
 
         return gameDao.createOrUpdate(game);
     }
@@ -301,6 +311,10 @@ public class GameServiceImpl implements GameService {
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Only started games can end
+        if (game.getStatus() != GameStatusEnum.STARTED)
+            throw new GameNotStartedException();
 
         // Set the ended status
         game.setStatus(GameStatusEnum.ENDING);
@@ -350,8 +364,8 @@ public class GameServiceImpl implements GameService {
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check the number of players in the game
-        if (game.getPlayers().size() < getMinNumberOfPlayers())
-            throw new GameNotFilledException();
+        if (game.getStatus() != GameStatusEnum.STARTED)
+            throw new GameNotStartedException();
 
         // Create the next round
         if (game.getCurrentRound() == null) { // If it's a new round
@@ -361,13 +375,6 @@ public class GameServiceImpl implements GameService {
         }
 
         return gameDao.createOrUpdate(game);
-    }
-
-    @Override
-    public void transferCardsFromDictionaryToDeck(Game game) {
-        logger.debug("Transferring cards from dictionary to deck in game {}", game);
-
-        gameDao.transferCardsFromDictionaryToDeck(game);
     }
 
     @Override

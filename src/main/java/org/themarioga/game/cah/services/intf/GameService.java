@@ -20,6 +20,4 @@ public interface GameService extends org.themarioga.game.commons.services.intf.G
 
     Game startRound(Game game);
 
-    void transferCardsFromDictionaryToDeck(Game game);
-
 }

@@ -27,6 +27,7 @@ import org.themarioga.game.commons.exceptions.room.RoomDoesntExistsException;
 import org.themarioga.game.commons.exceptions.user.UserNotActiveException;
 import org.themarioga.game.commons.models.User;
 import org.themarioga.game.commons.services.intf.UserService;
+import org.themarioga.game.commons.util.Assert;
 
 import java.util.UUID;
 
@@ -256,21 +257,28 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @Disabled
     void testStartGame() {
-        gameService.startGame(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+        Game game = gameService.startGame(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getRoom().getId());
+        Assertions.assertEquals(3, game.getPlayers().size());
+        Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
     }
 
     @Test
-    @Disabled
     void testStartGame_GameAlreadyStarted() {
         Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.startGame(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333"))));
     }
 
     @Test
-    @Disabled
     void testStartGame_GameNotFilled() {
-        Assertions.assertThrows(GameNotFilledException.class, () -> gameService.startGame(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+        Assertions.assertThrows(GameNotFilledException.class, () -> gameService.startGame(gameService.getByRoomId(UUID.fromString("11111111-1111-1111-1111-111111111111"))));
+    }
+
+    @Test
+    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
+    void testStartGame_GameOverflowed() {
+        Assertions.assertThrows(GameAlreadyFilledException.class, () -> gameService.startGame(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
     @Test
@@ -319,17 +327,23 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testEndGame() {
-        Game game = gameService.startGame(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+        Game game = gameService.endGame(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
 
-        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getRoom().getId());
-        Assertions.assertEquals(3, game.getPlayers().size());
-        Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
-
-        game = gameService.endGame(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-
-        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), game.getRoom().getId());
-        Assertions.assertEquals(3, game.getPlayers().size());
+        Assertions.assertEquals(UUID.fromString("33333333-3333-3333-3333-333333333333"), game.getRoom().getId());
         Assertions.assertEquals(GameStatusEnum.ENDING, game.getStatus());
+    }
+
+    @Test
+    void testEndGame_GameNotStarted() {
+        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.endGame(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+    }
+
+    @Test
+    @Disabled
+    void testStartRound() {
+        Game game = gameService.startRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+        Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
     }
 
 }
