@@ -38,6 +38,7 @@ public class RoundServiceImpl implements RoundService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Round createRound(Game game, int roundNumber) {
         logger.debug("Creating round for game {}", game);
 
@@ -55,7 +56,7 @@ public class RoundServiceImpl implements RoundService {
 
         // Set current president if needed
         if (game.getVotationMode() == VotationModeEnum.DICTATORSHIP) {
-            round.setRoundPresident((Player) playerService.findByUser(game.getCreator()));
+            round.setRoundPresident(playerService.findByUser(game.getCreator()));
         } else if (round.getGame().getVotationMode() == VotationModeEnum.CLASSIC) {
             selectPlayerForRoundPresident(round);
         }
@@ -201,9 +202,9 @@ public class RoundServiceImpl implements RoundService {
             playerIndex = 0;
         }
 
-        org.themarioga.game.commons.models.Player nextPresident = round.getGame().getPlayers().get(playerIndex);
+        Player nextPresident = round.getGame().getPlayers().get(playerIndex);
 
-        round.setRoundPresident((Player) nextPresident);
+        round.setRoundPresident(nextPresident);
     }
 
     private int getCurrentPresidentIndex(Round round) {

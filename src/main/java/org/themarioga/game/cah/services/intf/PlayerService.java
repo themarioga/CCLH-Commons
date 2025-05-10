@@ -1,12 +1,13 @@
 package org.themarioga.game.cah.services.intf;
 
+import org.themarioga.game.cah.models.Game;
 import org.themarioga.game.cah.models.Player;
 import org.themarioga.game.cah.models.Card;
 import org.themarioga.game.cah.models.DeckCard;
 
 import java.util.List;
 
-public interface PlayerService extends org.themarioga.game.commons.services.intf.PlayerService<Player> {
+public interface PlayerService extends org.themarioga.game.commons.services.intf.PlayerService<Player, Game> {
 
     void transferWhiteCardsFromGameDeckToPlayerHand(Player player, List<DeckCard> cardsToTransfer);
 

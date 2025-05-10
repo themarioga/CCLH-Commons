@@ -3,10 +3,9 @@ package org.themarioga.game.cah.services.intf;
 import org.themarioga.game.cah.enums.VotationModeEnum;
 import org.themarioga.game.cah.models.Dictionary;
 import org.themarioga.game.cah.models.Game;
+import org.themarioga.game.cah.models.Player;
 
-import java.util.UUID;
-
-public interface GameService extends org.themarioga.game.commons.services.intf.GameService<Game> {
+public interface GameService extends org.themarioga.game.commons.services.intf.GameService<Game, Player> {
 
     Game setVotationMode(Game game, VotationModeEnum type);
 
@@ -20,4 +19,5 @@ public interface GameService extends org.themarioga.game.commons.services.intf.G
 
     Game startRound(Game game);
 
+    Game endRound(Game game);
 }

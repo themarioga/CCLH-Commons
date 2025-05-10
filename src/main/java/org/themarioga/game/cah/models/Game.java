@@ -27,6 +27,9 @@ public class Game extends org.themarioga.game.commons.models.Game implements Ser
     private Dictionary dictionary;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "game", orphanRemoval = true)
+    private List<Player> players = new ArrayList<>(0);
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "game", orphanRemoval = true)
     private List<DeckCard> deckCards = new ArrayList<>(0);
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "game", orphanRemoval = true)
@@ -78,6 +81,14 @@ public class Game extends org.themarioga.game.commons.models.Game implements Ser
 
     public void setDictionary(Dictionary dictionary) {
         this.dictionary = dictionary;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<Player> players) {
+        this.players = players;
     }
 
     public List<DeckCard> getDeckCards() {

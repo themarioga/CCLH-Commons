@@ -8,10 +8,12 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.game.cah.dao.intf.GameDao;
 import org.themarioga.game.cah.enums.PunctuationModeEnum;
+import org.themarioga.game.cah.enums.RoundStatusEnum;
 import org.themarioga.game.cah.enums.VotationModeEnum;
 import org.themarioga.game.cah.exceptions.game.GameAlreadyFilledException;
 import org.themarioga.game.cah.exceptions.game.GameNotFilledException;
 import org.themarioga.game.cah.models.Game;
+import org.themarioga.game.cah.models.Player;
 import org.themarioga.game.cah.models.Dictionary;
 import org.themarioga.game.cah.services.intf.GameService;
 import org.themarioga.game.cah.services.intf.DictionaryService;
@@ -23,7 +25,6 @@ import org.themarioga.game.commons.exceptions.game.*;
 import org.themarioga.game.commons.exceptions.player.PlayerAlreadyVotedDeleteException;
 import org.themarioga.game.commons.exceptions.player.PlayerDoesntExistsException;
 import org.themarioga.game.commons.exceptions.room.RoomAlreadyExistsException;
-import org.themarioga.game.commons.models.Player;
 import org.themarioga.game.commons.models.Room;
 import org.themarioga.game.commons.models.User;
 import org.themarioga.game.commons.services.intf.ConfigurationService;
@@ -99,15 +100,13 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public Game delete(Game game) {
+    public void delete(Game game) {
         logger.debug("Deleting game: {}", game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         gameDao.delete(game);
-
-        return game;
     }
 
     @Override
@@ -306,18 +305,70 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public Game endGame(Game game) {
+    public void endGame(Game game) {
         logger.debug("Ending game {}", game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Only started games can end
+        if (game.getStatus() != GameStatusEnum.ENDING)
+            throw new GameNotEndingException();
+
+        gameDao.delete(game);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public Game startRound(Game game) {
+        logger.debug("Starting round on game {}", game);
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check the number of players in the game
         if (game.getStatus() != GameStatusEnum.STARTED)
             throw new GameNotStartedException();
 
-        // Set the ended status
-        game.setStatus(GameStatusEnum.ENDING);
+        // Create the next round
+        if (game.getCurrentRound() == null) {
+            // Start first round
+            game.setCurrentRound(roundService.createRound(game, 0));
+        } else {
+            // Get current round number
+            int currentRoundNumber = game.getCurrentRound().getRoundNumber();
+
+            // Delete the current round
+            roundService.deleteRound(game.getCurrentRound());
+
+            // Start next round
+            game.setCurrentRound(roundService.createRound(game, currentRoundNumber + 1));
+        }
+
+        return gameDao.createOrUpdate(game);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public Game endRound(Game game) {
+        logger.debug("Ending round on game {}", game);
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // If there are not round started it have no sense to end it
+        if (game.getCurrentRound() != null)
+            throw new GameNotStartedException();
+
+        // If round is not ending you can't end it
+        if (game.getCurrentRound().getStatus() != RoundStatusEnum.ENDING)
+            throw new GameNotEndingException();
+
+        // Check if game is ended
+        if (checkIfGameIsEnded(game)) {
+            // Set the ended status
+            game.setStatus(GameStatusEnum.ENDING);
+        }
 
         return gameDao.createOrUpdate(game);
     }
@@ -357,27 +408,6 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Game startRound(Game game) {
-        logger.debug("Starting round on game {}", game);
-
-        // Check game exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
-
-        // Check the number of players in the game
-        if (game.getStatus() != GameStatusEnum.STARTED)
-            throw new GameNotStartedException();
-
-        // Create the next round
-        if (game.getCurrentRound() == null) { // If it's a new round
-            game.setCurrentRound(roundService.createRound(game, 0));
-        } else {
-            game.setCurrentRound(roundService.createRound(game, game.getCurrentRound().getRoundNumber() + 1));
-        }
-
-        return gameDao.createOrUpdate(game);
-    }
-
-    @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public Game getByRoom(Room room) {
         logger.debug("Getting game with room: {}", room);
@@ -391,6 +421,21 @@ public class GameServiceImpl implements GameService {
         logger.debug("Getting game with room id: {}", roomId);
 
         return (Game) gameDao.getByRoom(roomService.getById(roomId));
+    }
+
+    private boolean checkIfGameIsEnded(Game game) {
+        if (game.getPunctuationMode().equals(PunctuationModeEnum.ROUNDS)) {
+            return Objects.equals(game.getCurrentRound().getRoundNumber(), game.getNumberOfRounds());
+        } else if (game.getPunctuationMode().equals(PunctuationModeEnum.POINTS)) {
+            for (Player player : game.getPlayers()) {
+                if (Objects.equals(player.getPoints(), game.getNumberOfPointsToWin()))
+                    return true;
+            }
+
+            return false;
+        } else {
+            throw new GameNotEndingException();
+        }
     }
 
     private VotationModeEnum getDefaultGameMode() {

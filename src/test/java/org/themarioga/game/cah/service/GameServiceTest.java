@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.game.cah.BaseTest;
 import org.themarioga.game.cah.enums.PunctuationModeEnum;
 import org.themarioga.game.cah.enums.VotationModeEnum;
-import org.themarioga.game.cah.exceptions.dictionary.DictionaryDoesntExistsException;
 import org.themarioga.game.cah.exceptions.game.GameAlreadyFilledException;
 import org.themarioga.game.cah.exceptions.game.GameNotFilledException;
 import org.themarioga.game.cah.models.Dictionary;
@@ -27,7 +26,6 @@ import org.themarioga.game.commons.exceptions.room.RoomDoesntExistsException;
 import org.themarioga.game.commons.exceptions.user.UserNotActiveException;
 import org.themarioga.game.commons.models.User;
 import org.themarioga.game.commons.services.intf.UserService;
-import org.themarioga.game.commons.util.Assert;
 
 import java.util.UUID;
 
@@ -326,24 +324,40 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
+    @DatabaseSetup("classpath:dbunit/service/setup/game2.xml")
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testEndGame-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testEndGame() {
-        Game game = gameService.endGame(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+        gameService.endGame(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
 
-        Assertions.assertEquals(UUID.fromString("33333333-3333-3333-3333-333333333333"), game.getRoom().getId());
-        Assertions.assertEquals(GameStatusEnum.ENDING, game.getStatus());
+        Game game = gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333"));
+
+        Assertions.assertNull(game);
     }
 
     @Test
-    void testEndGame_GameNotStarted() {
-        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.endGame(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+    void testEndGame_GameNotEnding() {
+        Assertions.assertThrows(GameNotEndingException.class, () -> gameService.endGame(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
     @Test
     @Disabled
-    void testStartRound() {
+    void testStartRound_FirstRound() {
         Game game = gameService.startRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
 
         Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
+    }
+
+    @Test
+    @Disabled
+    void testStartRound_SecondRound() {
+        Game game = gameService.startRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+        Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
+    }
+
+    @Test
+    void testStartRound_GameNotStarted() {
+        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.startRound(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
 }
