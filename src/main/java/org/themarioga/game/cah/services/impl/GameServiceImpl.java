@@ -25,6 +25,8 @@ import org.themarioga.game.commons.exceptions.game.*;
 import org.themarioga.game.commons.exceptions.player.PlayerAlreadyVotedDeleteException;
 import org.themarioga.game.commons.exceptions.player.PlayerDoesntExistsException;
 import org.themarioga.game.commons.exceptions.room.RoomAlreadyExistsException;
+import org.themarioga.game.commons.exceptions.round.RoundNotEndingException;
+import org.themarioga.game.commons.exceptions.round.RoundNotStartedException;
 import org.themarioga.game.commons.models.Room;
 import org.themarioga.game.commons.models.User;
 import org.themarioga.game.commons.services.intf.ConfigurationService;
@@ -356,13 +358,17 @@ public class GameServiceImpl implements GameService {
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
-        // If there are not round started it have no sense to end it
-        if (game.getCurrentRound() != null)
+        // Check if the game is started
+        if (game.getStatus() != GameStatusEnum.STARTED)
             throw new GameNotStartedException();
+
+        // If there are not round started it have no sense to end it
+        if (game.getCurrentRound() == null)
+            throw new RoundNotStartedException();
 
         // If round is not ending you can't end it
         if (game.getCurrentRound().getStatus() != RoundStatusEnum.ENDING)
-            throw new GameNotEndingException();
+            throw new RoundNotEndingException();
 
         // Check if game is ended
         if (checkIfGameIsEnded(game)) {
@@ -433,9 +439,9 @@ public class GameServiceImpl implements GameService {
             }
 
             return false;
-        } else {
-            throw new GameNotEndingException();
         }
+
+        throw new GameNotEndingException();
     }
 
     private VotationModeEnum getDefaultGameMode() {

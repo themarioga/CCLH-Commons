@@ -4,7 +4,6 @@ import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
 import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.game.cah.BaseTest;
@@ -23,6 +22,8 @@ import org.themarioga.game.commons.exceptions.game.*;
 import org.themarioga.game.commons.exceptions.player.PlayerAlreadyVotedDeleteException;
 import org.themarioga.game.commons.exceptions.player.PlayerDoesntExistsException;
 import org.themarioga.game.commons.exceptions.room.RoomDoesntExistsException;
+import org.themarioga.game.commons.exceptions.round.RoundNotEndingException;
+import org.themarioga.game.commons.exceptions.round.RoundNotStartedException;
 import org.themarioga.game.commons.exceptions.user.UserNotActiveException;
 import org.themarioga.game.commons.models.User;
 import org.themarioga.game.commons.services.intf.UserService;
@@ -324,7 +325,7 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/service/setup/game2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/game_endGame.xml")
     @ExpectedDatabase(value = "classpath:dbunit/service/expected/testEndGame-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testEndGame() {
         gameService.endGame(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
@@ -340,7 +341,9 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @Disabled
+    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
     void testStartRound_FirstRound() {
         Game game = gameService.startRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
 
@@ -348,7 +351,10 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @Disabled
+    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/round.xml")
     void testStartRound_SecondRound() {
         Game game = gameService.startRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
 
@@ -358,6 +364,71 @@ class GameServiceTest extends BaseTest {
     @Test
     void testStartRound_GameNotStarted() {
         Assertions.assertThrows(GameNotStartedException.class, () -> gameService.startRound(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+    }
+
+    @Test
+    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/round.xml")
+    void testEndRound_Rounds_NotEnding() {
+        Game game = gameService.endRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+        Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
+    }
+
+    @Test
+    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/round_endRound_RoundEnding.xml")
+    void testEndRound_Rounds_Ending() {
+        Game game = gameService.endRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+        Assertions.assertEquals(GameStatusEnum.ENDING, game.getStatus());
+    }
+
+    @Test
+    @DatabaseSetup("classpath:dbunit/service/setup/game_endRound_Points_NotEnding.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/round.xml")
+    void testEndRound_Points_NotEnding() {
+        Game game = gameService.endRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+        Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
+    }
+
+    @Test
+    @DatabaseSetup("classpath:dbunit/service/setup/game_endRound_Points_NotEnding.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/player_endRound_Points.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/round.xml")
+    void testEndRound_Points_Ending() {
+        Game game = gameService.endRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+        Assertions.assertEquals(GameStatusEnum.ENDING, game.getStatus());
+    }
+
+    @Test
+    void testEndRound_GameNotStarted() {
+        Assertions.assertThrows(GameNotStartedException.class, () -> gameService.endRound(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+    }
+
+    @Test
+    void testEndRound_RoundNoStarted() {
+        Assertions.assertThrows(RoundNotStartedException.class, () -> gameService.endRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333"))));
+    }
+
+    @Test
+    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/round_endRound_RoundNotEnding.xml")
+    void testEndRound_RoundNotEnding() {
+        Assertions.assertThrows(RoundNotEndingException.class, () -> gameService.endRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333"))));
     }
 
 }

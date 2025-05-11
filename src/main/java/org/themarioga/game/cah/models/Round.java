@@ -7,13 +7,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 public class Round implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
@@ -37,11 +38,11 @@ public class Round implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "round", orphanRemoval = true)
     private List<VotedCard> votedCards = new ArrayList<>(0);
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -116,7 +117,12 @@ public class Round implements Serializable {
 
     @Override
     public String toString() {
-        return "Round{" + "id=" + id + ", currentRoundNumber=" + roundNumber + ", game=" + game + '}';
+        return "Round{" +
+                "id=" + id +
+                ", roundBlackCard=" + roundBlackCard +
+                ", roundNumber=" + roundNumber +
+                ", status=" + status +
+                '}';
     }
 
 }
