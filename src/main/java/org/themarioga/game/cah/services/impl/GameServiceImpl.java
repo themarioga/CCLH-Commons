@@ -12,11 +12,14 @@ import org.themarioga.game.cah.enums.RoundStatusEnum;
 import org.themarioga.game.cah.enums.VotationModeEnum;
 import org.themarioga.game.cah.exceptions.game.GameAlreadyFilledException;
 import org.themarioga.game.cah.exceptions.game.GameNotFilledException;
+import org.themarioga.game.cah.exceptions.player.PlayerCannotDrawCardException;
+import org.themarioga.game.cah.models.Card;
 import org.themarioga.game.cah.models.Game;
 import org.themarioga.game.cah.models.Player;
 import org.themarioga.game.cah.models.Dictionary;
 import org.themarioga.game.cah.services.intf.GameService;
 import org.themarioga.game.cah.services.intf.DictionaryService;
+import org.themarioga.game.cah.services.intf.PlayerService;
 import org.themarioga.game.cah.services.intf.RoundService;
 import org.themarioga.game.commons.enums.ErrorEnum;
 import org.themarioga.game.commons.enums.GameStatusEnum;
@@ -34,6 +37,7 @@ import org.themarioga.game.commons.services.intf.RoomService;
 import org.themarioga.game.commons.util.Assert;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -47,15 +51,17 @@ public class GameServiceImpl implements GameService {
     private final RoundService roundService;
     private final DictionaryService dictionaryService;
     private final ConfigurationService configurationService;
+    private final PlayerService playerService;
 
-    @Autowired
-    public GameServiceImpl(GameDao gameDao, RoomService roomService, RoundService roundService, DictionaryService dictionaryService, ConfigurationService configurationService) {
+	@Autowired
+    public GameServiceImpl(GameDao gameDao, RoomService roomService, RoundService roundService, DictionaryService dictionaryService, ConfigurationService configurationService, PlayerService playerService) {
         this.gameDao = gameDao;
         this.roomService = roomService;
         this.roundService = roundService;
         this.dictionaryService = dictionaryService;
         this.configurationService = configurationService;
-    }
+        this.playerService = playerService;
+	}
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
@@ -343,9 +349,19 @@ public class GameServiceImpl implements GameService {
             // Delete the current round
             roundService.deleteRound(game.getCurrentRound());
 
+			// Empty the current round
+			game.setCurrentRound(null);
+
+			// Persist
+			gameDao.createOrUpdate(game);
+			gameDao.getEntityManager().flush();
+
             // Start next round
             game.setCurrentRound(roundService.createRound(game, currentRoundNumber + 1));
         }
+
+        // Fill player hands
+        transferWhiteCardsFromGameDeckToPlayersHands(game);
 
         return gameDao.createOrUpdate(game);
     }
@@ -429,6 +445,27 @@ public class GameServiceImpl implements GameService {
         return (Game) gameDao.getByRoom(roomService.getById(roomId));
     }
 
+    private Game transferWhiteCardsFromGameDeckToPlayersHands(Game game) {
+        logger.debug("Transerir cartas blancas del mazo del juego a los jugadores en el juego: {}", game);
+
+        if (game.getStatus() != GameStatusEnum.STARTED)
+            throw new GameNotStartedException();
+
+        for (Player player : game.getPlayers()) {
+            int numberCardsNeedToFillHand = getDefaultMaxNumberOfCardsInHand() - player.getHand().size();
+
+            if (numberCardsNeedToFillHand < 0 || numberCardsNeedToFillHand > getDefaultMaxNumberOfCardsInHand())
+                throw new PlayerCannotDrawCardException();
+
+            List<Card> cardsToTransfer = game.getWhiteCardsDeck().subList(0, numberCardsNeedToFillHand);
+            playerService.insertWhiteCardsIntoPlayerHand(player, cardsToTransfer);
+
+            game.getWhiteCardsDeck().removeAll(cardsToTransfer);
+        }
+
+        return gameDao.createOrUpdate(game);
+    }
+
     private boolean checkIfGameIsEnded(Game game) {
         if (game.getPunctuationMode().equals(PunctuationModeEnum.ROUNDS)) {
             return Objects.equals(game.getCurrentRound().getRoundNumber(), game.getNumberOfRounds());
@@ -462,6 +499,10 @@ public class GameServiceImpl implements GameService {
 
     private int getDefaultMaxNumberOfPlayers() {
         return Integer.parseInt(configurationService.getConfiguration("game_max_number_of_players"));
+    }
+
+    private int getDefaultMaxNumberOfCardsInHand() {
+        return Integer.parseInt(configurationService.getConfiguration("game_default_number_cards_in_hand"));
     }
 
 }

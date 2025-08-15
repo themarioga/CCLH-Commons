@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.game.cah.dao.intf.RoundDao;
-import org.themarioga.game.cah.enums.CardTypeEnum;
 import org.themarioga.game.cah.enums.RoundStatusEnum;
 import org.themarioga.game.cah.enums.VotationModeEnum;
 import org.themarioga.game.cah.exceptions.card.CardAlreadyPlayedException;
@@ -67,7 +66,7 @@ public class RoundServiceImpl implements RoundService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public void deleteRound(Round round) {
-        logger.debug("Ending round {}", round);
+        logger.debug("Deleting round {}", round);
 
         // Check round exists
         Assert.assertNotNull(round, ErrorEnum.GAME_NOT_FOUND);
@@ -159,10 +158,10 @@ public class RoundServiceImpl implements RoundService {
     public Card getBlackCardFromGameDeck(Game game) {
         logger.debug("Getting black card from deck to game {}", game);
 
-        DeckCard nextBlackCard = roundDao.getDeckCards(game, 1, CardTypeEnum.BLACK).get(0);
-        game.getDeckCards().remove(nextBlackCard);
+        Card nextBlackCard = game.getBlackCardsDeck().get(0);
+        game.getBlackCardsDeck().remove(nextBlackCard);
 
-        return nextBlackCard.getCard();
+        return nextBlackCard;
     }
 
     @Override

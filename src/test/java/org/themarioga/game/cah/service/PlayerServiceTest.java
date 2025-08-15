@@ -5,7 +5,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.game.cah.BaseTest;
+import org.themarioga.game.cah.exceptions.player.PlayerCannotPlayCardException;
+import org.themarioga.game.cah.models.Card;
 import org.themarioga.game.cah.models.Game;
+import org.themarioga.game.cah.services.intf.CardService;
 import org.themarioga.game.cah.services.intf.GameService;
 import org.themarioga.game.cah.services.intf.PlayerService;
 import org.themarioga.game.commons.enums.GameStatusEnum;
@@ -34,6 +37,8 @@ class PlayerServiceTest extends BaseTest {
     GameService gameService;
     @Autowired
     PlayerService playerService;
+    @Autowired
+    CardService cardService;
 
     @Test
     void testCreate() {
@@ -64,6 +69,65 @@ class PlayerServiceTest extends BaseTest {
     }
 
     @Test
+    void testDelete() {
+        playerService.delete(playerService.findByUserId(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+    }
+
+    @Test
+    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/round.xml")
+    void testInsertWhiteCardsIntoPlayerHand() {
+        Game game = gameService.endRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+        org.themarioga.game.cah.models.Player player = playerService.findByUserId(UUID.fromString("77777777-7777-7777-7777-777777777777"));
+        playerService.insertWhiteCardsIntoPlayerHand(player, game.getWhiteCardsDeck().subList(0, 5));
+
+        Assertions.assertNotNull(player);
+    }
+
+    @Test
+    void testIncrementPoints() {
+        org.themarioga.game.cah.models.Player player = playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+
+        player = playerService.incrementPoints(player);
+
+        Assertions.assertNotNull(player);
+        Assertions.assertEquals(1, player.getPoints());
+    }
+
+    @Test
+    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/playerhand.xml")
+    void testRemoveCardFromHand() {
+        org.themarioga.game.cah.models.Player player = playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000003"));
+
+        player = playerService.removeCardFromHand(player, card);
+
+        Assertions.assertNotNull(player);
+        Assertions.assertEquals(0, player.getHand().size());
+    }
+
+    @Test
+    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
+    void testRemoveCardFromHand_NonExistentCard() {
+        org.themarioga.game.cah.models.Player player = playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000003"));
+
+        Assertions.assertThrows(PlayerCannotPlayCardException.class, () -> playerService.removeCardFromHand(player, card));
+    }
+
+    @Test
+    void testFindPlayerById() {
+        Player player = playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), player.getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), player.getGame().getId());
+        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), player.getUser().getId());
+    }
+
+    @Test
     void testFindPlayerByUser() {
         Player player = playerService.findByUser(userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
@@ -75,20 +139,6 @@ class PlayerServiceTest extends BaseTest {
     void testFindPlayerByUserId() {
         Player player = playerService.findByUserId(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), player.getGame().getId());
-        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), player.getUser().getId());
-    }
-
-    @Test
-    void testDelete() {
-        playerService.delete(playerService.findByUserId(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-    }
-
-    @Test
-    void testFindPlayerById() {
-        Player player = playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
-
-        Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), player.getId());
         Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), player.getGame().getId());
         Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), player.getUser().getId());
     }

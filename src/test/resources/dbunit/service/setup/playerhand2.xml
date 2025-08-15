@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE dataset SYSTEM "src/test/resources/cahschema.dtd">
+<dataset>
+    <Player_Hand_Card PLAYER_ID="44444444-4444-4444-4444-444444444444" CARD_ID="00000000-0000-0000-0000-000000000003"/>
+</dataset>

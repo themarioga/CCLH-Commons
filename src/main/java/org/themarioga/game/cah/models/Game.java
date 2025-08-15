@@ -7,6 +7,7 @@ import org.themarioga.game.cah.enums.VotationModeEnum;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Game extends org.themarioga.game.commons.models.Game implements Serializable {
@@ -29,8 +30,13 @@ public class Game extends org.themarioga.game.commons.models.Game implements Ser
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "game", orphanRemoval = true)
     private List<Player> players = new ArrayList<>(0);
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "game", orphanRemoval = true)
-    private List<DeckCard> deckCards = new ArrayList<>(0);
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "game_black_cards_deck", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "card_id"))
+    private List<Card> blackCardsDeck = new ArrayList<>(0);
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "game_white_cards_deck", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "card_id"))
+    private List<Card> whiteCardsDeck = new ArrayList<>(0);
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "game", orphanRemoval = true)
     private Round currentRound;
@@ -91,12 +97,20 @@ public class Game extends org.themarioga.game.commons.models.Game implements Ser
         this.players = players;
     }
 
-    public List<DeckCard> getDeckCards() {
-        return deckCards;
+    public List<Card> getBlackCardsDeck() {
+        return blackCardsDeck;
     }
 
-    public void setDeckCards(List<DeckCard> deckCards) {
-        this.deckCards = deckCards;
+    public void setBlackCardsDeck(List<Card> deckBlackCards) {
+        this.blackCardsDeck = deckBlackCards;
+    }
+
+    public List<Card> getWhiteCardsDeck() {
+        return whiteCardsDeck;
+    }
+
+    public void setWhiteCardsDeck(List<Card> deckWhiteCards) {
+        this.whiteCardsDeck = deckWhiteCards;
     }
 
     public Round getCurrentRound() {
@@ -107,7 +121,28 @@ public class Game extends org.themarioga.game.commons.models.Game implements Ser
         this.currentRound = currentRound;
     }
 
-    @Override
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+
+		Game game = (Game) o;
+		return getVotationMode() == game.getVotationMode() && getPunctuationMode() == game.getPunctuationMode() && Objects.equals(getNumberOfPointsToWin(), game.getNumberOfPointsToWin()) && Objects.equals(getNumberOfRounds(), game.getNumberOfRounds()) && Objects.equals(getMaxNumberOfPlayers(), game.getMaxNumberOfPlayers()) && Objects.equals(getDictionary(), game.getDictionary());
+	}
+
+	@Override
+	public int hashCode() {
+		int result = super.hashCode();
+		result = 31 * result + Objects.hashCode(getVotationMode());
+		result = 31 * result + Objects.hashCode(getPunctuationMode());
+		result = 31 * result + Objects.hashCode(getNumberOfPointsToWin());
+		result = 31 * result + Objects.hashCode(getNumberOfRounds());
+		result = 31 * result + Objects.hashCode(getMaxNumberOfPlayers());
+		result = 31 * result + Objects.hashCode(getDictionary());
+		return result;
+	}
+
+	@Override
     public String toString() {
         return "Game{" + super.toString() + "currentRound=" + currentRound + ", votationMode=" + votationMode + ", punctuationMode=" + punctuationMode + ", numberOfCardsToWin=" + numberOfPointsToWin + ", numberOfRounds=" + numberOfRounds + ", maxNumberOfPlayers=" + maxNumberOfPlayers + ", dictionary=" + dictionary + '}';
     }

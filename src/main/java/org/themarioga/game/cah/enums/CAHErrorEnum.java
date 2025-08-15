@@ -13,11 +13,12 @@ public enum CAHErrorEnum {
     DICTIONARY_NOT_YOURS(34L, "Diccionario no encontrado"),
     DICTIONARY_COLLAB_ALREADY_EXISTS(35L, "Colaborador ya existente"),
     DICTIONARY_COLLAB_NOT_FOUND(36L, "Colaborador no encontrado"),
-    PLAYER_CANNOT_PLAY_CARD(37L, "El jugador no puede jugar esa carta"),
-    PLAYER_CANNOT_VOTE_CARD(38L, "El jugador no puede votar"),
-    PLAYER_ALREADY_PLAYED_CARD(39L, "El jugador no puede jugar esa carta"),
-    PLAYER_ALREADY_VOTED_CARD(40L, "El jugador no puede votar"),
-    ROUND_WRONG_STATUS(41L, "Mesa en estado incorrecto");
+    PLAYER_CANNOT_DRAW_CARD(37L, "El jugador no puede sacar esa carta"),
+    PLAYER_CANNOT_PLAY_CARD(38L, "El jugador no puede jugar esa carta"),
+    PLAYER_CANNOT_VOTE_CARD(39L, "El jugador no puede votar"),
+    PLAYER_ALREADY_PLAYED_CARD(40L, "El jugador no puede jugar esa carta"),
+    PLAYER_ALREADY_VOTED_CARD(41L, "El jugador no puede votar"),
+    ROUND_WRONG_STATUS(42L, "Mesa en estado incorrecto");
 
     final Long errorCode;
     final String errorDesc;

@@ -117,12 +117,7 @@ public class Round implements Serializable {
 
     @Override
     public String toString() {
-        return "Round{" +
-                "id=" + id +
-                ", roundBlackCard=" + roundBlackCard +
-                ", roundNumber=" + roundNumber +
-                ", status=" + status +
-                '}';
+        return "Round{" + "id=" + id + ", roundBlackCard=" + roundBlackCard + ", roundNumber=" + roundNumber + ", status=" + status + '}';
     }
 
 }

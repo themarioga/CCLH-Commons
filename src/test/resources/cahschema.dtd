@@ -8,8 +8,10 @@
         Users*,
         Dictionary*,
         Card*,
-        Deck_Card*,
-        Round*)>
+        Round*,
+        Game_black_cards_deck*,
+        Game_white_cards_deck*,
+        Player_Hand_Card*)>
 
         <!ELEMENT Configuration EMPTY>
         <!ATTLIST Configuration
@@ -44,7 +46,7 @@
                 JOIN_ORDER CDATA #REQUIRED
                 GAME_ID CDATA #REQUIRED
                 USER_ID CDATA #REQUIRED
-                POINTS CDATA #IMPLIED
+                POINTS CDATA #REQUIRED
                 CREATION_DATE CDATA #REQUIRED
                 >
 
@@ -91,12 +93,6 @@
                 CREATION_DATE CDATA #REQUIRED
                 >
 
-        <!ELEMENT Deck_Card EMPTY>
-        <!ATTLIST Deck_Card
-                CARD_ID CDATA #REQUIRED
-                GAME_ID CDATA #REQUIRED
-                >
-
         <!ELEMENT Round EMPTY>
         <!ATTLIST Round
                 ID CDATA #REQUIRED
@@ -105,4 +101,22 @@
                 ROUND_NUMBER CDATA #REQUIRED
                 ROUND_BLACK_CARD_ID CDATA #REQUIRED
                 ROUND_PRESIDENT_ID CDATA #IMPLIED
+                >
+
+        <!ELEMENT Game_black_cards_deck EMPTY>
+        <!ATTLIST Game_black_cards_deck
+                GAME_ID CDATA #REQUIRED
+                CARD_ID CDATA #REQUIRED
+                >
+
+        <!ELEMENT Game_white_cards_deck EMPTY>
+        <!ATTLIST Game_white_cards_deck
+                GAME_ID CDATA #REQUIRED
+                CARD_ID CDATA #REQUIRED
+                >
+
+        <!ELEMENT Player_Hand_Card EMPTY>
+        <!ATTLIST Player_Hand_Card
+                PLAYER_ID CDATA #REQUIRED
+                CARD_ID CDATA #REQUIRED
                 >

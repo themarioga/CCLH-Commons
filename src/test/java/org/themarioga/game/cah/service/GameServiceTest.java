@@ -344,8 +344,13 @@ class GameServiceTest extends BaseTest {
     @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
     @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
     @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/playerhand2.xml")
     void testStartRound_FirstRound() {
-        Game game = gameService.startRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+        Game game = gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333"));
+
+        game.getWhiteCardsDeck().remove(game.getWhiteCardsDeck().get(0));
+
+        game = gameService.startRound(game);
 
         Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
     }

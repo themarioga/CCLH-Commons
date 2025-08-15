@@ -76,13 +76,13 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public void transferWhiteCardsFromGameDeckToPlayerHand(Player player, List<DeckCard> cardsToTransfer) {
-        logger.debug("Transferring white cards from deck to hand from player {}", player);
+    public void insertWhiteCardsIntoPlayerHand(Player player, List<Card> cardsToTransfer) {
+        logger.debug("Transferring white cards to hand of player {}", player);
 
-        for (DeckCard gameDeckCard : cardsToTransfer) {
+        for (Card card : cardsToTransfer) {
             PlayerHandCard playerHandCard = new PlayerHandCard();
             playerHandCard.setPlayer(player);
-            playerHandCard.setCard(gameDeckCard.getCard());
+            playerHandCard.setCard(card);
 
             player.getHand().add(playerHandCard);
         }
@@ -92,17 +92,17 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public void incrementPoints(Player player) {
+    public Player incrementPoints(Player player) {
         logger.debug("Incrementing player's ({}) points", player);
 
         player.setPoints(player.getPoints() + 1);
 
-        playerDao.createOrUpdate(player);
+        return playerDao.createOrUpdate(player);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public void removeCardFromHand(Player player, Card card) {
+    public Player removeCardFromHand(Player player, Card card) {
         logger.debug("Removing card {} from the hand of the player {}", card, player);
 
         Optional<PlayerHandCard> cards = player.getHand().stream().filter(playerHandCard -> playerHandCard.getCard().getId().equals(card.getId())).findFirst();
@@ -111,7 +111,8 @@ public class PlayerServiceImpl implements PlayerService {
             throw new PlayerCannotPlayCardException();
 
         player.getHand().remove(cards.get());
-        playerDao.createOrUpdate(player);
+
+        return playerDao.createOrUpdate(player);
     }
 
     @Override
