@@ -448,9 +448,6 @@ public class GameServiceImpl implements GameService {
     private Game transferWhiteCardsFromGameDeckToPlayersHands(Game game) {
         logger.debug("Transerir cartas blancas del mazo del juego a los jugadores en el juego: {}", game);
 
-        if (game.getStatus() != GameStatusEnum.STARTED)
-            throw new GameNotStartedException();
-
         for (Player player : game.getPlayers()) {
             int numberCardsNeedToFillHand = getDefaultMaxNumberOfCardsInHand() - player.getHand().size();
 
