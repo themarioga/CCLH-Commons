@@ -76,7 +76,7 @@ class PlayerDaoTest extends BaseTest {
 
     @Test
     void findPlayer() {
-        org.themarioga.game.commons.models.Player player = playerDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        Player player = playerDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         Assertions.assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), player.getId());
     }

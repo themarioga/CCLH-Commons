@@ -8,7 +8,7 @@ public interface RoundService {
 
     void deleteRound(Round round);
 
-    Round playCard(Round round, Player player, Card card);
+    Round addCardToPlayedCards(Round round, Player player, Card card);
 
     Round voteCard(Round round, Player player, Card card);
 

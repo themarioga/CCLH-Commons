@@ -5,10 +5,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.game.cah.BaseTest;
-import org.themarioga.game.cah.enums.VotationModeEnum;
-import org.themarioga.game.cah.models.Game;
 import org.themarioga.game.cah.services.intf.GameService;
-import org.themarioga.game.commons.services.intf.PlayerService;
+import org.themarioga.game.cah.services.intf.PlayerService;
 
 @DatabaseSetup("classpath:dbunit/service/setup/lang.xml")
 @DatabaseSetup("classpath:dbunit/service/setup/user.xml")

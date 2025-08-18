@@ -79,6 +79,8 @@ public class PlayerServiceImpl implements PlayerService {
     public void insertWhiteCardsIntoPlayerHand(Player player, List<Card> cardsToTransfer) {
         logger.debug("Transferring white cards to hand of player {}", player);
 
+        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+
         for (Card card : cardsToTransfer) {
             PlayerHandCard playerHandCard = new PlayerHandCard();
             playerHandCard.setPlayer(player);
@@ -95,6 +97,8 @@ public class PlayerServiceImpl implements PlayerService {
     public Player incrementPoints(Player player) {
         logger.debug("Incrementing player's ({}) points", player);
 
+        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+
         player.setPoints(player.getPoints() + 1);
 
         return playerDao.createOrUpdate(player);
@@ -104,6 +108,8 @@ public class PlayerServiceImpl implements PlayerService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Player removeCardFromHand(Player player, Card card) {
         logger.debug("Removing card {} from the hand of the player {}", card, player);
+
+        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
 
         Optional<PlayerHandCard> cards = player.getHand().stream().filter(playerHandCard -> playerHandCard.getCard().getId().equals(card.getId())).findFirst();
 
@@ -128,7 +134,7 @@ public class PlayerServiceImpl implements PlayerService {
     public Player findByUser(User user) {
         logger.debug("Getting player with user: {}", user);
 
-        return (Player) playerDao.findPlayerByUser(user);
+        return playerDao.findPlayerByUser(user);
     }
 
     @Override
@@ -136,7 +142,15 @@ public class PlayerServiceImpl implements PlayerService {
     public Player findByUserId(UUID userId) {
         logger.debug("Getting player with user ID: {}", userId);
 
-        return (Player) playerDao.findPlayerByUser(userService.getById(userId));
+        return playerDao.findPlayerByUser(userService.getById(userId));
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    public Player findPlayerByUserAndGame(User user, Game game) {
+        logger.debug("Checking user's playing game {}", user);
+
+        return playerDao.findPlayerByUserAndGame(user, game);
     }
 
 }

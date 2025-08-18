@@ -8,13 +8,13 @@ import org.themarioga.game.cah.BaseTest;
 import org.themarioga.game.cah.exceptions.player.PlayerCannotPlayCardException;
 import org.themarioga.game.cah.models.Card;
 import org.themarioga.game.cah.models.Game;
+import org.themarioga.game.cah.models.Player;
 import org.themarioga.game.cah.services.intf.CardService;
 import org.themarioga.game.cah.services.intf.GameService;
 import org.themarioga.game.cah.services.intf.PlayerService;
 import org.themarioga.game.commons.enums.GameStatusEnum;
 import org.themarioga.game.commons.exceptions.game.GameAlreadyStartedException;
 import org.themarioga.game.commons.exceptions.player.PlayerAlreadyExistsException;
-import org.themarioga.game.commons.models.Player;
 import org.themarioga.game.commons.models.User;
 import org.themarioga.game.commons.services.intf.RoomService;
 import org.themarioga.game.commons.services.intf.UserService;
@@ -52,7 +52,7 @@ class PlayerServiceTest extends BaseTest {
 
     @Test
     void testCreate_AlreadyStarted() {
-        org.themarioga.game.cah.models.Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+        Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
         User user = userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         gameService.setStatus(game, GameStatusEnum.STARTED);
@@ -80,7 +80,7 @@ class PlayerServiceTest extends BaseTest {
     @DatabaseSetup("classpath:dbunit/service/setup/round.xml")
     void testInsertWhiteCardsIntoPlayerHand() {
         Game game = gameService.endRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
-        org.themarioga.game.cah.models.Player player = playerService.findByUserId(UUID.fromString("77777777-7777-7777-7777-777777777777"));
+        Player player = playerService.findByUserId(UUID.fromString("77777777-7777-7777-7777-777777777777"));
         playerService.insertWhiteCardsIntoPlayerHand(player, game.getWhiteCardsDeck().subList(0, 5));
 
         Assertions.assertNotNull(player);
@@ -88,7 +88,7 @@ class PlayerServiceTest extends BaseTest {
 
     @Test
     void testIncrementPoints() {
-        org.themarioga.game.cah.models.Player player = playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        Player player = playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
         player = playerService.incrementPoints(player);
 
@@ -100,7 +100,7 @@ class PlayerServiceTest extends BaseTest {
     @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
     @DatabaseSetup("classpath:dbunit/service/setup/playerhand.xml")
     void testRemoveCardFromHand() {
-        org.themarioga.game.cah.models.Player player = playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        Player player = playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
         Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000003"));
 
         player = playerService.removeCardFromHand(player, card);
@@ -112,7 +112,7 @@ class PlayerServiceTest extends BaseTest {
     @Test
     @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
     void testRemoveCardFromHand_NonExistentCard() {
-        org.themarioga.game.cah.models.Player player = playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        Player player = playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
         Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000003"));
 
         Assertions.assertThrows(PlayerCannotPlayCardException.class, () -> playerService.removeCardFromHand(player, card));

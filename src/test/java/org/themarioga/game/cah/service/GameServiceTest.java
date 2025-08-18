@@ -15,7 +15,6 @@ import org.themarioga.game.cah.models.Dictionary;
 import org.themarioga.game.cah.models.Game;
 import org.themarioga.game.cah.services.intf.DictionaryService;
 import org.themarioga.game.cah.services.intf.GameService;
-import org.themarioga.game.cah.services.intf.PlayerService;
 import org.themarioga.game.commons.enums.GameStatusEnum;
 import org.themarioga.game.commons.exceptions.ApplicationException;
 import org.themarioga.game.commons.exceptions.game.*;
@@ -45,8 +44,6 @@ class GameServiceTest extends BaseTest {
     DictionaryService dictionaryService;
     @Autowired
     GameService gameService;
-    @Autowired
-    PlayerService playerService;
 
     @Test
     @ExpectedDatabase(value = "classpath:dbunit/service/expected/testCreateGame-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
@@ -206,27 +203,33 @@ class GameServiceTest extends BaseTest {
     @Test
     void testAddPlayer() {
         Game game = gameService.getByRoomId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
-        User creator = userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444"));
-        gameService.addPlayer(game, playerService.create(game, creator));
+        User user = userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444"));
+        gameService.addPlayer(game, user);
 
         Assertions.assertEquals(2L, game.getPlayers().size());
     }
 
+	@Test
+	void testAddPlayer_GameStarted() {
+		Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.addPlayer(
+				gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")), userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444"))));
+	}
+
     @Test
     void testAddPlayer_UserNotActive() {
         Assertions.assertThrows(UserNotActiveException.class, () -> gameService.addPlayer(
-                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findByUserId(UUID.fromString("22222222-2222-2222-2222-222222222222"))));
+                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), userService.getById(UUID.fromString("22222222-2222-2222-2222-222222222222"))));
     }
 
     @Test
     void testAddPlayer_GameAlreadyFilled() {
         Assertions.assertThrows(GameAlreadyFilledException.class, () -> gameService.addPlayer(
-                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findByUserId(UUID.fromString("66666666-6666-6666-6666-666666666666"))));
+                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), userService.getById(UUID.fromString("66666666-6666-6666-6666-666666666666"))));
     }
 
     @Test
     void testLeaveGame() {
-        Game game = gameService.removePlayer(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findByUserId(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+        Game game = gameService.removePlayer(gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
 
         Assertions.assertEquals(2L, game.getPlayers().size());
     }
@@ -234,25 +237,25 @@ class GameServiceTest extends BaseTest {
     @Test
     void testLeaveGame_GameAlreadyStarted() {
         Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.removePlayer(
-                gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")), playerService.findByUserId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+                gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")), userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
     @Test
     void testLeaveGame_CreatorLeave() {
         Assertions.assertThrows(GameCreatorCannotLeaveException.class, () -> gameService.removePlayer(
-                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findByUserId(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
     @Test
     void testLeaveGame_PlayerNotInGame() {
         Assertions.assertThrows(PlayerDoesntExistsException.class, () -> gameService.removePlayer(
-                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findByUserId(UUID.fromString("66666666-6666-6666-6666-666666666666"))));
+                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), userService.getById(UUID.fromString("66666666-6666-6666-6666-666666666666"))));
     }
 
     @Test
     void testLeaveGame_GameNotStarted() {
         Assertions.assertThrows(GameNotStartedException.class, () -> gameService.voteForDeletion(
-                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+                gameService.getByRoomId(UUID.fromString("00000000-0000-0000-0000-000000000000")), userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
     @Test
@@ -284,11 +287,11 @@ class GameServiceTest extends BaseTest {
     @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
     void testVoteDeletion_vote() {
         Game game = gameService.voteForDeletion(
-                gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")), playerService.findById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
+                gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")), userService.getById(UUID.fromString("77777777-7777-7777-7777-777777777777")));
 
         Assertions.assertNotNull(game);
         Assertions.assertNotNull(game.getDeletionVotes().get(0));
-        Assertions.assertEquals(UUID.fromString("44444444-4444-4444-4444-444444444444"), game.getDeletionVotes().get(0).getId());
+        Assertions.assertEquals(UUID.fromString("77777777-7777-7777-7777-777777777777"), game.getDeletionVotes().get(0).getId());
         Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
     }
 
@@ -296,14 +299,14 @@ class GameServiceTest extends BaseTest {
     @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
     void testVoteDeletion_delete() {
         gameService.voteForDeletion(
-                gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")), playerService.findById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
+                gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")), userService.getById(UUID.fromString("77777777-7777-7777-7777-777777777777")));
         Game game = gameService.voteForDeletion(
-                gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")), playerService.findById(UUID.fromString("55555555-5555-5555-5555-555555555555")));
+                gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")), userService.getById(UUID.fromString("88888888-8888-8888-8888-888888888888")));
 
         Assertions.assertNotNull(game);
         Assertions.assertNotNull(game.getDeletionVotes().get(0));
-        Assertions.assertEquals(UUID.fromString("44444444-4444-4444-4444-444444444444"), game.getDeletionVotes().get(0).getId());
-        Assertions.assertEquals(UUID.fromString("55555555-5555-5555-5555-555555555555"), game.getDeletionVotes().get(1).getId());
+        Assertions.assertEquals(UUID.fromString("77777777-7777-7777-7777-777777777777"), game.getDeletionVotes().get(0).getId());
+        Assertions.assertEquals(UUID.fromString("88888888-8888-8888-8888-888888888888"), game.getDeletionVotes().get(1).getId());
         Assertions.assertEquals(GameStatusEnum.DELETING, game.getStatus());
     }
 
@@ -311,17 +314,17 @@ class GameServiceTest extends BaseTest {
     @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
     void testVoteDeletion_PlayerAlreadyVoted() {
         gameService.voteForDeletion(
-                gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")), playerService.findById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
+                gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")), userService.getById(UUID.fromString("77777777-7777-7777-7777-777777777777")));
 
         Assertions.assertThrows(PlayerAlreadyVotedDeleteException.class, () -> gameService.voteForDeletion(
-                gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")), playerService.findById(UUID.fromString("44444444-4444-4444-4444-444444444444"))));
+                gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")), userService.getById(UUID.fromString("77777777-7777-7777-7777-777777777777"))));
     }
 
     @Test
     @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
     void testVoteDeletion_PlayerIsFromAnotherGame() {
         Assertions.assertThrows(PlayerDoesntExistsException.class, () -> gameService.voteForDeletion(
-                gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")), playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+                gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")), userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
     }
 
     @Test
@@ -435,5 +438,10 @@ class GameServiceTest extends BaseTest {
     void testEndRound_RoundNotEnding() {
         Assertions.assertThrows(RoundNotEndingException.class, () -> gameService.endRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333"))));
     }
+
+	@Test
+	void testPlayCard() {
+		// ToDo: test add card
+	}
 
 }

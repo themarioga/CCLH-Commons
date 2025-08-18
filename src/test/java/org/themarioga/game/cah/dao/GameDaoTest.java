@@ -14,10 +14,10 @@ import org.themarioga.game.cah.enums.PunctuationModeEnum;
 import org.themarioga.game.cah.enums.VotationModeEnum;
 import org.themarioga.game.cah.models.Dictionary;
 import org.themarioga.game.cah.models.Game;
+import org.themarioga.game.cah.models.Player;
 import org.themarioga.game.commons.dao.intf.RoomDao;
 import org.themarioga.game.commons.dao.intf.UserDao;
 import org.themarioga.game.commons.enums.GameStatusEnum;
-import org.themarioga.game.commons.models.Player;
 import org.themarioga.game.commons.models.Room;
 import org.themarioga.game.commons.models.User;
 
@@ -135,9 +135,9 @@ class GameDaoTest extends BaseTest {
     @ExpectedDatabase(value = "classpath:dbunit/dao/expected/game/testUpdateGameDeletionVotes-expected.xml", table = "game_deletion_votes", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void addDeletionVoteToTable() {
         Game game = gameDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
-        Player player = playerDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        User user = userDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-        game.getDeletionVotes().add(player);
+        game.getDeletionVotes().add(user);
 
         gameDao.createOrUpdate(game);
         getCurrentSession().flush();

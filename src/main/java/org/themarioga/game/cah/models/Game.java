@@ -27,6 +27,10 @@ public class Game extends org.themarioga.game.commons.models.Game implements Ser
     @JoinColumn(nullable = false)
     private Dictionary dictionary;
 
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(unique = true)
+    private Player creatorPlayer;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "game", orphanRemoval = true)
     private List<Player> players = new ArrayList<>(0);
 
@@ -89,6 +93,14 @@ public class Game extends org.themarioga.game.commons.models.Game implements Ser
         this.dictionary = dictionary;
     }
 
+    public Player getCreatorPlayer() {
+        return creatorPlayer;
+    }
+
+    public void setCreatorPlayer(Player creatorPlayer) {
+        this.creatorPlayer = creatorPlayer;
+    }
+
     public List<Player> getPlayers() {
         return players;
     }
@@ -121,28 +133,28 @@ public class Game extends org.themarioga.game.commons.models.Game implements Ser
         this.currentRound = currentRound;
     }
 
-	@Override
-	public boolean equals(Object o) {
-		if (o == null || getClass() != o.getClass()) return false;
-		if (!super.equals(o)) return false;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
-		Game game = (Game) o;
-		return getVotationMode() == game.getVotationMode() && getPunctuationMode() == game.getPunctuationMode() && Objects.equals(getNumberOfPointsToWin(), game.getNumberOfPointsToWin()) && Objects.equals(getNumberOfRounds(), game.getNumberOfRounds()) && Objects.equals(getMaxNumberOfPlayers(), game.getMaxNumberOfPlayers()) && Objects.equals(getDictionary(), game.getDictionary());
-	}
+        Game game = (Game) o;
+        return getVotationMode() == game.getVotationMode() && getPunctuationMode() == game.getPunctuationMode() && Objects.equals(getNumberOfPointsToWin(), game.getNumberOfPointsToWin()) && Objects.equals(getNumberOfRounds(), game.getNumberOfRounds()) && Objects.equals(getMaxNumberOfPlayers(), game.getMaxNumberOfPlayers()) && Objects.equals(getDictionary(), game.getDictionary());
+    }
 
-	@Override
-	public int hashCode() {
-		int result = super.hashCode();
-		result = 31 * result + Objects.hashCode(getVotationMode());
-		result = 31 * result + Objects.hashCode(getPunctuationMode());
-		result = 31 * result + Objects.hashCode(getNumberOfPointsToWin());
-		result = 31 * result + Objects.hashCode(getNumberOfRounds());
-		result = 31 * result + Objects.hashCode(getMaxNumberOfPlayers());
-		result = 31 * result + Objects.hashCode(getDictionary());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + Objects.hashCode(getVotationMode());
+        result = 31 * result + Objects.hashCode(getPunctuationMode());
+        result = 31 * result + Objects.hashCode(getNumberOfPointsToWin());
+        result = 31 * result + Objects.hashCode(getNumberOfRounds());
+        result = 31 * result + Objects.hashCode(getMaxNumberOfPlayers());
+        result = 31 * result + Objects.hashCode(getDictionary());
+        return result;
+    }
 
-	@Override
+    @Override
     public String toString() {
         return "Game{" + super.toString() + "currentRound=" + currentRound + ", votationMode=" + votationMode + ", punctuationMode=" + punctuationMode + ", numberOfCardsToWin=" + numberOfPointsToWin + ", numberOfRounds=" + numberOfRounds + ", maxNumberOfPlayers=" + maxNumberOfPlayers + ", dictionary=" + dictionary + '}';
     }

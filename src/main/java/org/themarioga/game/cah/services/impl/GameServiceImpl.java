@@ -53,7 +53,7 @@ public class GameServiceImpl implements GameService {
     private final ConfigurationService configurationService;
     private final PlayerService playerService;
 
-	@Autowired
+    @Autowired
     public GameServiceImpl(GameDao gameDao, RoomService roomService, RoundService roundService, DictionaryService dictionaryService, ConfigurationService configurationService, PlayerService playerService) {
         this.gameDao = gameDao;
         this.roomService = roomService;
@@ -61,7 +61,7 @@ public class GameServiceImpl implements GameService {
         this.dictionaryService = dictionaryService;
         this.configurationService = configurationService;
         this.playerService = playerService;
-	}
+    }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
@@ -80,10 +80,12 @@ public class GameServiceImpl implements GameService {
         Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
 
         // Check if a game already exists in this room
-        if (gameDao.countByRoom(room) > 0) throw new GameAlreadyExistsException();
+        if (gameDao.countByRoom(room) > 0)
+			throw new GameAlreadyExistsException();
 
         // Check if this user already have a running game
-        if (gameDao.countByCreator(creator) > 0) throw new GameCreatorAlreadyExistsException();
+        if (gameDao.countByCreator(creator) > 0)
+			throw new GameCreatorAlreadyExistsException();
 
         // Check if the creator exists
         Assert.assertNotNull(creator, ErrorEnum.USER_NOT_FOUND);
@@ -102,6 +104,13 @@ public class GameServiceImpl implements GameService {
         game.setDictionary(dictionaryService.getDefaultDictionary());
         game.setCreationDate(new Date());
         game.setMaxNumberOfPlayers(getDefaultMaxNumberOfPlayers());
+
+        game = gameDao.createOrUpdate(game);
+
+        // Add the game creator player
+        Player player = playerService.create(game, creator);
+        game.getPlayers().add(player);
+        game.setCreatorPlayer(player);
 
         return gameDao.createOrUpdate(game);
     }
@@ -140,7 +149,8 @@ public class GameServiceImpl implements GameService {
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check if the game has already started
-        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
+        if (game.getStatus() == GameStatusEnum.STARTED)
+			throw new GameAlreadyStartedException();
 
         // Set the type to game
         game.setVotationMode(type);
@@ -157,7 +167,8 @@ public class GameServiceImpl implements GameService {
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check if the game has already started
-        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
+        if (game.getStatus() == GameStatusEnum.STARTED)
+			throw new GameAlreadyStartedException();
 
         // Check if the game has more players than the max we want to set
         if (maxNumberOfPlayers < game.getPlayers().size())
@@ -182,7 +193,8 @@ public class GameServiceImpl implements GameService {
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check if the game has already started
-        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
+        if (game.getStatus() == GameStatusEnum.STARTED)
+			throw new GameAlreadyStartedException();
 
         // Set the game punctuation type
         game.setPunctuationMode(PunctuationModeEnum.POINTS);
@@ -202,7 +214,8 @@ public class GameServiceImpl implements GameService {
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check if the game has already started
-        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
+        if (game.getStatus() == GameStatusEnum.STARTED)
+			throw new GameAlreadyStartedException();
 
         // Set the game punctuation type
         game.setPunctuationMode(PunctuationModeEnum.ROUNDS);
@@ -225,7 +238,8 @@ public class GameServiceImpl implements GameService {
         Assert.assertNotNull(dictionary, ErrorEnum.DICTIONARY_NOT_FOUND);
 
         // Check if the game has already started
-        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
+        if (game.getStatus() == GameStatusEnum.STARTED)
+			throw new GameAlreadyStartedException();
 
         // Set the dictionary
         game.setDictionary(dictionary);
@@ -235,18 +249,25 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public Game addPlayer(Game game, Player player) {
-        logger.debug("Adding player {} to game {}", player, game);
+    public Game addPlayer(Game game, User user) {
+        logger.debug("Adding player {} to game {}", user, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check player exists
-        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+
+	    // Check if the game has not started
+	    if (game.getStatus() != GameStatusEnum.CREATED)
+			throw new GameAlreadyStartedException();
 
         // Check if game is already filled
         if (game.getPlayers().size() + 1 > game.getMaxNumberOfPlayers())
-            throw new GameAlreadyFilledException();
+	        throw new GameAlreadyFilledException();
+
+        // Create the player
+        Player player = playerService.create(game, user);
 
         // Add player to game
         game.getPlayers().add(player);
@@ -256,26 +277,32 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public Game removePlayer(Game game, Player player) {
-        logger.debug("Removing player from user {} in game {}", player, game);
+    public Game removePlayer(Game game, User user) {
+        logger.debug("Removing player from user {} in game {}", user, game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
-
-        // Check player exists
-        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
 
         // Check the status of the game
         if (game.getStatus() == GameStatusEnum.STARTED)
             throw new GameAlreadyStartedException();
 
+        // Check player exists
+        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+
         // Game creator cannor leave
-        if (Objects.equals(game.getCreator().getId(), player.getUser().getId()))
+        if (Objects.equals(game.getCreator().getId(), user.getId()))
             throw new GameCreatorCannotLeaveException();
 
-        // Check if the user is not playing
-        if (game.getPlayers().stream().noneMatch(p -> Objects.equals(p.getId(), player.getId())))
+        // Get the player
+        Player player = playerService.findPlayerByUserAndGame(user, game);
+
+        //  Check if the user is playing this game
+        if (player == null)
             throw new PlayerDoesntExistsException();
+
+        // Delete player
+        playerService.delete(player);
 
         // Remove a player
         game.getPlayers().removeIf(p -> Objects.equals(p.getId(), player.getId()));
@@ -292,7 +319,8 @@ public class GameServiceImpl implements GameService {
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
         // Check the status of the game
-        if (game.getStatus() == GameStatusEnum.STARTED) throw new GameAlreadyStartedException();
+        if (game.getStatus() == GameStatusEnum.STARTED)
+			throw new GameAlreadyStartedException();
 
         // Check the players are more than min
         if (game.getPlayers().size() < getMinNumberOfPlayers())
@@ -349,12 +377,12 @@ public class GameServiceImpl implements GameService {
             // Delete the current round
             roundService.deleteRound(game.getCurrentRound());
 
-			// Empty the current round
-			game.setCurrentRound(null);
+            // Empty the current round
+            game.setCurrentRound(null);
 
-			// Persist
-			gameDao.createOrUpdate(game);
-			gameDao.getEntityManager().flush();
+            // Persist
+            gameDao.createOrUpdate(game);
+            gameDao.getEntityManager().flush();
 
             // Start next round
             game.setCurrentRound(roundService.createRound(game, currentRoundNumber + 1));
@@ -397,29 +425,59 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public Game voteForDeletion(Game game, Player player) {
-        logger.debug("Player {} vote for the deletion of the game {}", player, game);
+    public Game playCard(Game game, User user, Card card) {
+        logger.debug("Playing card on game {}", game);
 
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check user exists
+        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+
+        // Check user exists
+        Assert.assertNotNull(card, ErrorEnum.CARD_NOT_FOUND);
+
+	    // Check the status of the game
+	    if (game.getStatus() == GameStatusEnum.STARTED)
+		    throw new GameAlreadyStartedException();
+
+        // Get the player
+        Player player = playerService.findPlayerByUserAndGame(user, game);
+
+        // Add card to round
+        roundService.addCardToPlayedCards(game.getCurrentRound(), player, card);
+
+        // Remove card from player hand
+        playerService.removeCardFromHand(player, card);
+
+        return gameDao.createOrUpdate(game);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public Game voteForDeletion(Game game, User user) {
+        logger.debug("Player {} vote for the deletion of the game {}", user, game);
+
+        // Check game exists
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check user exists
+        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
 
         // Check if game is started
         if (game.getStatus() != GameStatusEnum.STARTED)
             throw new GameNotStartedException();
 
-        // Check player exists
-        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
-
-        // Check player if from this game
-        if (!game.getPlayers().contains(player))
+        // Check user is playing this game
+        if (playerService.findPlayerByUserAndGame(user, game) == null)
             throw new PlayerDoesntExistsException();
 
-        // Check player not voted already
-        if (game.getDeletionVotes().contains(player))
+        // Check user not voted already
+        if (game.getDeletionVotes().contains(user))
             throw new PlayerAlreadyVotedDeleteException();
 
         // Add deletion votes
-        game.getDeletionVotes().add(player);
+        game.getDeletionVotes().add(user);
 
         // If more than half of the game players vote to delete the game...
         if (game.getStatus().equals(GameStatusEnum.STARTED) && game.getDeletionVotes().size() >= ((game.getPlayers().size() / 2) + 1)) {

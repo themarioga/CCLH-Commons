@@ -28,12 +28,10 @@ public class RoundServiceImpl implements RoundService {
     private final Logger logger = LoggerFactory.getLogger(RoundServiceImpl.class);
 
     private final RoundDao roundDao;
-    private final PlayerService playerService;
 
     @Autowired
-    public RoundServiceImpl(RoundDao roundDao, PlayerService playerService) {
+    public RoundServiceImpl(RoundDao roundDao) {
         this.roundDao = roundDao;
-        this.playerService = playerService;
     }
 
     @Override
@@ -55,7 +53,7 @@ public class RoundServiceImpl implements RoundService {
 
         // Set current president if needed
         if (game.getVotationMode() == VotationModeEnum.DICTATORSHIP) {
-            round.setRoundPresident(playerService.findByUser(game.getCreator()));
+            round.setRoundPresident(game.getCreatorPlayer());
         } else if (round.getGame().getVotationMode() == VotationModeEnum.CLASSIC) {
             selectPlayerForRoundPresident(round);
         }
@@ -80,11 +78,11 @@ public class RoundServiceImpl implements RoundService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public Round playCard(Round round, Player player, Card card) {
+    public Round addCardToPlayedCards(Round round, Player player, Card card) {
         logger.debug("Player {} playing card {} for the round {}", player, card, round);
 
         // Check round exists
-        Assert.assertNotNull(round, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(round, ErrorEnum.ROUND_NOT_STARTED);
 
         // Check if the round is ready to start
         if (round.getStatus() != RoundStatusEnum.PLAYING)
@@ -97,9 +95,6 @@ public class RoundServiceImpl implements RoundService {
         // Check if the card was already played
         if (round.getPlayedCards().stream().anyMatch(playedCard -> playedCard.getCard().getId().equals(card.getId())))
             throw new CardAlreadyPlayedException();
-
-        // Remove the card from the player hand
-        playerService.removeCardFromHand(player, card);
 
         // Set the played card
         PlayedCard playedCard = new PlayedCard();

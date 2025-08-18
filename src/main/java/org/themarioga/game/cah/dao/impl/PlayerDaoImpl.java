@@ -2,6 +2,7 @@ package org.themarioga.game.cah.dao.impl;
 
 import org.springframework.stereotype.Repository;
 import org.themarioga.game.cah.dao.intf.PlayerDao;
+import org.themarioga.game.cah.models.Game;
 import org.themarioga.game.cah.models.Player;
 import org.themarioga.game.cah.models.PlayedCard;
 import org.themarioga.game.cah.models.VotedCard;
@@ -17,7 +18,12 @@ public class PlayerDaoImpl extends AbstractHibernateDao<Player> implements Playe
 
     @Override
     public Player findPlayerByUser(User user) {
-        return getCurrentSession().createQuery("SELECT t FROM Player t where t.user=:user", Player.class).setParameter("user", user).getSingleResultOrNull();
+        return getCurrentSession().createQuery("SELECT p FROM Player p where p.user=:user", Player.class).setParameter("user", user).getSingleResultOrNull();
+    }
+
+    @Override
+    public Player findPlayerByUserAndGame(User user, Game game) {
+        return getCurrentSession().createQuery("SELECT p FROM Player p where p.user=:user and p.game=:game", Player.class).setParameter("user", user).setParameter("game", game).getSingleResultOrNull();
     }
 
     @Override
