@@ -2,19 +2,14 @@ package org.themarioga.game.cah.models;
 
 import jakarta.persistence.*;
 import org.themarioga.game.cah.enums.RoundStatusEnum;
+import org.themarioga.game.commons.models.Base;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 @Entity
-public class Round implements Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class Round extends Base implements Serializable {
 
     @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
@@ -37,14 +32,6 @@ public class Round implements Serializable {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "round", orphanRemoval = true)
     private List<VotedCard> votedCards = new ArrayList<>(0);
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
 
     public Game getGame() {
         return game;
@@ -103,21 +90,8 @@ public class Round implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Round round = (Round) o;
-        return Objects.equals(id, round.id) && Objects.equals(game, round.game) && Objects.equals(roundNumber, round.roundNumber);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, game, roundNumber);
-    }
-
-    @Override
     public String toString() {
-        return "Round{" + "id=" + id + ", roundBlackCard=" + roundBlackCard + ", roundNumber=" + roundNumber + ", status=" + status + '}';
+        return "Round{id=" + getId() + ", roundBlackCard=" + roundBlackCard + ", roundNumber=" + roundNumber + ", status=" + status + '}';
     }
 
 }

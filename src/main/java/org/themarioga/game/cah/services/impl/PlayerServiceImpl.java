@@ -8,12 +8,13 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.game.cah.dao.intf.PlayerDao;
 import org.themarioga.game.cah.exceptions.player.PlayerCannotPlayCardException;
-import org.themarioga.game.cah.models.*;
+import org.themarioga.game.cah.models.Card;
+import org.themarioga.game.cah.models.Game;
+import org.themarioga.game.cah.models.Player;
+import org.themarioga.game.cah.models.PlayerHandCard;
 import org.themarioga.game.cah.services.intf.PlayerService;
 import org.themarioga.game.commons.enums.ErrorEnum;
-import org.themarioga.game.commons.enums.GameStatusEnum;
 import org.themarioga.game.commons.exceptions.ApplicationException;
-import org.themarioga.game.commons.exceptions.game.GameAlreadyStartedException;
 import org.themarioga.game.commons.exceptions.player.PlayerAlreadyExistsException;
 import org.themarioga.game.commons.models.User;
 import org.themarioga.game.commons.services.intf.UserService;
@@ -45,10 +46,6 @@ public class PlayerServiceImpl implements PlayerService {
 
         // Check game is not null
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
-
-        // Check if the game is already started
-        if (game.getStatus() == GameStatusEnum.STARTED)
-            throw new GameAlreadyStartedException();
 
         // Check user is not null
         Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
@@ -147,7 +144,7 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public Player findPlayerByUserAndGame(User user, Game game) {
+    public Player findPlayerByGameAndUser(Game game, User user) {
         logger.debug("Checking user's playing game {}", user);
 
         return playerDao.findPlayerByUserAndGame(user, game);

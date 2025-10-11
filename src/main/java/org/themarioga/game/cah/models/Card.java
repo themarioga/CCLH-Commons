@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import org.themarioga.game.cah.enums.CardTypeEnum;
 import org.themarioga.game.commons.models.Base;
 
-import java.util.Objects;
-
 @Entity
 public class Card extends Base {
 
@@ -40,19 +38,6 @@ public class Card extends Base {
 
     public void setDictionary(Dictionary dictionary) {
         this.dictionary = dictionary;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        Card card = (Card) object;
-        return Objects.equals(getId(), card.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId());
     }
 
     @Override

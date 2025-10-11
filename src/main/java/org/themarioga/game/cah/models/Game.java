@@ -7,7 +7,6 @@ import org.themarioga.game.cah.enums.VotationModeEnum;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 public class Game extends org.themarioga.game.commons.models.Game implements Serializable {
@@ -131,27 +130,6 @@ public class Game extends org.themarioga.game.commons.models.Game implements Ser
 
     public void setCurrentRound(Round currentRound) {
         this.currentRound = currentRound;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        Game game = (Game) o;
-        return getVotationMode() == game.getVotationMode() && getPunctuationMode() == game.getPunctuationMode() && Objects.equals(getNumberOfPointsToWin(), game.getNumberOfPointsToWin()) && Objects.equals(getNumberOfRounds(), game.getNumberOfRounds()) && Objects.equals(getMaxNumberOfPlayers(), game.getMaxNumberOfPlayers()) && Objects.equals(getDictionary(), game.getDictionary());
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + Objects.hashCode(getVotationMode());
-        result = 31 * result + Objects.hashCode(getPunctuationMode());
-        result = 31 * result + Objects.hashCode(getNumberOfPointsToWin());
-        result = 31 * result + Objects.hashCode(getNumberOfRounds());
-        result = 31 * result + Objects.hashCode(getMaxNumberOfPlayers());
-        result = 31 * result + Objects.hashCode(getDictionary());
-        return result;
     }
 
     @Override

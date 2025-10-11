@@ -20,7 +20,7 @@ public interface PlayerService {
 
     Player findByUserId(UUID userId);
 
-    Player findPlayerByUserAndGame(User user, Game game);
+    Player findPlayerByGameAndUser(Game game, User user);
 
     void insertWhiteCardsIntoPlayerHand(Player player, List<Card> cardsToTransfer);
 

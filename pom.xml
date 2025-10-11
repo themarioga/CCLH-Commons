@@ -61,6 +61,20 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -74,13 +88,6 @@
                         <exclude>**/BaseTest.java</exclude>
                     </excludes>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.owasp</groupId>
@@ -90,6 +97,8 @@
                     <failBuildOnCVSS>8</failBuildOnCVSS>
                     <suppressionFile>${project.basedir}/src/main/resources/supressed-cve-exceptions.xml</suppressionFile>
                     <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>
+                    <ossIndexUsername>${env.OSS_INDEX_USER}</ossIndexUsername>
+                    <ossIndexPassword>${env.OSS_INDEX_PASS}</ossIndexPassword>
                 </configuration>
                 <executions>
                     <execution>
