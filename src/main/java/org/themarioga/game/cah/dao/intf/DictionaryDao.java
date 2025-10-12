@@ -12,11 +12,13 @@ public interface DictionaryDao extends InterfaceHibernateDao<Dictionary> {
 
     List<Dictionary> getDictionariesByCreatorOrCollaborator(User creator);
 
-    List<Dictionary> getDictionariesPaginated(User creator, int firstResult, int maxResults);
+    List<Dictionary> getDictionariesPaginatedForTable(User creator, int firstResult, int maxResults);
 
-    Long getDictionaryCount(User creator);
+    Long getDictionaryCountForTable(User creator);
 
     Long countDictionariesByName(String name);
+
+    Long countUnpublishedDictionariesByCreator(User user);
 
     boolean isDictionaryCollaborator(Dictionary dictionary, User user);
 

@@ -16,11 +16,12 @@ import org.themarioga.game.cah.exceptions.player.PlayerAlreadyPlayedCardExceptio
 import org.themarioga.game.cah.exceptions.player.PlayerAlreadyVotedCardException;
 import org.themarioga.game.cah.exceptions.player.PlayerCannotVoteCardException;
 import org.themarioga.game.cah.models.*;
-import org.themarioga.game.cah.services.intf.PlayerService;
 import org.themarioga.game.cah.services.intf.RoundService;
 import org.themarioga.game.commons.enums.ErrorEnum;
 import org.themarioga.game.commons.exceptions.ApplicationException;
 import org.themarioga.game.commons.util.Assert;
+
+import java.util.Date;
 
 @Service
 public class RoundServiceImpl implements RoundService {
@@ -47,6 +48,7 @@ public class RoundServiceImpl implements RoundService {
         round.setGame(game);
         round.setRoundNumber(roundNumber);
         round.setStatus(RoundStatusEnum.PLAYING);
+        round.setCreationDate(new Date());
 
         // Set current black card
         round.setRoundBlackCard(getBlackCardFromGameDeck(game));
@@ -150,17 +152,6 @@ public class RoundServiceImpl implements RoundService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public Card getBlackCardFromGameDeck(Game game) {
-        logger.debug("Getting black card from deck to game {}", game);
-
-        Card nextBlackCard = game.getBlackCardsDeck().get(0);
-        game.getBlackCardsDeck().remove(nextBlackCard);
-
-        return nextBlackCard;
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public PlayedCard getMostVotedCard(long gameId) {
         logger.debug("Getting most voted card of the game of the game {}", gameId);
 
@@ -185,6 +176,15 @@ public class RoundServiceImpl implements RoundService {
             votesNeededToEnd = 1;
 
         return roundDao.countVotedCards(round) == votesNeededToEnd;
+    }
+
+    private Card getBlackCardFromGameDeck(Game game) {
+        logger.debug("Getting black card from deck to game {}", game);
+
+        Card nextBlackCard = game.getBlackCardsDeck().get(0);
+        game.getBlackCardsDeck().remove(nextBlackCard);
+
+        return nextBlackCard;
     }
 
     private void selectPlayerForRoundPresident(Round round) {

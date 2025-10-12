@@ -40,9 +40,15 @@ public class DictionaryServiceImpl implements DictionaryService {
     public Dictionary create(String name, User creator) {
         logger.debug("Creating dictionary: {}", name);
 
+        // Don't allow creating a dictionary with an already existing name
         if (dictionaryDao.countDictionariesByName(name) > 0)
             throw new DictionaryAlreadyExistsException();
 
+        // Don't allow creating a dictionary if max number have already been exceeded
+        if (dictionaryDao.countUnpublishedDictionariesByCreator(creator) >= getDictionaryMaxNumberOfUnfinishedDictionaries())
+            throw new DictionaryAlreadyFilledException();
+
+        // Create dictionary
         Dictionary dictionary = new Dictionary();
         dictionary.setName(name);
         dictionary.setCreator(creator);
@@ -51,6 +57,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         dictionary.setShared(false);
         dictionary.setCreationDate(new Date());
 
+        // Set creator as collaborator
         DictionaryCollaborator dictionaryCollaborator = new DictionaryCollaborator();
         dictionaryCollaborator.setDictionary(dictionary);
         dictionaryCollaborator.setUser(creator);
@@ -63,7 +70,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public void setName(Dictionary dictionary, String newName) {
+    public Dictionary setName(Dictionary dictionary, String newName) {
         logger.debug("Setting name {} to dictionary {}", newName, dictionary);
 
         if (dictionaryDao.countDictionariesByName(newName) > 0)
@@ -71,22 +78,22 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         dictionary.setName(newName);
 
-        dictionaryDao.createOrUpdate(dictionary);
+        return dictionaryDao.createOrUpdate(dictionary);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public void setLanguage(Dictionary dictionary, Lang lang) {
+    public Dictionary setLanguage(Dictionary dictionary, Lang lang) {
         logger.debug("Setting lang {} to dictionary {}", lang, dictionary);
 
         dictionary.setLang(lang);
 
-        dictionaryDao.createOrUpdate(dictionary);
+        return dictionaryDao.createOrUpdate(dictionary);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public void togglePublished(Dictionary dictionary) {
+    public Dictionary togglePublished(Dictionary dictionary) {
         logger.debug("Toggling published to dictionary {}", dictionary);
 
         if (Boolean.TRUE.equals(dictionary.getShared()))
@@ -97,12 +104,12 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         dictionary.setPublished(!dictionary.getPublished());
 
-        dictionaryDao.createOrUpdate(dictionary);
+        return dictionaryDao.createOrUpdate(dictionary);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public void toggleShared(Dictionary dictionary) {
+    public Dictionary toggleShared(Dictionary dictionary) {
         logger.debug("Toggling shared to dictionary {}", dictionary);
 
         if (Boolean.FALSE.equals(dictionary.getPublished()))
@@ -110,13 +117,16 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         dictionary.setShared(!dictionary.getShared());
 
-        dictionaryDao.createOrUpdate(dictionary);
+        return dictionaryDao.createOrUpdate(dictionary);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public void delete(Dictionary dictionary) {
         logger.debug("Delete dictionary: {}", dictionary);
+
+	    if (Boolean.TRUE.equals(dictionary.getShared()))
+		    throw new DictionaryAlreadySharedException();
 
         dictionaryDao.delete(dictionary);
     }
@@ -163,7 +173,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public DictionaryCollaborator toggleCollaborator(Dictionary dictionary, User user) {
-        logger.debug("Delete dictionary collaborator: {} {}", dictionary, user);
+        logger.debug("Toggle dictionary collaborator: {} {}", dictionary, user);
 
         Optional<DictionaryCollaborator> collaborator = dictionary.getCollaborators().stream().filter(dictionaryCollaborator -> Objects.equals(dictionaryCollaborator.getUser().getId(), user.getId())).findFirst();
 
@@ -220,7 +230,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     public List<Dictionary> getDictionariesPaginated(User creator, int firstResult, int maxResults) {
         logger.debug("Getting dictionary from {} to {}", firstResult, maxResults);
 
-        return dictionaryDao.getDictionariesPaginated(creator, firstResult, maxResults);
+        return dictionaryDao.getDictionariesPaginatedForTable(creator, firstResult, maxResults);
     }
 
     @Override
@@ -228,7 +238,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     public Long getDictionaryCount(User creator) {
         logger.debug("Get dictionary count {}", creator);
 
-        return dictionaryDao.getDictionaryCount(creator);
+        return dictionaryDao.getDictionaryCountForTable(creator);
     }
 
     @Override
@@ -253,10 +263,12 @@ public class DictionaryServiceImpl implements DictionaryService {
         return dictionaryDao.findOne(UUID.fromString(configurationService.getConfiguration("game_default_dictionary_id")));
     }
 
-    @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public int getDictionaryMaxCollaborators() {
+    private int getDictionaryMaxCollaborators() {
         return Integer.parseInt(configurationService.getConfiguration("dictionaries_max_collaborators"));
+    }
+
+    private int getDictionaryMaxNumberOfUnfinishedDictionaries() {
+        return Integer.parseInt(configurationService.getConfiguration("dictionaries_max_unfinished_number"));
     }
 
 }

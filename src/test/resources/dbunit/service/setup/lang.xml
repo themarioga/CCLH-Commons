@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE dataset SYSTEM "src/test/resources/cahschema.dtd">
 <dataset>
-    <lang ID="es" NAME="Español"/>
-    <lang ID="EN" NAME="English"/>
+    <Lang ID="es" NAME="Español"/>
+    <Lang ID="en" NAME="English"/>
 </dataset>

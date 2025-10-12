@@ -6,7 +6,7 @@ import org.themarioga.game.cah.exceptions.CAHApplicationException;
 public class DictionaryAlreadySharedException extends CAHApplicationException {
 
     public DictionaryAlreadySharedException() {
-        super(CAHErrorEnum.DICTIONARY_ALREADY_FILLED);
+        super(CAHErrorEnum.DICTIONARY_ALREADY_SHARED);
     }
 
 }

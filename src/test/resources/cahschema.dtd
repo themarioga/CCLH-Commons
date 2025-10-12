@@ -102,6 +102,7 @@
                 ROUND_NUMBER CDATA #REQUIRED
                 ROUND_BLACK_CARD_ID CDATA #REQUIRED
                 ROUND_PRESIDENT_ID CDATA #IMPLIED
+                CREATION_DATE CDATA #REQUIRED
                 >
 
         <!ELEMENT Game_black_cards_deck EMPTY>

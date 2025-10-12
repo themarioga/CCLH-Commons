@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<dataset>
-    <t_table_playervotes GAME_ID="10" PLAYER_ID="10" CARD_ID="0"/>
-    <t_table_playervotes GAME_ID="10" PLAYER_ID="11" CARD_ID="0"/>
-    <t_table_playervotes GAME_ID="10" PLAYER_ID="12" CARD_ID="1"/>
-</dataset>

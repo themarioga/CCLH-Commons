@@ -62,17 +62,17 @@ class PlayerServiceTest extends BaseTest {
     }
 
     @Test
-//    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/round.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/round.xml")
     void testInsertWhiteCardsIntoPlayerHand() {
-        // ToDo
-//        Game game = gameService.endRound(gameService.getByRoomId(UUID.fromString("33333333-3333-3333-3333-333333333333")));
-//        Player player = playerService.findByUserId(UUID.fromString("77777777-7777-7777-7777-777777777777"));
-//        playerService.insertWhiteCardsIntoPlayerHand(player, game.getWhiteCardsDeck().subList(0, 5));
-//
-//        Assertions.assertNotNull(player);
+        Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+        Player player = playerService.findByUserId(UUID.fromString("77777777-7777-7777-7777-777777777777"));
+        playerService.insertWhiteCardsIntoPlayerHand(player, game.getWhiteCardsDeck().subList(0, 5));
+
+        Assertions.assertNotNull(player);
+        Assertions.assertEquals(5, player.getHand().size());
     }
 
     @Test

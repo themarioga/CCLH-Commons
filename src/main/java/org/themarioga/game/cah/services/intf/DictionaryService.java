@@ -12,15 +12,15 @@ public interface DictionaryService {
 
     Dictionary create(String name, User creator);
 
-    void setLanguage(Dictionary dictionary, Lang lang);
+    Dictionary setName(Dictionary dictionary, String newName);
 
-    void togglePublished(Dictionary dictionary);
+    Dictionary setLanguage(Dictionary dictionary, Lang lang);
 
-    void toggleShared(Dictionary dictionary);
+    Dictionary togglePublished(Dictionary dictionary);
+
+    Dictionary toggleShared(Dictionary dictionary);
 
     void delete(Dictionary dictionary);
-
-    void setName(Dictionary dictionary, String newName);
 
     DictionaryCollaborator addCollaborator(Dictionary dictionary, User user);
 
@@ -45,6 +45,4 @@ public interface DictionaryService {
     boolean isDictionaryActiveCollaborator(Dictionary dictionary, User user);
 
     Dictionary getDefaultDictionary();
-
-    int getDictionaryMaxCollaborators();
 }

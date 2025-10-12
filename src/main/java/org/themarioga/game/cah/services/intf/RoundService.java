@@ -14,8 +14,6 @@ public interface RoundService {
 
     void setNextBlackCard(Round round, Card nextBlackCard);
 
-    Card getBlackCardFromGameDeck(Game game);
-
     PlayedCard getMostVotedCard(long gameId);
 
     boolean checkIfEveryoneHavePlayedACard(Round round);
