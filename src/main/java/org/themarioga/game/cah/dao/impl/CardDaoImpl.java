@@ -21,12 +21,12 @@ public class CardDaoImpl extends AbstractHibernateDao<Card> implements CardDao {
     }
 
     @Override
-    public List<Card> findCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
+    public List<Card> findCardsByDictionaryAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
         return getCurrentSession().createQuery("SELECT c FROM Card c where c.dictionary=:dictionary and c.type=:type", Card.class).setParameter("dictionary", dictionary).setParameter("type", cardTypeEnum).getResultList();
     }
 
     @Override
-    public int countCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
+    public int countCardsByDictionaryAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
         return getCurrentSession().createQuery("SELECT count(c) FROM Card c where c.dictionary=:dictionary and c.type=:type", Long.class).setParameter("dictionary", dictionary).setParameter("type", cardTypeEnum).getSingleResultOrNull().intValue();
     }
 

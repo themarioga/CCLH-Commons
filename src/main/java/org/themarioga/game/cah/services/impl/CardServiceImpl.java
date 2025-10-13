@@ -48,7 +48,7 @@ public class CardServiceImpl implements CardService {
             throw new DictionaryAlreadyFilledException();
 
         // Check if text limits are exceeded
-        if ((type == CardTypeEnum.WHITE && text.length() > getDictionaryWhiteCardMaxLength()) || (type == CardTypeEnum.BLACK && text.length() > getDictionaryBlackCardMaxLength()))
+        if (checkCardTextExcededLength(type, text))
             throw new CardTextExcededLength();
 
         // Create the card
@@ -63,18 +63,21 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public void changeText(Card card, String newText) {
+    public Card changeText(Card card, String newText) {
         logger.debug("Updating card text: {} {}", card, newText);
 
+		// Check if card with that text already exists
         if (cardDao.checkCardExistsByDictionaryTypeAndText(card.getDictionary(), card.getType(), newText))
             throw new CardAlreadyExistsException();
 
-        if ((card.getType() == CardTypeEnum.WHITE && newText.length() > getDictionaryWhiteCardMaxLength()) || (card.getType() == CardTypeEnum.BLACK && newText.length() > getDictionaryBlackCardMaxLength()))
-            throw new CardTextExcededLength();
+	    // Check if text limits are exceeded
+	    if (checkCardTextExcededLength(card.getType(), newText))
+		    throw new CardTextExcededLength();
 
+		// Change card text
         card.setText(newText);
 
-        cardDao.createOrUpdate(card);
+        return cardDao.createOrUpdate(card);
     }
 
     @Override
@@ -95,27 +98,27 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public List<Card> findCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
+    public List<Card> findCardsByDictionaryAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
         logger.debug("Getting cards by dictionary {} and type {}", dictionary, cardTypeEnum);
 
-        return cardDao.findCardsByDictionaryIdAndType(dictionary, cardTypeEnum);
+        return cardDao.findCardsByDictionaryAndType(dictionary, cardTypeEnum);
     }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public int countCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
+    public int countCardsByDictionaryAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
         logger.debug("Counting cards by dictionary {} and type {}", dictionary, cardTypeEnum);
 
-        return cardDao.countCardsByDictionaryIdAndType(dictionary, cardTypeEnum);
+        return cardDao.countCardsByDictionaryAndType(dictionary, cardTypeEnum);
     }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public boolean checkDictionaryCanBePublished(Dictionary dictionary) {
-        if (cardDao.countCardsByDictionaryIdAndType(dictionary, CardTypeEnum.WHITE) < getDictionaryMinWhiteCards())
+        if (cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.WHITE) < getDictionaryMinWhiteCards())
             return false;
 
-        if (cardDao.countCardsByDictionaryIdAndType(dictionary, CardTypeEnum.BLACK) < getDictionaryMinBlackCards())
+        if (cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK) < getDictionaryMinBlackCards())
             return false;
 
         return true;
@@ -147,12 +150,16 @@ public class CardServiceImpl implements CardService {
 
     private boolean checkDictionaryAlreadyFilled(Dictionary dictionary, CardTypeEnum type) {
         if (type == CardTypeEnum.WHITE) {
-            return cardDao.countCardsByDictionaryIdAndType(dictionary, CardTypeEnum.WHITE) >= getDictionaryMaxWhiteCards();
+            return cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.WHITE) >= getDictionaryMaxWhiteCards();
         } else if (type == CardTypeEnum.BLACK) {
-            return cardDao.countCardsByDictionaryIdAndType(dictionary, CardTypeEnum.BLACK) >= getDictionaryMaxBlackCards();
+            return cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK) >= getDictionaryMaxBlackCards();
         }
 
         throw new ApplicationException("Error desconocido");
     }
+
+	private boolean checkCardTextExcededLength(CardTypeEnum type, String text) {
+		return (type == CardTypeEnum.WHITE && text.length() > getDictionaryWhiteCardMaxLength()) || (type == CardTypeEnum.BLACK && text.length() > getDictionaryBlackCardMaxLength());
+	}
 
 }

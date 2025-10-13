@@ -11,15 +11,15 @@ public interface CardService {
 
     Card create(Dictionary dictionary, CardTypeEnum type, String text);
 
-    void changeText(Card card, String newText);
+	Card changeText(Card card, String newText);
 
     void delete(Card card);
 
     Card getCardById(UUID id);
 
-    List<Card> findCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum);
+    List<Card> findCardsByDictionaryAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum);
 
-    int countCardsByDictionaryIdAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum);
+    int countCardsByDictionaryAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum);
 
     boolean checkDictionaryCanBePublished(Dictionary dictionary);
 }

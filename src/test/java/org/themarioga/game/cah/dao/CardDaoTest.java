@@ -100,11 +100,11 @@ class CardDaoTest extends BaseTest {
 
     @Test
     @DatabaseSetup("classpath:dbunit/dao/setup/card.xml")
-    void testFindCardsByDictionaryIdAndType() {
+    void testFindCardsByDictionaryAndType() {
         Dictionary dictionary = dictionaryDao.findOne(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-        List<Card> cards = cardDao.findCardsByDictionaryIdAndType(dictionary, CardTypeEnum.BLACK);
-        int cardNumber = cardDao.countCardsByDictionaryIdAndType(dictionary, CardTypeEnum.BLACK);
+        List<Card> cards = cardDao.findCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK);
+        int cardNumber = cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK);
 
         Assertions.assertEquals(1L, cards.size());
         Assertions.assertEquals(1L, cardNumber);
