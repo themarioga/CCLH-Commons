@@ -11,7 +11,7 @@ import org.themarioga.game.cah.enums.RoundStatusEnum;
 import org.themarioga.game.cah.enums.VotationModeEnum;
 import org.themarioga.game.cah.exceptions.card.CardAlreadyPlayedException;
 import org.themarioga.game.cah.exceptions.card.CardNotPlayedException;
-import org.themarioga.game.cah.exceptions.game.RoundWrongStatusException;
+import org.themarioga.game.cah.exceptions.round.RoundWrongStatusException;
 import org.themarioga.game.cah.exceptions.player.PlayerAlreadyPlayedCardException;
 import org.themarioga.game.cah.exceptions.player.PlayerAlreadyVotedCardException;
 import org.themarioga.game.cah.exceptions.player.PlayerCannotVoteCardException;

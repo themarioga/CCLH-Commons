@@ -10,6 +10,7 @@ import org.themarioga.game.cah.enums.PunctuationModeEnum;
 import org.themarioga.game.cah.enums.RoundStatusEnum;
 import org.themarioga.game.cah.enums.VotationModeEnum;
 import org.themarioga.game.cah.exceptions.player.PlayerCannotDrawCardException;
+import org.themarioga.game.cah.exceptions.round.RoundWrongStatusException;
 import org.themarioga.game.cah.models.*;
 import org.themarioga.game.cah.services.intf.CCLHService;
 import org.themarioga.game.cah.services.intf.GameService;
@@ -21,8 +22,6 @@ import org.themarioga.game.commons.exceptions.ApplicationException;
 import org.themarioga.game.commons.exceptions.game.*;
 import org.themarioga.game.commons.exceptions.player.PlayerDoesntExistsException;
 import org.themarioga.game.commons.exceptions.room.RoomAlreadyExistsException;
-import org.themarioga.game.commons.exceptions.round.RoundNotEndingException;
-import org.themarioga.game.commons.exceptions.round.RoundNotStartedException;
 import org.themarioga.game.commons.models.Room;
 import org.themarioga.game.commons.models.User;
 import org.themarioga.game.commons.services.intf.ConfigurationService;
@@ -382,11 +381,11 @@ public class CCLHServiceImpl implements CCLHService {
 
         // If there are not round started it have no sense to end it
         if (game.getCurrentRound() == null)
-            throw new RoundNotStartedException();
+            throw new RoundWrongStatusException();
 
         // If round is not ending you can't end it
         if (game.getCurrentRound().getStatus() != RoundStatusEnum.ENDING)
-            throw new RoundNotEndingException();
+            throw new RoundWrongStatusException();
 
         // Check if game is ended
         if (checkIfGameEnded(game)) {

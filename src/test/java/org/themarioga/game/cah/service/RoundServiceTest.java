@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.game.cah.BaseTest;
+import org.themarioga.game.cah.enums.RoundStatusEnum;
 import org.themarioga.game.cah.enums.VotationModeEnum;
+import org.themarioga.game.cah.exceptions.round.RoundWrongStatusException;
 import org.themarioga.game.cah.models.Game;
 import org.themarioga.game.cah.models.Round;
 import org.themarioga.game.cah.services.intf.GameService;
@@ -80,6 +82,14 @@ class RoundServiceTest extends BaseTest {
 
         roundService.deleteRound(game.getCurrentRound());
         getCurrentSession().flush();
+    }
+
+    @Test
+    void testDeleteRound_NotEnding() {
+        Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+        game.getCurrentRound().setStatus(RoundStatusEnum.PLAYING);
+
+        Assertions.assertThrows(RoundWrongStatusException.class, () -> roundService.deleteRound(game.getCurrentRound()));
     }
 
 }
