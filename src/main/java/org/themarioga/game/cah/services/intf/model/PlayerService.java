@@ -1,4 +1,4 @@
-package org.themarioga.game.cah.services.intf;
+package org.themarioga.game.cah.services.intf.model;
 
 import org.themarioga.game.cah.models.Game;
 import org.themarioga.game.cah.models.Player;

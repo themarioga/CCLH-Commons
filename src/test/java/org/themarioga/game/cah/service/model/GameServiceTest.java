@@ -1,4 +1,4 @@
-package org.themarioga.game.cah.service;
+package org.themarioga.game.cah.service.model;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
@@ -15,10 +15,10 @@ import org.themarioga.game.cah.models.Dictionary;
 import org.themarioga.game.cah.models.Game;
 import org.themarioga.game.cah.models.Player;
 import org.themarioga.game.cah.models.Round;
-import org.themarioga.game.cah.services.intf.DictionaryService;
-import org.themarioga.game.cah.services.intf.GameService;
-import org.themarioga.game.cah.services.intf.PlayerService;
-import org.themarioga.game.cah.services.intf.RoundService;
+import org.themarioga.game.cah.services.intf.model.DictionaryService;
+import org.themarioga.game.cah.services.intf.model.GameService;
+import org.themarioga.game.cah.services.intf.model.PlayerService;
+import org.themarioga.game.cah.services.intf.model.RoundService;
 import org.themarioga.game.commons.enums.GameStatusEnum;
 import org.themarioga.game.commons.exceptions.ApplicationException;
 import org.themarioga.game.commons.exceptions.game.*;
@@ -32,12 +32,12 @@ import org.themarioga.game.commons.services.intf.UserService;
 import java.util.UUID;
 
 @DatabaseSetup("classpath:dbunit/service/setup/lang.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/user.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/room.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/dictionary.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/card.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/game.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/player.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/user.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/room.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/dictionary.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/card.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/game.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/player.xml")
 class GameServiceTest extends BaseTest {
 
     @Autowired
@@ -54,7 +54,7 @@ class GameServiceTest extends BaseTest {
     private RoundService roundService;
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testCreateGame-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testCreateGame-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testCreateGame() {
         Room room = roomService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444"));
         User creator = userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444"));
@@ -89,7 +89,7 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameVotationMode-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testUpdateGameVotationMode-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testUpdate() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
         game.setVotationMode(VotationModeEnum.DICTATORSHIP);
@@ -102,7 +102,7 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testDeleteGame-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testDeleteGame-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testDeleteGame() {
         gameService.delete(gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
 
@@ -122,7 +122,7 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameStatus-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testUpdateGameStatus-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testUpdateStatus() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
         game = gameService.setStatus(game, GameStatusEnum.DELETING);
@@ -132,7 +132,7 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameVotationMode-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testUpdateGameVotationMode-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetMaxVotationMode() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
         game = gameService.setVotationMode(game, VotationModeEnum.DICTATORSHIP);
@@ -149,7 +149,7 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameNumberPlayers-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testUpdateGameNumberPlayers-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetMaxNumberOfPlayers() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
         game = gameService.setMaxNumberOfPlayers(game, 5);
@@ -180,7 +180,7 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameNumberPoints-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testUpdateGameNumberPoints-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetNumberPointsToWin() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
         game = gameService.setNumberOfPointsToWin(game, 5);
@@ -198,7 +198,7 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameNumberRounds-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testUpdateGameNumberRounds-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetNumberRounds() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
         game = gameService.setNumberOfRoundsToEnd(game, 5);
@@ -216,7 +216,7 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameDictionary-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testUpdateGameDictionary-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testSetDictionary() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
         Dictionary dictionary = dictionaryService.getDictionaryById(UUID.fromString("11111111-1111-1111-1111-111111111111"));
@@ -311,13 +311,13 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/player2.xml")
     void testStartGame_GameOverflowed() {
         Assertions.assertThrows(GameAlreadyFilledException.class, () -> gameService.startGame(gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")))));
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/player2.xml")
     void testVoteDeletion_vote() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
         User user = userService.getById(UUID.fromString("77777777-7777-7777-7777-777777777777"));
@@ -332,7 +332,7 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/player2.xml")
     void testVoteDeletion_delete() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
         User user = userService.getById(UUID.fromString("77777777-7777-7777-7777-777777777777"));
@@ -362,8 +362,8 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
-    @DatabaseSetup("classpath:dbunit/service/setup/gamedeletionvotes.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/gamedeletionvotes.xml")
     void testVoteDeletion_PlayerAlreadyVoted() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
         User user = userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
@@ -375,8 +375,8 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/service/setup/game_endGame.xml")
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testEndGame-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @DatabaseSetup("classpath:dbunit/service/setup/model/game_endGame.xml")
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testEndGame-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testEndGame() {
         gameService.endGame(gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333"))));
 
@@ -389,8 +389,8 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
-    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/deckcard.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/player2.xml")
     void testSetCurrentRound() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
         Round round = roundService.createRound(game, 0);
@@ -400,8 +400,8 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
-    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/deckcard.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/player2.xml")
     void testSetCurrentRound_GameNotStarted() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
         game.setStatus(GameStatusEnum.DELETING);
@@ -418,7 +418,8 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/service/setup/round.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/round.xml")
     void testGetNextRoundNumber_SecondRound() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
 

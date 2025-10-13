@@ -1,4 +1,4 @@
-package org.themarioga.game.cah.services.impl;
+package org.themarioga.game.cah.services.impl.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ import org.themarioga.game.cah.models.Card;
 import org.themarioga.game.cah.models.Game;
 import org.themarioga.game.cah.models.Player;
 import org.themarioga.game.cah.models.PlayerHandCard;
-import org.themarioga.game.cah.services.intf.PlayerService;
+import org.themarioga.game.cah.services.intf.model.PlayerService;
 import org.themarioga.game.commons.enums.ErrorEnum;
 import org.themarioga.game.commons.exceptions.ApplicationException;
 import org.themarioga.game.commons.exceptions.player.PlayerAlreadyExistsException;

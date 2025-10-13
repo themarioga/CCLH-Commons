@@ -1,4 +1,4 @@
-package org.themarioga.game.cah.service;
+package org.themarioga.game.cah.service.model;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
@@ -12,17 +12,17 @@ import org.themarioga.game.cah.exceptions.card.CardAlreadyExistsException;
 import org.themarioga.game.cah.exceptions.card.CardTextExcededLength;
 import org.themarioga.game.cah.exceptions.dictionary.DictionaryAlreadyFilledException;
 import org.themarioga.game.cah.models.*;
-import org.themarioga.game.cah.services.intf.CardService;
-import org.themarioga.game.cah.services.intf.DictionaryService;
+import org.themarioga.game.cah.services.intf.model.CardService;
+import org.themarioga.game.cah.services.intf.model.DictionaryService;
 
 import java.util.List;
 import java.util.UUID;
 
 @DatabaseSetup("classpath:dbunit/service/setup/lang.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/user.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/dictionary.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/card.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/dictionarycollaborators.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/user.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/dictionary.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/card.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/dictionarycollaborators.xml")
 class CardServiceTest extends BaseTest {
 
     @Autowired
@@ -32,7 +32,7 @@ class CardServiceTest extends BaseTest {
     DictionaryService dictionaryService;
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testCreateCard-expected.xml", table = "Card", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testCreateCard-expected.xml", table = "Card", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testCreateCard() {
         Dictionary dictionary = dictionaryService.getDictionaryById(UUID.fromString("11111111-1111-1111-1111-111111111111"));
 
@@ -86,7 +86,7 @@ class CardServiceTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testDeleteCard-expected.xml", table = "Card", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testDeleteCard-expected.xml", table = "Card", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testDelete() {
         Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 

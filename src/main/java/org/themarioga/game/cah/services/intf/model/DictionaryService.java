@@ -1,4 +1,4 @@
-package org.themarioga.game.cah.services.intf;
+package org.themarioga.game.cah.services.intf.model;
 
 import org.themarioga.game.commons.models.Lang;
 import org.themarioga.game.commons.models.User;

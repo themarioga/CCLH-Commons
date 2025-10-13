@@ -1,4 +1,4 @@
-package org.themarioga.game.cah.service;
+package org.themarioga.game.cah.service.model;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
@@ -10,7 +10,7 @@ import org.themarioga.game.cah.BaseTest;
 import org.themarioga.game.cah.exceptions.dictionary.*;
 import org.themarioga.game.cah.models.Dictionary;
 import org.themarioga.game.cah.models.DictionaryCollaborator;
-import org.themarioga.game.cah.services.intf.DictionaryService;
+import org.themarioga.game.cah.services.intf.model.DictionaryService;
 import org.themarioga.game.commons.models.User;
 import org.themarioga.game.commons.services.intf.LanguageService;
 import org.themarioga.game.commons.services.intf.UserService;
@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.UUID;
 
 @DatabaseSetup("classpath:dbunit/service/setup/lang.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/user.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/dictionary.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/card.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/dictionarycollaborators.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/user.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/dictionary.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/card.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/dictionarycollaborators.xml")
 class DictionaryServiceTest extends BaseTest {
 
     @Autowired
@@ -35,7 +35,7 @@ class DictionaryServiceTest extends BaseTest {
     private LanguageService languageService;
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testCreateDictionary-expected.xml", table = "Dictionary", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testCreateDictionary-expected.xml", table = "Dictionary", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testCreateDictionary() {
         User creator = userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
         Dictionary dictionary = dictionaryService.create("Dictionary 1", creator);
@@ -119,7 +119,7 @@ class DictionaryServiceTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testDeleteDictionary-expected.xml", table = "Dictionary", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testDeleteDictionary-expected.xml", table = "Dictionary", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testDelete() {
         Dictionary dictionary = dictionaryService.getDictionaryById(UUID.fromString("22222222-2222-2222-2222-222222222222"));
 
@@ -171,7 +171,7 @@ class DictionaryServiceTest extends BaseTest {
     // //////// COLLABORATORS //////////
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testCreateCollaborator-expected.xml", table = "dictionary_collaborator", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testCreateCollaborator-expected.xml", table = "dictionary_collaborator", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testAddCollaborator() {
         Dictionary dictionary = dictionaryService.getDictionaryById(UUID.fromString("22222222-2222-2222-2222-222222222222"));
         User user = userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111"));
@@ -258,7 +258,7 @@ class DictionaryServiceTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testDeleteCollaborator-expected.xml", table = "dictionary_collaborator", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/model/testDeleteCollaborator-expected.xml", table = "dictionary_collaborator", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testRemoveCollaborator() {
         Dictionary dictionary = dictionaryService.getDictionaryById(UUID.fromString("11111111-1111-1111-1111-111111111111"));
         User user = userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111"));

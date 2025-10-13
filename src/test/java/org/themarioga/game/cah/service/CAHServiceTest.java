@@ -5,14 +5,14 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.game.cah.BaseTest;
-import org.themarioga.game.cah.services.intf.GameService;
-import org.themarioga.game.cah.services.intf.PlayerService;
+import org.themarioga.game.cah.services.intf.model.GameService;
+import org.themarioga.game.cah.services.intf.model.PlayerService;
 
 @DatabaseSetup("classpath:dbunit/service/setup/lang.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/user.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/room.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/dictionary.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/card.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/user.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/room.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/dictionary.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/card.xml")
 class CAHServiceTest extends BaseTest {
 
     @Autowired
@@ -55,10 +55,10 @@ class CAHServiceTest extends BaseTest {
 
 //
 //    @Test
-//    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/playerhand2.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/player2.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/card.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/deckcard.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/playerhand2.xml")
 //    void testStartRound_FirstRound() {
 //        Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
 //
@@ -70,10 +70,10 @@ class CAHServiceTest extends BaseTest {
 //    }
 //
 //    @Test
-//    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/round.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/player2.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/card.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/deckcard.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/round.xml")
 //    void testStartRound_SecondRound() {
 //        Game game = gameService.startRound(gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333"))));
 //
@@ -86,10 +86,10 @@ class CAHServiceTest extends BaseTest {
 //    }
 //
 //    @Test
-//    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/round.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/player2.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/card.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/deckcard.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/round.xml")
 //    void testEndRound_Rounds_NotEnding() {
 //        Game game = gameService.endRound(gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333"))));
 //
@@ -97,10 +97,10 @@ class CAHServiceTest extends BaseTest {
 //    }
 //
 //    @Test
-//    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/round_endRound_RoundEnding.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/player2.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/card.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/deckcard.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/round_endRound_RoundEnding.xml")
 //    void testEndRound_Rounds_Ending() {
 //        Game game = gameService.endRound(gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333"))));
 //
@@ -108,11 +108,11 @@ class CAHServiceTest extends BaseTest {
 //    }
 //
 //    @Test
-//    @DatabaseSetup("classpath:dbunit/service/setup/game_endRound_Points_NotEnding.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/round.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/game_endRound_Points_NotEnding.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/player2.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/card.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/deckcard.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/round.xml")
 //    void testEndRound_Points_NotEnding() {
 //        Game game = gameService.endRound(gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333"))));
 //
@@ -120,11 +120,11 @@ class CAHServiceTest extends BaseTest {
 //    }
 //
 //    @Test
-//    @DatabaseSetup("classpath:dbunit/service/setup/game_endRound_Points_NotEnding.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/player_endRound_Points.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/round.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/game_endRound_Points_NotEnding.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/player_endRound_Points.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/card.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/deckcard.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/round.xml")
 //    void testEndRound_Points_Ending() {
 //        Game game = gameService.endRound(gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333"))));
 //
@@ -142,10 +142,10 @@ class CAHServiceTest extends BaseTest {
 //    }
 //
 //    @Test
-//    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
-//    @DatabaseSetup("classpath:dbunit/service/setup/round_endRound_RoundNotEnding.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/player2.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/card.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/deckcard.xml")
+//    @DatabaseSetup("classpath:dbunit/service/setup/model/round_endRound_RoundNotEnding.xml")
 //    void testEndRound_RoundNotEnding() {
 //        Assertions.assertThrows(RoundNotEndingException.class, () -> gameService.endRound(gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")))));
 //    }

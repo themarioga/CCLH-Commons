@@ -1,4 +1,4 @@
-package org.themarioga.game.cah.services.impl;
+package org.themarioga.game.cah.services.impl.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +14,8 @@ import org.themarioga.game.commons.exceptions.ApplicationException;
 import org.themarioga.game.cah.exceptions.dictionary.*;
 import org.themarioga.game.cah.models.Dictionary;
 import org.themarioga.game.cah.models.DictionaryCollaborator;
-import org.themarioga.game.cah.services.intf.CardService;
-import org.themarioga.game.cah.services.intf.DictionaryService;
+import org.themarioga.game.cah.services.intf.model.CardService;
+import org.themarioga.game.cah.services.intf.model.DictionaryService;
 
 import java.util.*;
 

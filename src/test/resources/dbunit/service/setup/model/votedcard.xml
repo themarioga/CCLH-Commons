@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE dataset SYSTEM "src/test/resources/cahschema.dtd">
+<dataset>
+    <Voted_card ROUND_ID="00000000-0000-0000-0000-000000000001" PLAYER_ID="55555555-5555-5555-5555-555555555555" CARD_ID="00000000-0000-0000-0000-000000000003"/>
+</dataset>

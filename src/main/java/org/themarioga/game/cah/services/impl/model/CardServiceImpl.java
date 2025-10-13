@@ -1,4 +1,4 @@
-package org.themarioga.game.cah.services.impl;
+package org.themarioga.game.cah.services.impl.model;
 
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +14,7 @@ import org.themarioga.game.commons.exceptions.ApplicationException;
 import org.themarioga.game.cah.exceptions.card.CardAlreadyExistsException;
 import org.themarioga.game.cah.exceptions.card.CardTextExcededLength;
 import org.themarioga.game.cah.models.*;
-import org.themarioga.game.cah.services.intf.CardService;
+import org.themarioga.game.cah.services.intf.model.CardService;
 
 import java.util.Date;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.themarioga.game.cah.service;
+package org.themarioga.game.cah.service.model;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.jupiter.api.Assertions;
@@ -9,9 +9,9 @@ import org.themarioga.game.cah.exceptions.player.PlayerCannotPlayCardException;
 import org.themarioga.game.cah.models.Card;
 import org.themarioga.game.cah.models.Game;
 import org.themarioga.game.cah.models.Player;
-import org.themarioga.game.cah.services.intf.CardService;
-import org.themarioga.game.cah.services.intf.GameService;
-import org.themarioga.game.cah.services.intf.PlayerService;
+import org.themarioga.game.cah.services.intf.model.CardService;
+import org.themarioga.game.cah.services.intf.model.GameService;
+import org.themarioga.game.cah.services.intf.model.PlayerService;
 import org.themarioga.game.commons.exceptions.player.PlayerAlreadyExistsException;
 import org.themarioga.game.commons.models.User;
 import org.themarioga.game.commons.services.intf.RoomService;
@@ -20,11 +20,11 @@ import org.themarioga.game.commons.services.intf.UserService;
 import java.util.UUID;
 
 @DatabaseSetup("classpath:dbunit/service/setup/lang.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/user.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/room.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/dictionary.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/game.xml")
-@DatabaseSetup("classpath:dbunit/service/setup/player.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/user.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/room.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/dictionary.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/game.xml")
+@DatabaseSetup("classpath:dbunit/service/setup/model/player.xml")
 class PlayerServiceTest extends BaseTest {
 
     @Autowired
@@ -59,13 +59,16 @@ class PlayerServiceTest extends BaseTest {
     @Test
     void testDelete() {
         playerService.delete(playerService.findByUserId(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+        getCurrentSession().flush();
+
+        Assertions.assertNull(playerService.findByUserId(UUID.fromString("00000000-0000-0000-0000-000000000000")));
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/service/setup/player2.xml")
-    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
-    @DatabaseSetup("classpath:dbunit/service/setup/deckcard.xml")
-    @DatabaseSetup("classpath:dbunit/service/setup/round.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/player2.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/card.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/deckcard.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/round.xml")
     void testInsertWhiteCardsIntoPlayerHand() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
         Player player = playerService.findByUserId(UUID.fromString("77777777-7777-7777-7777-777777777777"));
@@ -86,8 +89,8 @@ class PlayerServiceTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
-    @DatabaseSetup("classpath:dbunit/service/setup/playerhand.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/card.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/playerhand.xml")
     void testRemoveCardFromHand() {
         Player player = playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
         Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000003"));
@@ -99,7 +102,7 @@ class PlayerServiceTest extends BaseTest {
     }
 
     @Test
-    @DatabaseSetup("classpath:dbunit/service/setup/card.xml")
+    @DatabaseSetup("classpath:dbunit/service/setup/model/card.xml")
     void testRemoveCardFromHand_NonExistentCard() {
         Player player = playerService.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
         Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000003"));

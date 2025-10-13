@@ -11,7 +11,9 @@
         Round*,
         Game_black_cards_deck*,
         Game_white_cards_deck*,
-        Player_Hand_Card*)>
+        Player_Hand_Card*,
+        Played_card*,
+        Voted_card*)>
 
         <!ELEMENT Configuration EMPTY>
         <!ATTLIST Configuration
@@ -118,6 +120,20 @@
 
         <!ELEMENT Player_Hand_Card EMPTY>
         <!ATTLIST Player_Hand_Card
+                PLAYER_ID CDATA #REQUIRED
+                CARD_ID CDATA #REQUIRED
+                >
+
+        <!ELEMENT Played_card EMPTY>
+        <!ATTLIST Played_card
+                ROUND_ID CDATA #REQUIRED
+                PLAYER_ID CDATA #REQUIRED
+                CARD_ID CDATA #REQUIRED
+                >
+
+        <!ELEMENT Voted_card EMPTY>
+        <!ATTLIST Voted_card
+                ROUND_ID CDATA #REQUIRED
                 PLAYER_ID CDATA #REQUIRED
                 CARD_ID CDATA #REQUIRED
                 >

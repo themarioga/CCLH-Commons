@@ -1,4 +1,4 @@
-package org.themarioga.game.cah.services.impl;
+package org.themarioga.game.cah.services.impl.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +16,8 @@ import org.themarioga.game.cah.exceptions.player.PlayerAlreadyPlayedCardExceptio
 import org.themarioga.game.cah.exceptions.player.PlayerAlreadyVotedCardException;
 import org.themarioga.game.cah.exceptions.player.PlayerCannotVoteCardException;
 import org.themarioga.game.cah.models.*;
-import org.themarioga.game.cah.services.intf.PlayerService;
-import org.themarioga.game.cah.services.intf.RoundService;
+import org.themarioga.game.cah.services.intf.model.PlayerService;
+import org.themarioga.game.cah.services.intf.model.RoundService;
 import org.themarioga.game.commons.enums.ErrorEnum;
 import org.themarioga.game.commons.exceptions.ApplicationException;
 import org.themarioga.game.commons.util.Assert;
@@ -95,7 +95,7 @@ public class RoundServiceImpl implements RoundService {
             throw new RoundWrongStatusException();
 
         // Check if the player already played
-        if (round.getPlayedCards().stream().anyMatch(playedCard -> playedCard.getPlayer().equals(player)))
+        if (round.getPlayedCards().stream().anyMatch(playedCard -> playedCard.getPlayer().getId().equals(player.getId())))
             throw new PlayerAlreadyPlayedCardException();
 
         // Check if the card was already played
@@ -125,11 +125,11 @@ public class RoundServiceImpl implements RoundService {
             throw new RoundWrongStatusException();
 
         // Check if the player can vote
-        if ((round.getGame().getVotationMode().equals(VotationModeEnum.DICTATORSHIP) || round.getGame().getVotationMode().equals(VotationModeEnum.CLASSIC)) && !player.equals(round.getRoundPresident()))
+        if ((round.getGame().getVotationMode().equals(VotationModeEnum.DICTATORSHIP) || round.getGame().getVotationMode().equals(VotationModeEnum.CLASSIC)) && !player.getId().equals(round.getRoundPresident().getId()))
             throw new PlayerCannotVoteCardException();
 
         // Check if the player already voted
-        if (round.getVotedCards().stream().anyMatch(votedCard -> votedCard.getPlayer().equals(player)))
+        if (round.getVotedCards().stream().anyMatch(votedCard -> votedCard.getPlayer().getId().equals(player.getId())))
             throw new PlayerAlreadyVotedCardException();
 
         // Check if the card have been played this round
@@ -148,10 +148,12 @@ public class RoundServiceImpl implements RoundService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public void setNextBlackCard(Round round, Card nextBlackCard) {
+    public Round setNextBlackCard(Round round, Card nextBlackCard) {
         logger.debug("Setting next black card to round {}", round);
 
         round.setRoundBlackCard(nextBlackCard);
+
+		return roundDao.createOrUpdate(round);
     }
 
     @Override

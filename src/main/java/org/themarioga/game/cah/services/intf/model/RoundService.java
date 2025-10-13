@@ -1,4 +1,4 @@
-package org.themarioga.game.cah.services.intf;
+package org.themarioga.game.cah.services.intf.model;
 
 import org.themarioga.game.cah.models.*;
 
@@ -12,7 +12,7 @@ public interface RoundService {
 
     Round voteCard(Round round, Player player, Card card);
 
-    void setNextBlackCard(Round round, Card nextBlackCard);
+	Round setNextBlackCard(Round round, Card nextBlackCard);
 
     PlayedCard getMostVotedCard(long gameId);
 
