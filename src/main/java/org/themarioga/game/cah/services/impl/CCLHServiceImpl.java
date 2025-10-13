@@ -76,7 +76,6 @@ public class CCLHServiceImpl implements CCLHService {
         // Add the game creator player
         Player player = playerService.create(game, creator);
         game.getPlayers().add(player);
-        game.setCreatorPlayer(player);
 
         return gameService.update(game);
     }

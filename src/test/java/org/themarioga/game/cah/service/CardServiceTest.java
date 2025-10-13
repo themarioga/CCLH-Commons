@@ -62,73 +62,73 @@ class CardServiceTest extends BaseTest {
         Assertions.assertThrows(CardTextExcededLength.class, () -> cardService.create(dictionary, CardTypeEnum.WHITE, "This test card have a very long text"));
     }
 
-	@Test
-	void testChangeText() {
-		Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+    @Test
+    void testChangeText() {
+        Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-		card = cardService.changeText(card, "New text");
+        card = cardService.changeText(card, "New text");
 
-		Assertions.assertEquals("New text", card.getText());
-	}
+        Assertions.assertEquals("New text", card.getText());
+    }
 
-	@Test
-	void testChangeText_CardAlreadyExists() {
-		Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+    @Test
+    void testChangeText_CardAlreadyExists() {
+        Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-		Assertions.assertThrows(CardAlreadyExistsException.class, () -> cardService.changeText(card, "Second black card"));
-	}
+        Assertions.assertThrows(CardAlreadyExistsException.class, () -> cardService.changeText(card, "Second black card"));
+    }
 
-	@Test
-	void testChangeText_TextLengthExceeded() {
-		Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+    @Test
+    void testChangeText_TextLengthExceeded() {
+        Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-		Assertions.assertThrows(CardTextExcededLength.class, () -> cardService.changeText(card, "This test card will have a very long text"));
-	}
+        Assertions.assertThrows(CardTextExcededLength.class, () -> cardService.changeText(card, "This test card will have a very long text"));
+    }
 
-	@Test
-	@ExpectedDatabase(value = "classpath:dbunit/service/expected/testDeleteCard-expected.xml", table = "Card", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
-	void testDelete() {
-		Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+    @Test
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testDeleteCard-expected.xml", table = "Card", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    void testDelete() {
+        Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-		cardService.delete(card);
-		getCurrentSession().flush();
+        cardService.delete(card);
+        getCurrentSession().flush();
 
-		Assertions.assertNull(cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-	}
+        Assertions.assertNull(cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+    }
 
-	@Test
-	void testGetCardById(){
-		Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+    @Test
+    void testGetCardById() {
+        Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-		Assertions.assertNotNull(card);
-		Assertions.assertEquals("First black card", card.getText());
-	}
+        Assertions.assertNotNull(card);
+        Assertions.assertEquals("First black card", card.getText());
+    }
 
-	@Test
-	void testFindCardsByDictionaryAndType() {
-		Dictionary dictionary = dictionaryService.getDictionaryById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+    @Test
+    void testFindCardsByDictionaryAndType() {
+        Dictionary dictionary = dictionaryService.getDictionaryById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-		List<Card> blackCards = cardService.findCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK);
-		Assertions.assertEquals(3, blackCards.size());
+        List<Card> blackCards = cardService.findCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK);
+        Assertions.assertEquals(3, blackCards.size());
 
-		List<Card> whiteCards = cardService.findCardsByDictionaryAndType(dictionary, CardTypeEnum.WHITE);
-		Assertions.assertEquals(15, whiteCards.size());
-	}
+        List<Card> whiteCards = cardService.findCardsByDictionaryAndType(dictionary, CardTypeEnum.WHITE);
+        Assertions.assertEquals(15, whiteCards.size());
+    }
 
-	@Test
-	void testCountCardsByDictionaryAndType() {
-		Dictionary dictionary = dictionaryService.getDictionaryById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+    @Test
+    void testCountCardsByDictionaryAndType() {
+        Dictionary dictionary = dictionaryService.getDictionaryById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-		Assertions.assertEquals(3, cardService.countCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK));
+        Assertions.assertEquals(3, cardService.countCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK));
 
-		Assertions.assertEquals(15, cardService.countCardsByDictionaryAndType(dictionary, CardTypeEnum.WHITE));
-	}
+        Assertions.assertEquals(15, cardService.countCardsByDictionaryAndType(dictionary, CardTypeEnum.WHITE));
+    }
 
-	@Test
-	void testCheckDictionaryCanBePublished() {
-		Dictionary dictionary = dictionaryService.getDictionaryById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+    @Test
+    void testCheckDictionaryCanBePublished() {
+        Dictionary dictionary = dictionaryService.getDictionaryById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-		Assertions.assertTrue(cardService.checkDictionaryCanBePublished(dictionary));
-	}
+        Assertions.assertTrue(cardService.checkDictionaryCanBePublished(dictionary));
+    }
 
 }

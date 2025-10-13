@@ -31,7 +31,6 @@
                 NUMBER_OF_ROUNDS CDATA #REQUIRED
                 MAX_NUMBER_OF_PLAYERS CDATA #REQUIRED
                 DICTIONARY_ID CDATA #REQUIRED
-                CREATOR_PLAYER_ID CDATA #IMPLIED
                 CREATION_DATE CDATA #REQUIRED
                 >
 

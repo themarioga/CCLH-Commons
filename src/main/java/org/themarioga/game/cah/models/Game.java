@@ -26,10 +26,6 @@ public class Game extends org.themarioga.game.commons.models.Game implements Ser
     @JoinColumn(nullable = false)
     private Dictionary dictionary;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(unique = true)
-    private Player creatorPlayer;
-
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "game", orphanRemoval = true)
     private List<Player> players = new ArrayList<>(0);
 
@@ -90,14 +86,6 @@ public class Game extends org.themarioga.game.commons.models.Game implements Ser
 
     public void setDictionary(Dictionary dictionary) {
         this.dictionary = dictionary;
-    }
-
-    public Player getCreatorPlayer() {
-        return creatorPlayer;
-    }
-
-    public void setCreatorPlayer(Player creatorPlayer) {
-        this.creatorPlayer = creatorPlayer;
     }
 
     public List<Player> getPlayers() {

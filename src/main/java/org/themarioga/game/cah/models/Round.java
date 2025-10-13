@@ -21,7 +21,7 @@ public class Round extends Base implements Serializable {
     private RoundStatusEnum status;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn
+    @JoinColumn(nullable = false)
     private Card roundBlackCard;
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn

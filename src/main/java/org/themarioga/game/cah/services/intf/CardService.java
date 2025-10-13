@@ -11,7 +11,7 @@ public interface CardService {
 
     Card create(Dictionary dictionary, CardTypeEnum type, String text);
 
-	Card changeText(Card card, String newText);
+    Card changeText(Card card, String newText);
 
     void delete(Card card);
 

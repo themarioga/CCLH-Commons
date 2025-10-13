@@ -66,15 +66,15 @@ public class CardServiceImpl implements CardService {
     public Card changeText(Card card, String newText) {
         logger.debug("Updating card text: {} {}", card, newText);
 
-		// Check if card with that text already exists
+        // Check if card with that text already exists
         if (cardDao.checkCardExistsByDictionaryTypeAndText(card.getDictionary(), card.getType(), newText))
             throw new CardAlreadyExistsException();
 
-	    // Check if text limits are exceeded
-	    if (checkCardTextExcededLength(card.getType(), newText))
-		    throw new CardTextExcededLength();
+        // Check if text limits are exceeded
+        if (checkCardTextExcededLength(card.getType(), newText))
+            throw new CardTextExcededLength();
 
-		// Change card text
+        // Change card text
         card.setText(newText);
 
         return cardDao.createOrUpdate(card);
@@ -158,8 +158,8 @@ public class CardServiceImpl implements CardService {
         throw new ApplicationException("Error desconocido");
     }
 
-	private boolean checkCardTextExcededLength(CardTypeEnum type, String text) {
-		return (type == CardTypeEnum.WHITE && text.length() > getDictionaryWhiteCardMaxLength()) || (type == CardTypeEnum.BLACK && text.length() > getDictionaryBlackCardMaxLength());
-	}
+    private boolean checkCardTextExcededLength(CardTypeEnum type, String text) {
+        return (type == CardTypeEnum.WHITE && text.length() > getDictionaryWhiteCardMaxLength()) || (type == CardTypeEnum.BLACK && text.length() > getDictionaryBlackCardMaxLength());
+    }
 
 }

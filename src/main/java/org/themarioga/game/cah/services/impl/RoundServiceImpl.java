@@ -16,6 +16,7 @@ import org.themarioga.game.cah.exceptions.player.PlayerAlreadyPlayedCardExceptio
 import org.themarioga.game.cah.exceptions.player.PlayerAlreadyVotedCardException;
 import org.themarioga.game.cah.exceptions.player.PlayerCannotVoteCardException;
 import org.themarioga.game.cah.models.*;
+import org.themarioga.game.cah.services.intf.PlayerService;
 import org.themarioga.game.cah.services.intf.RoundService;
 import org.themarioga.game.commons.enums.ErrorEnum;
 import org.themarioga.game.commons.exceptions.ApplicationException;
@@ -29,10 +30,12 @@ public class RoundServiceImpl implements RoundService {
     private final Logger logger = LoggerFactory.getLogger(RoundServiceImpl.class);
 
     private final RoundDao roundDao;
+    private final PlayerService playerService;
 
     @Autowired
-    public RoundServiceImpl(RoundDao roundDao) {
+    public RoundServiceImpl(RoundDao roundDao, PlayerService playerService) {
         this.roundDao = roundDao;
+        this.playerService = playerService;
     }
 
     @Override
@@ -55,9 +58,9 @@ public class RoundServiceImpl implements RoundService {
 
         // Set current president if needed
         if (game.getVotationMode() == VotationModeEnum.DICTATORSHIP) {
-            round.setRoundPresident(game.getCreatorPlayer());
+            round.setRoundPresident(playerService.findPlayerByGameAndUser(game, game.getCreator()));
         } else if (round.getGame().getVotationMode() == VotationModeEnum.CLASSIC) {
-            selectPlayerForRoundPresident(round);
+            round.setRoundPresident(getPresidentForNextRound(round));
         }
 
         return roundDao.createOrUpdate(round);
@@ -75,6 +78,7 @@ public class RoundServiceImpl implements RoundService {
         if (round.getStatus() != RoundStatusEnum.ENDING)
             throw new RoundWrongStatusException();
 
+        round.getGame().setCurrentRound(null);
         roundDao.delete(round);
     }
 
@@ -187,8 +191,13 @@ public class RoundServiceImpl implements RoundService {
         return nextBlackCard;
     }
 
-    private void selectPlayerForRoundPresident(Round round) {
-        int playerIndex = getCurrentPresidentIndex(round);
+    private Player getPresidentForNextRound(Round round) {
+        int playerIndex = 0;
+
+        for (int i = 0; i < round.getGame().getPlayers().size(); i++) {
+            if (round.getGame().getPlayers().get(i).equals(round.getRoundPresident()))
+                playerIndex = i;
+        }
 
         if (playerIndex + 1 < round.getGame().getPlayers().size()) {
             playerIndex += 1;
@@ -196,18 +205,7 @@ public class RoundServiceImpl implements RoundService {
             playerIndex = 0;
         }
 
-        Player nextPresident = round.getGame().getPlayers().get(playerIndex);
-
-        round.setRoundPresident(nextPresident);
-    }
-
-    private int getCurrentPresidentIndex(Round round) {
-        for (int i = 0; i < round.getGame().getPlayers().size(); i++) {
-            if (round.getGame().getPlayers().get(i).equals(round.getRoundPresident()))
-                return i;
-        }
-
-        return 0;
+        return round.getGame().getPlayers().get(playerIndex);
     }
 
 }
