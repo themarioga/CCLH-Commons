@@ -7,9 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.game.cah.dao.intf.RoundDao;
+import org.themarioga.game.cah.enums.CardTypeEnum;
 import org.themarioga.game.cah.enums.RoundStatusEnum;
 import org.themarioga.game.cah.enums.VotationModeEnum;
 import org.themarioga.game.cah.exceptions.card.CardAlreadyPlayedException;
+import org.themarioga.game.cah.exceptions.card.CardDoesntExistsException;
 import org.themarioga.game.cah.exceptions.card.CardNotPlayedException;
 import org.themarioga.game.cah.exceptions.round.RoundWrongStatusException;
 import org.themarioga.game.cah.exceptions.player.PlayerAlreadyPlayedCardException;
@@ -151,6 +153,11 @@ public class RoundServiceImpl implements RoundService {
     public Round setNextBlackCard(Round round, Card nextBlackCard) {
         logger.debug("Setting next black card to round {}", round);
 
+		// Check the card type is black
+		if (nextBlackCard.getType() != CardTypeEnum.BLACK)
+			throw new CardDoesntExistsException();
+
+		// Set the round black card
         round.setRoundBlackCard(nextBlackCard);
 
 		return roundDao.createOrUpdate(round);
@@ -158,11 +165,19 @@ public class RoundServiceImpl implements RoundService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public PlayedCard getMostVotedCard(long gameId) {
-        logger.debug("Getting most voted card of the game of the game {}", gameId);
+    public VotedCard getMostVotedCard(Round round) {
+        logger.debug("Getting most voted card of the game of the round {}", round);
 
-        return roundDao.getMostVotedCard(gameId);
+        return roundDao.getMostVotedCard(round);
     }
+
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+	public PlayedCard getPlayedCardByCard(Round round, Card card) {
+		logger.debug("Getting played card from round {} and card {}", round, card);
+
+		return roundDao.getPlayedCardByCard(round, card);
+	}
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)

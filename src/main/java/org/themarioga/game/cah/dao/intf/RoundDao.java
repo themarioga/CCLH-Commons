@@ -5,9 +5,11 @@ import org.themarioga.game.commons.dao.InterfaceHibernateDao;
 
 public interface RoundDao extends InterfaceHibernateDao<Round> {
 
-    PlayedCard getMostVotedCard(long roundId);
+    VotedCard getMostVotedCard(Round round);
 
-    long countPlayedCards(Round round);
+	PlayedCard getPlayedCardByCard(Round round, Card card);
+
+	long countPlayedCards(Round round);
 
     long countVotedCards(Round round);
 

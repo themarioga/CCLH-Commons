@@ -13,9 +13,14 @@ public class RoundDaoImpl extends AbstractHibernateDao<Round> implements RoundDa
     }
 
     @Override
-    public PlayedCard getMostVotedCard(long roundId) {
-        return getCurrentSession().createNativeQuery("SELECT * FROM t_round_playedcards WHERE round_id=:round_id and CARD_ID = (SELECT CARD_ID FROM (SELECT CARD_ID, count(card_id) as value_ocurrence FROM t_round_playervotes WHERE round_id=:round_id GROUP BY card_id ORDER BY value_ocurrence DESC LIMIT 1) as CIvo)", PlayedCard.class).setParameter("round_id", roundId).setMaxResults(1).getSingleResultOrNull();
-    }
+    public VotedCard getMostVotedCard(Round round) {
+        return getCurrentSession().createQuery("SELECT v FROM VotedCard v WHERE v.round = :round GROUP BY v.card ORDER BY COUNT(v) DESC", VotedCard.class).setParameter("round", round).getSingleResultOrNull();
+	}
+
+	@Override
+	public PlayedCard getPlayedCardByCard(Round round, Card card) {
+		return getCurrentSession().createQuery("SELECT p FROM PlayedCard p WHERE p.round = :round AND p.card = :card", PlayedCard.class).setParameter("round", round).setParameter("card", card).getSingleResultOrNull();
+	}
 
     @Override
     public long countPlayedCards(Round round) {

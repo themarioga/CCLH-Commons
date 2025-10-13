@@ -10,15 +10,13 @@ import org.themarioga.game.cah.BaseTest;
 import org.themarioga.game.cah.enums.RoundStatusEnum;
 import org.themarioga.game.cah.enums.VotationModeEnum;
 import org.themarioga.game.cah.exceptions.card.CardAlreadyPlayedException;
+import org.themarioga.game.cah.exceptions.card.CardDoesntExistsException;
 import org.themarioga.game.cah.exceptions.card.CardNotPlayedException;
 import org.themarioga.game.cah.exceptions.player.PlayerAlreadyPlayedCardException;
 import org.themarioga.game.cah.exceptions.player.PlayerAlreadyVotedCardException;
 import org.themarioga.game.cah.exceptions.player.PlayerCannotVoteCardException;
 import org.themarioga.game.cah.exceptions.round.RoundWrongStatusException;
-import org.themarioga.game.cah.models.Card;
-import org.themarioga.game.cah.models.Game;
-import org.themarioga.game.cah.models.Player;
-import org.themarioga.game.cah.models.Round;
+import org.themarioga.game.cah.models.*;
 import org.themarioga.game.cah.services.intf.model.CardService;
 import org.themarioga.game.cah.services.intf.model.GameService;
 import org.themarioga.game.cah.services.intf.model.PlayerService;
@@ -217,5 +215,65 @@ class RoundServiceTest extends BaseTest {
 
         Assertions.assertThrows(CardNotPlayedException.class, () -> roundService.voteCard(game.getCurrentRound(), player, card));
     }
+
+	@Test
+	void testSetNextBlackCard() {
+		Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+		Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+
+		Round round = roundService.setNextBlackCard(game.getCurrentRound(), card);
+
+		Assertions.assertEquals(card.getId(), round.getRoundBlackCard().getId());
+	}
+
+	@Test
+	void testSetNextBlackCard_CardDoesntExists() {
+		Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+		Card card = cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000004"));
+
+		Assertions.assertThrows(CardDoesntExistsException.class, () -> roundService.setNextBlackCard(game.getCurrentRound(), card));
+	}
+
+	@Test
+	@DatabaseSetup("classpath:dbunit/service/setup/model/playedcard.xml")
+	@DatabaseSetup("classpath:dbunit/service/setup/model/votedcard.xml")
+	void testGetMostVotedCard() {
+		Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+		VotedCard votedCard = roundService.getMostVotedCard(game.getCurrentRound());
+
+		Assertions.assertNotNull(votedCard);
+	}
+
+	@Test
+	@DatabaseSetup("classpath:dbunit/service/setup/model/playedcard.xml")
+	@DatabaseSetup("classpath:dbunit/service/setup/model/votedcard.xml")
+	void testGetPlayedCardByCard() {
+		Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+		VotedCard votedCard = roundService.getMostVotedCard(game.getCurrentRound());
+
+		PlayedCard playedCard = roundService.getPlayedCardByCard(game.getCurrentRound(), votedCard.getCard());
+
+		Assertions.assertNotNull(playedCard);
+	}
+
+	@Test
+	@DatabaseSetup("classpath:dbunit/service/setup/model/playedcard.xml")
+	@DatabaseSetup("classpath:dbunit/service/setup/model/votedcard.xml")
+	void testGetCheckIfEveryoneHavePlayedACard() {
+		Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+		Assertions.assertTrue(roundService.checkIfEveryoneHavePlayedACard(game.getCurrentRound()));
+	}
+
+	@Test
+	@DatabaseSetup("classpath:dbunit/service/setup/model/playedcard.xml")
+	@DatabaseSetup("classpath:dbunit/service/setup/model/votedcard.xml")
+	void testGetCheckIfEveryoneHaveVotedACard() {
+		Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+		Assertions.assertTrue(roundService.checkIfEveryoneHaveVotedACard(game.getCurrentRound()));
+	}
 
 }
