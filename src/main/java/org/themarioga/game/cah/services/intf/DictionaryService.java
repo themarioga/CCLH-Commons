@@ -24,9 +24,9 @@ public interface DictionaryService {
 
     DictionaryCollaborator addCollaborator(Dictionary dictionary, User user);
 
-    DictionaryCollaborator acceptCollaborator(Dictionary dictionary, User user);
+    DictionaryCollaborator toggleAcceptedCollaborator(Dictionary dictionary, User user);
 
-    DictionaryCollaborator toggleCollaborator(Dictionary dictionary, User user);
+    DictionaryCollaborator toggleCanEditCollaborator(Dictionary dictionary, User user);
 
     void removeCollaborator(Dictionary dictionary, User user);
 
@@ -34,15 +34,15 @@ public interface DictionaryService {
 
     List<Dictionary> getDictionariesByCreator(User creator);
 
-    List<Dictionary> getDictionariesByCreatorOrCollaborator(User creator);
+    List<Dictionary> getDictionariesByCollaborator(User creator);
 
-    List<Dictionary> getDictionariesPaginated(User creator, int firstResult, int maxResults);
+    List<Dictionary> getDictionariesPaginatedForTable(User creator, int firstResult, int maxResults);
 
-    Long getDictionaryCount(User creator);
+    Long getDictionaryCountForTable(User creator);
 
     boolean isDictionaryCollaborator(Dictionary dictionary, User user);
 
-    boolean isDictionaryActiveCollaborator(Dictionary dictionary, User user);
+    boolean isDictionaryEditor(Dictionary dictionary, User user);
 
     Dictionary getDefaultDictionary();
 }

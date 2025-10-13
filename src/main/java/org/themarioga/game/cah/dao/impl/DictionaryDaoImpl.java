@@ -21,18 +21,18 @@ public class DictionaryDaoImpl extends AbstractHibernateDao<Dictionary> implemen
     }
 
     @Override
-    public List<Dictionary> getDictionariesByCreatorOrCollaborator(User user) {
-        return getCurrentSession().createQuery("SELECT d FROM Dictionary d WHERE d.creator=:user or d IN (SELECT c.dictionary FROM DictionaryCollaborator c WHERE c.user=:user)", Dictionary.class).setParameter("user", user).getResultList();
+    public List<Dictionary> getDictionariesByCollaborator(User collaborator) {
+        return getCurrentSession().createQuery("SELECT d FROM Dictionary d WHERE d IN (SELECT c.dictionary FROM DictionaryCollaborator c WHERE c.user=:collaborator and c.accepted=true)", Dictionary.class).setParameter("collaborator", collaborator).getResultList();
     }
 
     @Override
-    public List<Dictionary> getDictionariesPaginatedForTable(User creator, int firstResult, int maxResults) {
-        return getCurrentSession().createQuery("SELECT d FROM Dictionary d WHERE d.lang=:lang and d.published=true and (d.shared=true or (d.shared=false and d.creator=:creator))", Dictionary.class).setParameter("lang", creator.getLang()).setParameter("creator", creator).setFirstResult(firstResult).setMaxResults(maxResults).getResultList();
+    public List<Dictionary> getDictionariesPaginatedForTable(User collaborator, int firstResult, int maxResults) {
+        return getCurrentSession().createQuery("SELECT d FROM Dictionary d WHERE d.lang=:lang and d.published=true and (d.shared=true or (d.shared=false and d IN (SELECT c.dictionary FROM DictionaryCollaborator c WHERE c.user=:collaborator and c.accepted=true)))", Dictionary.class).setParameter("lang", collaborator.getLang()).setParameter("collaborator", collaborator).setFirstResult(firstResult).setMaxResults(maxResults).getResultList();
     }
 
     @Override
-    public Long getDictionaryCountForTable(User creator) {
-        return getCurrentSession().createQuery("SELECT count(*) FROM Dictionary d WHERE d.lang=:lang and d.published=true and (d.shared=true or (d.shared=false and d.creator=:creator))", Long.class).setParameter("lang", creator.getLang()).setParameter("creator", creator).getSingleResult();
+    public Long getDictionaryCountForTable(User collaborator) {
+        return getCurrentSession().createQuery("SELECT count(*) FROM Dictionary d WHERE d.lang=:lang and d.published=true and (d.shared=true or (d.shared=false and d IN (SELECT c.dictionary FROM DictionaryCollaborator c WHERE c.user=:collaborator and c.accepted=true)))", Long.class).setParameter("lang", collaborator.getLang()).setParameter("collaborator", collaborator).getSingleResult();
     }
 
     @Override
@@ -51,8 +51,8 @@ public class DictionaryDaoImpl extends AbstractHibernateDao<Dictionary> implemen
     }
 
     @Override
-    public boolean isDictionaryActiveCollaborator(Dictionary dictionary, User user) {
-        return getCurrentSession().createQuery("SELECT count(c) FROM DictionaryCollaborator c WHERE c.dictionary=:dictionary and c.user=:user and accepted=true and canEdit=true", Long.class).setParameter("dictionary", dictionary).setParameter("user", user).getSingleResultOrNull() > 0;
+    public boolean isDictionaryEditor(Dictionary dictionary, User user) {
+        return getCurrentSession().createQuery("SELECT count(c) FROM DictionaryCollaborator c WHERE c.dictionary=:dictionary and c.user=:user and c.accepted=true and c.canEdit=true", Long.class).setParameter("dictionary", dictionary).setParameter("user", user).getSingleResultOrNull() > 0;
     }
 
 }

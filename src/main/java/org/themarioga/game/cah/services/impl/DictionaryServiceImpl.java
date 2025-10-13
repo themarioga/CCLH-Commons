@@ -73,6 +73,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     public Dictionary setName(Dictionary dictionary, String newName) {
         logger.debug("Setting name {} to dictionary {}", newName, dictionary);
 
+        // Check if that name is already registered
         if (dictionaryDao.countDictionariesByName(newName) > 0)
             throw new DictionaryAlreadyExistsException();
 
@@ -96,9 +97,11 @@ public class DictionaryServiceImpl implements DictionaryService {
     public Dictionary togglePublished(Dictionary dictionary) {
         logger.debug("Toggling published to dictionary {}", dictionary);
 
+        // Check if the dictionary is already shared
         if (Boolean.TRUE.equals(dictionary.getShared()))
             throw new DictionaryAlreadySharedException();
 
+        // Check if the dictionary meets the criteria to be published
         if (!cardService.checkDictionaryCanBePublished(dictionary))
             throw new DictionaryNotCompletedException();
 
@@ -112,6 +115,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     public Dictionary toggleShared(Dictionary dictionary) {
         logger.debug("Toggling shared to dictionary {}", dictionary);
 
+        // Check if the dictionary is published
         if (Boolean.FALSE.equals(dictionary.getPublished()))
             throw new DictionaryNotPublishedException();
 
@@ -125,80 +129,11 @@ public class DictionaryServiceImpl implements DictionaryService {
     public void delete(Dictionary dictionary) {
         logger.debug("Delete dictionary: {}", dictionary);
 
-	    if (Boolean.TRUE.equals(dictionary.getShared()))
-		    throw new DictionaryAlreadySharedException();
+        // Check if the dictionary is shared
+        if (Boolean.TRUE.equals(dictionary.getShared()))
+            throw new DictionaryAlreadySharedException();
 
         dictionaryDao.delete(dictionary);
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public DictionaryCollaborator addCollaborator(Dictionary dictionary, User user) {
-        logger.debug("Add dictionary collaborator: {} {}", dictionary, user);
-
-        if (dictionary.getCollaborators().size() >= getDictionaryMaxCollaborators())
-            throw new DictionaryMaxCollaboratorsReached();
-
-        Optional<DictionaryCollaborator> collaborator = dictionary.getCollaborators().stream().filter(dictionaryCollaborator -> Objects.equals(dictionaryCollaborator.getUser().getId(), user.getId())).findFirst();
-        if (collaborator.isPresent())
-            throw new DictionaryCollaboratorAlreadyExists();
-
-        DictionaryCollaborator dictionaryCollaborator = new DictionaryCollaborator();
-        dictionaryCollaborator.setDictionary(dictionary);
-        dictionaryCollaborator.setUser(user);
-        dictionaryCollaborator.setAccepted(false);
-        dictionaryCollaborator.setCanEdit(false);
-        dictionary.getCollaborators().add(dictionaryCollaborator);
-
-        dictionaryDao.createOrUpdate(dictionary);
-
-        return dictionaryCollaborator;
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public DictionaryCollaborator acceptCollaborator(Dictionary dictionary, User user) {
-        logger.debug("Accept dictionary collaborator: {} {}", dictionary, user);
-
-        Optional<DictionaryCollaborator> collaborator = dictionary.getCollaborators().stream().filter(dictionaryCollaborator -> Objects.equals(dictionaryCollaborator.getUser().getId(), user.getId())).findFirst();
-
-        if (collaborator.isEmpty())
-            throw new DictionaryCollaboratorDoesntExists();
-
-        collaborator.ifPresent(dictionaryCollaborator -> dictionaryCollaborator.setAccepted(true));
-
-        return collaborator.get();
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public DictionaryCollaborator toggleCollaborator(Dictionary dictionary, User user) {
-        logger.debug("Toggle dictionary collaborator: {} {}", dictionary, user);
-
-        Optional<DictionaryCollaborator> collaborator = dictionary.getCollaborators().stream().filter(dictionaryCollaborator -> Objects.equals(dictionaryCollaborator.getUser().getId(), user.getId())).findFirst();
-
-        if (collaborator.isEmpty())
-            throw new DictionaryCollaboratorDoesntExists();
-
-        if (Boolean.FALSE.equals(collaborator.get().getAccepted()))
-            throw new DictionaryCollaboratorDoesntExists();
-
-        collaborator.ifPresent(dictionaryCollaborator -> dictionaryCollaborator.setCanEdit(!dictionaryCollaborator.getCanEdit()));
-
-        return collaborator.get();
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public void removeCollaborator(Dictionary dictionary, User user) {
-        logger.debug("Delete dictionary collaborator: {} {}", dictionary, user);
-
-        Optional<DictionaryCollaborator> collaborator = dictionary.getCollaborators().stream().filter(dictionaryCollaborator -> Objects.equals(dictionaryCollaborator.getUser().getId(), user.getId())).findFirst();
-
-        if (collaborator.isEmpty())
-            throw new DictionaryCollaboratorDoesntExists();
-
-        collaborator.ifPresent(dictionaryCollaborator -> dictionary.getCollaborators().remove(dictionaryCollaborator));
     }
 
     @Override
@@ -219,15 +154,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public List<Dictionary> getDictionariesByCreatorOrCollaborator(User creator) {
-        logger.debug("Getting dictionaries with user/collaborator: {}", creator);
-
-        return dictionaryDao.getDictionariesByCreatorOrCollaborator(creator);
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public List<Dictionary> getDictionariesPaginated(User creator, int firstResult, int maxResults) {
+    public List<Dictionary> getDictionariesPaginatedForTable(User creator, int firstResult, int maxResults) {
         logger.debug("Getting dictionary from {} to {}", firstResult, maxResults);
 
         return dictionaryDao.getDictionariesPaginatedForTable(creator, firstResult, maxResults);
@@ -235,10 +162,109 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public Long getDictionaryCount(User creator) {
+    public Long getDictionaryCountForTable(User creator) {
         logger.debug("Get dictionary count {}", creator);
 
         return dictionaryDao.getDictionaryCountForTable(creator);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    public Dictionary getDefaultDictionary() {
+        return dictionaryDao.findOne(UUID.fromString(configurationService.getConfiguration("game_default_dictionary_id")));
+    }
+
+    // //////// COLLABORATORS //////////
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public DictionaryCollaborator addCollaborator(Dictionary dictionary, User user) {
+        logger.debug("Add dictionary collaborator: {} {}", dictionary, user);
+
+        // Check if dictionary have reached the max number of collaborators
+        if (dictionary.getCollaborators().size() >= getDictionaryMaxCollaborators())
+            throw new DictionaryMaxCollaboratorsReached();
+
+        // Check if the collaborator is already present
+        Optional<DictionaryCollaborator> collaborator = dictionary.getCollaborators().stream().filter(dictionaryCollaborator -> Objects.equals(dictionaryCollaborator.getUser().getId(), user.getId())).findFirst();
+        if (collaborator.isPresent())
+            throw new DictionaryCollaboratorAlreadyExists();
+
+        // Create the collaborator
+        DictionaryCollaborator dictionaryCollaborator = new DictionaryCollaborator();
+        dictionaryCollaborator.setDictionary(dictionary);
+        dictionaryCollaborator.setUser(user);
+        dictionaryCollaborator.setAccepted(false);
+        dictionaryCollaborator.setCanEdit(false);
+        dictionary.getCollaborators().add(dictionaryCollaborator);
+        dictionaryDao.createOrUpdate(dictionary);
+
+        return dictionaryCollaborator;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public DictionaryCollaborator toggleAcceptedCollaborator(Dictionary dictionary, User user) {
+        logger.debug("Toggling accept in dictionary collaborator: {} {}", dictionary, user);
+
+        // Check if collaborator being toggled is the creator
+        if (dictionary.getCreator().getId().equals(user.getId()))
+            throw new DictionaryCollaboratorCreatorCantBeAltered();
+
+        // Check if the collaborator exists for this dictionary
+        Optional<DictionaryCollaborator> collaborator = dictionary.getCollaborators().stream().filter(dictionaryCollaborator -> Objects.equals(dictionaryCollaborator.getUser().getId(), user.getId())).findFirst();
+        if (collaborator.isEmpty())
+            throw new DictionaryCollaboratorDoesntExists();
+
+        // Toggle accept in collaborator
+        collaborator.ifPresent(dictionaryCollaborator -> dictionaryCollaborator.setAccepted(!dictionaryCollaborator.getAccepted()));
+        dictionaryDao.createOrUpdate(dictionary);
+
+        return collaborator.get();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public DictionaryCollaborator toggleCanEditCollaborator(Dictionary dictionary, User user) {
+        logger.debug("Toggling canEdit in dictionary collaborator: {} {}", dictionary, user);
+
+        // Check if collaborator being toggled is the creator
+        if (dictionary.getCreator().getId().equals(user.getId()))
+            throw new DictionaryCollaboratorCreatorCantBeAltered();
+
+        // Check if the collaborator exists for this dictionary
+        Optional<DictionaryCollaborator> collaborator = dictionary.getCollaborators().stream().filter(dictionaryCollaborator -> Objects.equals(dictionaryCollaborator.getUser().getId(), user.getId())).findFirst();
+        if (collaborator.isEmpty())
+            throw new DictionaryCollaboratorDoesntExists();
+
+        // Check if the collaborator have been accepted before
+        if (Boolean.FALSE.equals(collaborator.get().getAccepted()))
+            throw new DictionaryCollaboratorDoesntExists();
+
+        // Toggle can edit to collaborator
+        collaborator.ifPresent(dictionaryCollaborator -> dictionaryCollaborator.setCanEdit(!dictionaryCollaborator.getCanEdit()));
+        dictionaryDao.createOrUpdate(dictionary);
+
+        return collaborator.get();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public void removeCollaborator(Dictionary dictionary, User user) {
+        logger.debug("Delete dictionary collaborator: {} {}", dictionary, user);
+
+        // Check if collaborator being toggled is the creator
+        if (dictionary.getCreator().getId().equals(user.getId()))
+            throw new DictionaryCollaboratorCreatorCantBeAltered();
+
+        // Check if the collaborator exists for this dictionary
+        Optional<DictionaryCollaborator> collaborator = dictionary.getCollaborators().stream().filter(dictionaryCollaborator -> Objects.equals(dictionaryCollaborator.getUser().getId(), user.getId())).findFirst();
+        if (collaborator.isEmpty())
+            throw new DictionaryCollaboratorDoesntExists();
+
+        // Remove the collaborator
+        collaborator.ifPresent(dictionaryCollaborator -> dictionary.getCollaborators().remove(dictionaryCollaborator));
+        dictionaryDao.createOrUpdate(dictionary);
     }
 
     @Override
@@ -251,16 +277,18 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public boolean isDictionaryActiveCollaborator(Dictionary dictionary, User user) {
-        logger.debug("isDictionaryActiveCollaborator {}", user);
+    public boolean isDictionaryEditor(Dictionary dictionary, User user) {
+        logger.debug("isDictionaryEditor {}", user);
 
-        return dictionaryDao.isDictionaryActiveCollaborator(dictionary, user);
+        return dictionaryDao.isDictionaryEditor(dictionary, user);
     }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public Dictionary getDefaultDictionary() {
-        return dictionaryDao.findOne(UUID.fromString(configurationService.getConfiguration("game_default_dictionary_id")));
+    public List<Dictionary> getDictionariesByCollaborator(User creator) {
+        logger.debug("Getting dictionaries with user/collaborator: {}", creator);
+
+        return dictionaryDao.getDictionariesByCollaborator(creator);
     }
 
     private int getDictionaryMaxCollaborators() {

@@ -122,7 +122,7 @@ class GameServiceTest extends BaseTest {
     }
 
     @Test
-    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateStatus-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+    @ExpectedDatabase(value = "classpath:dbunit/service/expected/testUpdateGameStatus-expected.xml", table = "Game", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
     void testUpdateStatus() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
         game = gameService.setStatus(game, GameStatusEnum.DELETING);
