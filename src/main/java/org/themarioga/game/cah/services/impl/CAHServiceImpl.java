@@ -10,9 +10,8 @@ import org.themarioga.game.cah.enums.PunctuationModeEnum;
 import org.themarioga.game.cah.enums.RoundStatusEnum;
 import org.themarioga.game.cah.enums.VotationModeEnum;
 import org.themarioga.game.cah.exceptions.player.PlayerCannotDrawCardException;
-import org.themarioga.game.cah.exceptions.round.RoundWrongStatusException;
 import org.themarioga.game.cah.models.*;
-import org.themarioga.game.cah.services.intf.CCLHService;
+import org.themarioga.game.cah.services.intf.CAHService;
 import org.themarioga.game.cah.services.intf.model.GameService;
 import org.themarioga.game.cah.services.intf.model.PlayerService;
 import org.themarioga.game.cah.services.intf.model.RoundService;
@@ -32,9 +31,9 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class CCLHServiceImpl implements CCLHService {
+public class CAHServiceImpl implements CAHService {
 
-    private final Logger logger = LoggerFactory.getLogger(CCLHServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(CAHServiceImpl.class);
 
     private final RoomService roomService;
     private final GameService gameService;
@@ -43,7 +42,7 @@ public class CCLHServiceImpl implements CCLHService {
     private final ConfigurationService configurationService;
 
     @Autowired
-    public CCLHServiceImpl(RoomService roomService, GameService gameService, PlayerService playerService, RoundService roundService, ConfigurationService configurationService) {
+    public CAHServiceImpl(RoomService roomService, GameService gameService, PlayerService playerService, RoundService roundService, ConfigurationService configurationService) {
         this.roomService = roomService;
         this.gameService = gameService;
         this.playerService = playerService;
@@ -52,6 +51,7 @@ public class CCLHServiceImpl implements CCLHService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game createGame(String roomName, User creator) {
         logger.debug("Creating game for room {} by user {}", roomName, creator);
 
@@ -80,6 +80,7 @@ public class CCLHServiceImpl implements CCLHService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game setVotationMode(Room room, VotationModeEnum type) {
         logger.debug("Setting VotationMode {} to room {}", type, room);
 
@@ -96,6 +97,7 @@ public class CCLHServiceImpl implements CCLHService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game setMaxNumberOfPlayers(Room room, int maxNumberOfPlayers) {
         logger.debug("Setting MaxNumberOfPlayers {} to room {}", maxNumberOfPlayers, room);
 
@@ -112,6 +114,7 @@ public class CCLHServiceImpl implements CCLHService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game setNumberOfPointsToWin(Room room, int numberOfCards) {
         logger.debug("Setting NumberOfPointsToWin {} to room {}", numberOfCards, room);
 
@@ -128,6 +131,7 @@ public class CCLHServiceImpl implements CCLHService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game setNumberOfRoundsToEnd(Room room, int numberOfRoundsToEnd) {
         logger.debug("Setting NumberOfRoundsToEnd {} to room {}", numberOfRoundsToEnd, room);
 
@@ -144,6 +148,7 @@ public class CCLHServiceImpl implements CCLHService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game setDictionary(Room room, Dictionary dictionary) {
         logger.debug("Setting Dictionary {} to room {}", dictionary, room);
 
@@ -163,6 +168,7 @@ public class CCLHServiceImpl implements CCLHService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game deleteGameByCreator(Room room, User creator) {
         logger.debug("Deleting game from room {} by user {}", room, creator);
 
@@ -188,6 +194,7 @@ public class CCLHServiceImpl implements CCLHService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game addPlayer(Room room, User user) {
         logger.debug("Adding player {} to game from room {}", user, room);
 
@@ -214,14 +221,18 @@ public class CCLHServiceImpl implements CCLHService {
     }
 
     @Override
-    public Game removePlayer(Room room, User user) {
-        logger.debug("Removing player {} from game in room {}", user, room);
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public Game kickPlayer(Room room, User userWhoKicks, User userKicked) {
+        logger.debug("Kicking player {} from game in room {} by {}", userWhoKicks, room, userKicked);
 
         // Check room exists
         Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
 
-        // Check user exists
-        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+	    // Check userWhoKicks exists
+	    Assert.assertNotNull(userWhoKicks, ErrorEnum.USER_NOT_FOUND);
+
+        // Check userKicked exists
+        Assert.assertNotNull(userKicked, ErrorEnum.USER_NOT_FOUND);
 
         // Get the game from this room
         Game game = gameService.getByRoom(room);
@@ -229,8 +240,16 @@ public class CCLHServiceImpl implements CCLHService {
         // Check if the game exists
         if (game == null) throw new GameDoesntExistsException();
 
+		// Check if game is started
+		if (!game.getStatus().equals(GameStatusEnum.CREATED))
+			throw new GameNotStartedException();
+
+		// Check the player that kicks is the creator
+		if (game.getCreator().getId().equals(userWhoKicks.getId()))
+			throw new GameCreatorCannotLeaveException();
+
         // Get the player
-        Player player = playerService.findPlayerByGameAndUser(game, user);
+        Player player = playerService.findPlayerByGameAndUser(game, userKicked);
 
         // Check if player has been created successfully
         if (player == null) throw new PlayerDoesntExistsException();
@@ -244,7 +263,71 @@ public class CCLHServiceImpl implements CCLHService {
         return game;
     }
 
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+	public Game leavePlayer(Room room, User user) {
+		logger.debug("User {} leaving game in room {}", user, room);
+
+		// Check room exists
+		Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
+
+		// Check user exists
+		Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+
+		// Get the game from this room
+		Game game = gameService.getByRoom(room);
+
+		// Check if the game exists
+		if (game == null) throw new GameDoesntExistsException();
+
+		// Check if game is started
+		if (!game.getStatus().equals(GameStatusEnum.CREATED))
+			throw new GameNotStartedException();
+
+		// Get the player
+		Player player = playerService.findPlayerByGameAndUser(game, user);
+
+		// Check if player has been created successfully
+		if (player == null) throw new PlayerDoesntExistsException();
+
+		// Remove the player from the game
+		game = gameService.removePlayer(game, player);
+
+		// Delete the player
+		playerService.delete(player);
+
+		return game;
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+	public Game voteForDeletion(Room room, User user) {
+		logger.debug("User {} voting to delete game on room {}", user, room);
+
+		// Check game exists
+		Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
+
+		// Check user exists
+		Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+
+		// Get the game from this room
+		Game game = gameService.getByRoom(room);
+
+		// Check if the game exists
+		if (game == null) throw new GameDoesntExistsException();
+
+		// Get the player
+		Player player = playerService.findPlayerByGameAndUser(game, user);
+
+		// Check user is playing this game
+		if (player == null)
+			throw new PlayerDoesntExistsException();
+
+		return gameService.voteForDeletion(game, player);
+	}
+
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game startGame(Room room) {
         logger.debug("Starting game from room {}", room);
 
@@ -297,11 +380,19 @@ public class CCLHServiceImpl implements CCLHService {
         // Get the player
         Player player = playerService.findPlayerByGameAndUser(game, user);
 
+	    // Check if player has been created successfully
+	    if (player == null) throw new PlayerDoesntExistsException();
+
         // Add card to round
         roundService.addCardToPlayedCards(game.getCurrentRound(), player, card);
 
         // Remove card from player hand
         playerService.removeCardFromHand(player, card);
+
+		// Set status to voting if everyone have played
+		if (roundService.checkIfEveryoneHavePlayedACard(game.getCurrentRound())) {
+			roundService.setStatus(game.getCurrentRound(), RoundStatusEnum.VOTING);
+		}
 
         return gameService.update(game);
     }
@@ -325,37 +416,28 @@ public class CCLHServiceImpl implements CCLHService {
         // Check if the game exists
         if (game == null) throw new GameDoesntExistsException();
 
-        // ToDo
-        return null;
+	    // Check the status of the game
+	    if (game.getStatus() == GameStatusEnum.STARTED)
+		    throw new GameAlreadyStartedException();
+
+	    // Get the player
+	    Player player = playerService.findPlayerByGameAndUser(game, user);
+
+	    // Check if player has been created successfully
+	    if (player == null) throw new PlayerDoesntExistsException();
+
+		// Vote card
+		roundService.voteCard(game.getCurrentRound(), player, card);
+
+	    // Check if everyone have voted a card
+	    if (roundService.checkIfEveryoneHaveVotedACard(game.getCurrentRound())) {
+	        endRound(game);
+	    }
+
+	    return gameService.update(game);
     }
 
-    @Override
-    public Game voteForDeletion(Room room, User user) {
-        logger.debug("User {} voting to delete game on room {}", user, room);
-
-        // Check game exists
-        Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
-
-        // Check user exists
-        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
-
-        // Get the game from this room
-        Game game = gameService.getByRoom(room);
-
-        // Check if the game exists
-        if (game == null) throw new GameDoesntExistsException();
-
-        // Get the player
-        Player player = playerService.findPlayerByGameAndUser(game, user);
-
-        // Check user is playing this game
-        if (player == null)
-            throw new PlayerDoesntExistsException();
-
-        return gameService.voteForDeletion(game, player);
-    }
-
-    public void startRound(Game game) {
+	private void startRound(Game game) {
         logger.debug("Starting round on game {}", game);
 
         // Check if there is already a round and delete it
@@ -366,33 +448,22 @@ public class CCLHServiceImpl implements CCLHService {
         // Create next round
         Round round = roundService.createRound(game, gameService.getNextRoundNumber(game));
 
+		// Set the next round
         gameService.setCurrentRound(game, round);
 
         // Fill player hands
         transferWhiteCardsFromGameDeckToPlayersHands(game);
     }
 
-    private void endRound(Game game) {
-        logger.debug("Ending round on game {}", game);
+	private void endRound(Game game) {
+		roundService.setStatus(game.getCurrentRound(), RoundStatusEnum.ENDING);
 
-        // Check if the game is started
-        if (game.getStatus() != GameStatusEnum.STARTED)
-            throw new GameNotStartedException();
-
-        // If there are not round started it have no sense to end it
-        if (game.getCurrentRound() == null)
-            throw new RoundWrongStatusException();
-
-        // If round is not ending you can't end it
-        if (game.getCurrentRound().getStatus() != RoundStatusEnum.ENDING)
-            throw new RoundWrongStatusException();
-
-        // Check if game is ended
-        if (checkIfGameEnded(game)) {
-            // Set the ended status
-            game.setStatus(GameStatusEnum.ENDING);
-        }
-    }
+		// Check if game is ended
+		if (checkIfGameEnded(game)) {
+			// Set the ended status
+			game.setStatus(GameStatusEnum.ENDING);
+		}
+	}
 
     private void transferWhiteCardsFromGameDeckToPlayersHands(Game game) {
         logger.debug("Transerir cartas blancas del mazo del juego a los jugadores en el juego: {}", game);

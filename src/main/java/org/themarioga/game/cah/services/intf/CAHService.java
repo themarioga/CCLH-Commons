@@ -7,7 +7,7 @@ import org.themarioga.game.cah.models.Game;
 import org.themarioga.game.commons.models.Room;
 import org.themarioga.game.commons.models.User;
 
-public interface CCLHService {
+public interface CAHService {
 
     Game createGame(String roomName, User creator);
 
@@ -25,14 +25,16 @@ public interface CCLHService {
 
     Game addPlayer(Room room, User user);
 
-    Game removePlayer(Room room, User user);
+	Game kickPlayer(Room room, User userWhoKicks, User userKicked);
 
-    Game startGame(Room room);
+	Game leavePlayer(Room room, User user);
+
+	Game voteForDeletion(Room room, User user);
+
+	Game startGame(Room room);
 
     Game playCard(Room room, User user, Card card);
 
     Game voteCard(Room room, User user, Card card);
-
-    Game voteForDeletion(Room room, User user);
 
 }

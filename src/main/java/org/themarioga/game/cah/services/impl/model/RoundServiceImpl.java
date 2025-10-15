@@ -84,7 +84,21 @@ public class RoundServiceImpl implements RoundService {
         roundDao.delete(round);
     }
 
-    @Override
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+	public Round setStatus(Round round, RoundStatusEnum status) {
+		logger.debug("Setting round {} to status {}", round, status);
+
+		// Check round exists
+		Assert.assertNotNull(round, ErrorEnum.GAME_NOT_FOUND);
+
+		// Set status
+		round.setStatus(status);
+
+		return roundDao.createOrUpdate(round);
+	}
+
+	@Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Round addCardToPlayedCards(Round round, Player player, Card card) {
         logger.debug("Player {} playing card {} for the round {}", player, card, round);

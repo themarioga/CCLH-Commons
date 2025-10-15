@@ -109,6 +109,15 @@ class RoundServiceTest extends BaseTest {
         Assertions.assertThrows(RoundWrongStatusException.class, () -> roundService.deleteRound(game.getCurrentRound()));
     }
 
+	@Test
+	void testSetRound() {
+		Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+		Round round = roundService.setStatus(game.getCurrentRound(), RoundStatusEnum.PLAYING);
+
+		Assertions.assertEquals(RoundStatusEnum.PLAYING, round.getStatus());
+	}
+
     @Test
     void testAddCardToPlayedCards() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
