@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE dataset SYSTEM "src/test/resources/cahschema.dtd">
-<dataset>
-    <Round ID="00000000-0000-0000-0000-000000000000" GAME_ID="00000000-0000-0000-0000-000000000000" STATUS="0" ROUND_NUMBER="0"  ROUND_BLACK_CARD_ID="00000000-0000-0000-0000-000000000000" CREATION_DATE="[now]"/>
-</dataset>

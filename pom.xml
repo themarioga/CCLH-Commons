@@ -9,18 +9,18 @@
         <relativePath/>
     </parent>
     <groupId>org.themarioga</groupId>
-    <artifactId>cah-game</artifactId>
+    <artifactId>cah-engine</artifactId>
     <version>2.0.0</version>
-    <name>CAH Game Library</name>
-    <description>Library for Cards Against Humanity game backend</description>
+    <name>CAH Engine Library</name>
+    <description>Library for Cards Against Humanity game engine backend</description>
     <properties>
         <tests.skip>true</tests.skip>
     </properties>
     <dependencies>
-        <!-- GAME DEPENDENCIES -->
+        <!-- ENGINE DEPENDENCIES -->
         <dependency>
             <groupId>org.themarioga</groupId>
-            <artifactId>game-commons</artifactId>
+            <artifactId>engine-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
 
