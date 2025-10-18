@@ -25,11 +25,13 @@ import org.themarioga.engine.commons.exceptions.ApplicationException;
 import org.themarioga.engine.commons.exceptions.game.*;
 import org.themarioga.engine.commons.exceptions.player.PlayerDoesntExistsException;
 import org.themarioga.engine.commons.exceptions.room.RoomAlreadyExistsException;
+import org.themarioga.engine.commons.exceptions.user.UserDoesntExistsException;
 import org.themarioga.engine.commons.models.Room;
 import org.themarioga.engine.commons.models.User;
 import org.themarioga.engine.commons.services.intf.ConfigurationService;
 import org.themarioga.engine.commons.services.intf.RoomService;
 import org.themarioga.engine.commons.util.Assert;
+import org.themarioga.engine.commons.util.SessionUtil;
 
 import java.util.List;
 import java.util.Objects;
@@ -56,14 +58,14 @@ public class CAHServiceImpl implements CAHService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public Game createGame(String roomName, User creator) {
-        logger.debug("Creating game for room {} by user {}", roomName, creator);
+    public Game createGame(String roomName) {
+        logger.debug("Creating game for room {}", roomName);
 
         // Check roomName exists
         Assert.assertNotNull(roomName, ErrorEnum.ROOM_NOT_FOUND);
 
-        // Check creator exists
-        Assert.assertNotNull(creator, ErrorEnum.USER_NOT_FOUND);
+        // Obtenemos el usuario de la sesión y comprobamos que existe
+        User creator = getSessionUser();
 
         // Create or load room
         Room room;
@@ -88,14 +90,11 @@ public class CAHServiceImpl implements CAHService {
     public Game setVotationMode(Room room, VotationModeEnum type) {
         logger.debug("Setting VotationMode {} to room {}", type, room);
 
-        // Check room exists
-        Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
+        // Get the game
+        Game game = getGameByRoom(room);
 
-        // Get the game from this room
-        Game game = gameService.getByRoom(room);
-
-        // Check if the game exists
-        if (game == null) throw new GameDoesntExistsException();
+        // Check the user performing the action is the creator
+        checkSessionUserIsCreator(game);
 
         return gameService.setVotationMode(game, type);
     }
@@ -105,14 +104,11 @@ public class CAHServiceImpl implements CAHService {
     public Game setMaxNumberOfPlayers(Room room, int maxNumberOfPlayers) {
         logger.debug("Setting MaxNumberOfPlayers {} to room {}", maxNumberOfPlayers, room);
 
-        // Check room exists
-        Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
+        // Get the game
+        Game game = getGameByRoom(room);
 
-        // Get the game from this room
-        Game game = gameService.getByRoom(room);
-
-        // Check if the game exists
-        if (game == null) throw new GameDoesntExistsException();
+        // Check the user performing the action is the creator
+        checkSessionUserIsCreator(game);
 
         return gameService.setMaxNumberOfPlayers(game, maxNumberOfPlayers);
     }
@@ -122,14 +118,11 @@ public class CAHServiceImpl implements CAHService {
     public Game setNumberOfPointsToWin(Room room, int numberOfCards) {
         logger.debug("Setting NumberOfPointsToWin {} to room {}", numberOfCards, room);
 
-        // Check room exists
-        Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
+        // Get the game
+        Game game = getGameByRoom(room);
 
-        // Get the game from this room
-        Game game = gameService.getByRoom(room);
-
-        // Check if the game exists
-        if (game == null) throw new GameDoesntExistsException();
+        // Check the user performing the action is the creator
+        checkSessionUserIsCreator(game);
 
         return gameService.setNumberOfPointsToWin(game, numberOfCards);
     }
@@ -139,14 +132,11 @@ public class CAHServiceImpl implements CAHService {
     public Game setNumberOfRoundsToEnd(Room room, int numberOfRoundsToEnd) {
         logger.debug("Setting NumberOfRoundsToEnd {} to room {}", numberOfRoundsToEnd, room);
 
-        // Check room exists
-        Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
+        // Get the game
+        Game game = getGameByRoom(room);
 
-        // Get the game from this room
-        Game game = gameService.getByRoom(room);
-
-        // Check if the game exists
-        if (game == null) throw new GameDoesntExistsException();
+        // Check the user performing the action is the creator
+        checkSessionUserIsCreator(game);
 
         return gameService.setNumberOfRoundsToEnd(game, numberOfRoundsToEnd);
     }
@@ -156,40 +146,28 @@ public class CAHServiceImpl implements CAHService {
     public Game setDictionary(Room room, Dictionary dictionary) {
         logger.debug("Setting Dictionary {} to room {}", dictionary, room);
 
-        // Check room exists
-        Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
-
         // Check dictionary exists
         Assert.assertNotNull(dictionary, ErrorEnum.DICTIONARY_NOT_FOUND);
 
-        // Get the game from this room
-        Game game = gameService.getByRoom(room);
+        // Get the game
+        Game game = getGameByRoom(room);
 
-        // Check if the game exists
-        if (game == null) throw new GameDoesntExistsException();
+        // Check the user performing the action is the creator
+        checkSessionUserIsCreator(game);
 
         return gameService.setDictionary(game, dictionary);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public Game deleteGameByCreator(Room room, User creator) {
-        logger.debug("Deleting game from room {} by user {}", room, creator);
+    public Game deleteGameByCreator(Room room) {
+        logger.debug("Deleting game from room {}", room);
 
-        // Check room exists
-        Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
+        // Get the game
+        Game game = getGameByRoom(room);
 
-        // Check creator exists
-        Assert.assertNotNull(creator, ErrorEnum.USER_NOT_FOUND);
-
-        // Get the game from this room
-        Game game = gameService.getByRoom(room);
-
-        // Check if the game exists
-        if (game == null) throw new GameDoesntExistsException();
-
-        // Checking if user trying to delete is the creator
-        if (!game.getCreator().equals(creator)) throw new GameNotYoursException();
+        // Check the user performing the action is the creator
+        checkSessionUserIsCreator(game);
 
         // Delete the game
         gameService.delete(game);
@@ -199,26 +177,17 @@ public class CAHServiceImpl implements CAHService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public Game addPlayer(Room room, User user) {
-        logger.debug("Adding player {} to game from room {}", user, room);
+    public Game addPlayer(Room room) {
+        logger.debug("Adding player to game from room {}", room);
 
-        // Check room exists
-        Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
+        // Get the game
+        Game game = getGameByRoom(room);
 
-        // Check user exists
-        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
-
-        // Get the game from this room
-        Game game = gameService.getByRoom(room);
-
-        // Check if the game exists
-        if (game == null) throw new GameDoesntExistsException();
+        // Obtenemos el usuario de la sesión y comprobamos que existe
+        User user = getSessionUser();
 
         // Create the player
         Player player = playerService.create(game, user);
-
-        // Check if player has been created successfully
-        if (player == null) throw new PlayerDoesntExistsException();
 
         // Add player to the game
         return gameService.addPlayer(game, player);
@@ -226,37 +195,24 @@ public class CAHServiceImpl implements CAHService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public Game kickPlayer(Room room, User userWhoKicks, User userKicked) {
-        logger.debug("Kicking player {} from game in room {} by {}", userWhoKicks, room, userKicked);
-
-        // Check room exists
-        Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
-
-	    // Check userWhoKicks exists
-	    Assert.assertNotNull(userWhoKicks, ErrorEnum.USER_NOT_FOUND);
+    public Game kickPlayer(Room room, User userKicked) {
+        logger.debug("Kicking player {} from game in room {}", userKicked, room);
 
         // Check userKicked exists
         Assert.assertNotNull(userKicked, ErrorEnum.USER_NOT_FOUND);
 
-        // Get the game from this room
-        Game game = gameService.getByRoom(room);
+        // Get the game
+        Game game = getGameByRoom(room);
 
-        // Check if the game exists
-        if (game == null) throw new GameDoesntExistsException();
+        // Check the user performing the action is the creator
+        checkSessionUserIsCreator(game);
 
-		// Check if game is started
-		if (!game.getStatus().equals(GameStatusEnum.CREATED))
-			throw new GameNotStartedException();
-
-		// Check the player that kicks is the creator
-		if (game.getCreator().getId().equals(userWhoKicks.getId()))
-			throw new GameCreatorCannotLeaveException();
-
-        // Get the player
+        // Try to get the player for this game and user
         Player player = playerService.findPlayerByGameAndUser(game, userKicked);
 
         // Check if player has been created successfully
-        if (player == null) throw new PlayerDoesntExistsException();
+        if (player == null)
+            throw new PlayerDoesntExistsException();
 
         // Remove the player from the game
         game = gameService.removePlayer(game, player);
@@ -267,74 +223,133 @@ public class CAHServiceImpl implements CAHService {
         return game;
     }
 
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-	public Game leavePlayer(Room room, User user) {
-		logger.debug("User {} leaving game in room {}", user, room);
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public Game leavePlayer(Room room) {
+        logger.debug("Leaving game in room {}", room);
 
-		// Check room exists
-		Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
+        // Get the game
+        Game game = getGameByRoom(room);
 
-		// Check user exists
-		Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+        // Get the player
+        Player player = getPlayerBySessionUserAndGame(game);
 
-		// Get the game from this room
-		Game game = gameService.getByRoom(room);
+        // Remove the player from the game
+        game = gameService.removePlayer(game, player);
 
-		// Check if the game exists
-		if (game == null) throw new GameDoesntExistsException();
+        // Delete the player
+        playerService.delete(player);
 
-		// Check if game is started
-		if (!game.getStatus().equals(GameStatusEnum.CREATED))
-			throw new GameNotStartedException();
+        return game;
+    }
 
-		// Get the player
-		Player player = playerService.findPlayerByGameAndUser(game, user);
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public Game voteForDeletion(Room room) {
+        logger.debug("User voting to delete game on room {}", room);
 
-		// Check if player has been created successfully
-		if (player == null) throw new PlayerDoesntExistsException();
+        // Get the game
+        Game game = getGameByRoom(room);
 
-		// Remove the player from the game
-		game = gameService.removePlayer(game, player);
+        // Get the player
+        Player player = getPlayerBySessionUserAndGame(game);
 
-		// Delete the player
-		playerService.delete(player);
+        // Vote for deletion
+        game = gameService.voteForDeletion(game, player);
 
-		return game;
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-	public Game voteForDeletion(Room room, User user) {
-		logger.debug("User {} voting to delete game on room {}", user, room);
-
-		// Check game exists
-		Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
-
-		// Check user exists
-		Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
-
-		// Get the game from this room
-		Game game = gameService.getByRoom(room);
-
-		// Check if the game exists
-		if (game == null) throw new GameDoesntExistsException();
-
-		// Get the player
-		Player player = playerService.findPlayerByGameAndUser(game, user);
-
-		// Check user is playing this game
-		if (player == null)
-			throw new PlayerDoesntExistsException();
-
-		return gameService.voteForDeletion(game, player);
-	}
+        return game;
+    }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game startGame(Room room) {
         logger.debug("Starting game from room {}", room);
 
+        // Get the game
+        Game game = getGameByRoom(room);
+
+        // Check the user performing the action is the creator
+        checkSessionUserIsCreator(game);
+
+        // Start the game
+        game = gameService.startGame(game);
+
+        // Start the first round
+        startRound(game);
+
+        return gameService.update(game);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public Game playCard(Room room, Card card) {
+        logger.debug("User playing card {} on room {}", card, room);
+
+        // Check user exists
+        Assert.assertNotNull(card, ErrorEnum.CARD_NOT_FOUND);
+
+        // Get the game
+        Game game = getGameByRoom(room);
+
+        // Check the game have already started
+        if (game.getStatus() != GameStatusEnum.STARTED)
+            throw new GameNotStartedException();
+
+        // Get the player
+        Player player = getPlayerBySessionUserAndGame(game);
+
+        // Add card to round
+        roundService.addCardToPlayedCards(game.getCurrentRound(), player, card);
+
+        // Remove card from player hand
+        playerService.removeCardFromHand(player, card);
+
+        // Set status to voting if everyone have played
+        if (roundService.checkIfEveryoneHavePlayedACard(game.getCurrentRound())) {
+            roundService.setStatus(game.getCurrentRound(), RoundStatusEnum.VOTING);
+        }
+
+        return gameService.update(game);
+    }
+
+    @Override
+    public Game voteCard(Room room, Card card) {
+        logger.debug("User voting card {} on room {}", card, room);
+
+        // Check user exists
+        Assert.assertNotNull(card, ErrorEnum.CARD_NOT_FOUND);
+
+        // Get the game
+        Game game = getGameByRoom(room);
+
+        // Check the game have already started
+        if (game.getStatus() != GameStatusEnum.STARTED)
+            throw new GameNotStartedException();
+
+        // Get the player
+        Player player = getPlayerBySessionUserAndGame(game);
+
+        // Vote card
+        roundService.voteCard(game.getCurrentRound(), player, card);
+
+        // Check if everyone have voted a card
+        if (roundService.checkIfEveryoneHaveVotedACard(game.getCurrentRound())) {
+            endRound(game);
+        }
+
+        return gameService.update(game);
+    }
+
+    // ///////////// Helpers //////////////////
+
+    private User getSessionUser() {
+        User user = SessionUtil.getCurrentUser();
+        if (user == null)
+            throw new UserDoesntExistsException();
+        return user;
+    }
+
+    private Game getGameByRoom(Room room) {
         // Check room exists
         Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
 
@@ -344,104 +359,32 @@ public class CAHServiceImpl implements CAHService {
         // Check if the game exists
         if (game == null) throw new GameDoesntExistsException();
 
-        // Start the game
-        game = gameService.startGame(game);
-
-        // Check if the game started correctly
-        if (game.getStatus() != GameStatusEnum.STARTED)
-            throw new GameNotStartedException();
-
-        // Start a round
-        startRound(game);
-
-        return gameService.update(game);
+        return game;
     }
 
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public Game playCard(Room room, User user, Card card) {
-        logger.debug("User {} playing card {} on room {}", user, card, room);
+    private void checkSessionUserIsCreator(Game game) {
+        // Obtenemos el usuario de la sesión y comprobamos que existe
+        User creator = getSessionUser();
 
-        // Check game exists
-        Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
+        // Check if the user performing the action is the creator of the game
+        if (!game.getCreator().getId().equals(creator.getId()))
+            throw new GameOnlyCreatorCanPerformActionException();
+    }
 
-        // Check user exists
-        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+    private Player getPlayerBySessionUserAndGame(Game game) {
+        // Obtenemos el usuario de la sesión y comprobamos que existe
+        User user = getSessionUser();
 
-        // Check user exists
-        Assert.assertNotNull(card, ErrorEnum.CARD_NOT_FOUND);
-
-        // Get the game from this room
-        Game game = gameService.getByRoom(room);
-
-        // Check if the game exists
-        if (game == null) throw new GameDoesntExistsException();
-
-        // Check the status of the game
-        if (game.getStatus() == GameStatusEnum.STARTED)
-            throw new GameAlreadyStartedException();
-
-        // Get the player
+        // Try to get the player for this game and user
         Player player = playerService.findPlayerByGameAndUser(game, user);
 
-	    // Check if player has been created successfully
-	    if (player == null) throw new PlayerDoesntExistsException();
+        // Check if player has been created successfully
+        if (player == null) throw new PlayerDoesntExistsException();
 
-        // Add card to round
-        roundService.addCardToPlayedCards(game.getCurrentRound(), player, card);
-
-        // Remove card from player hand
-        playerService.removeCardFromHand(player, card);
-
-		// Set status to voting if everyone have played
-		if (roundService.checkIfEveryoneHavePlayedACard(game.getCurrentRound())) {
-			roundService.setStatus(game.getCurrentRound(), RoundStatusEnum.VOTING);
-		}
-
-        return gameService.update(game);
+        return player;
     }
 
-    @Override
-    public Game voteCard(Room room, User user, Card card) {
-        logger.debug("User {} voting card {} on room {}", user, card, room);
-
-        // Check game exists
-        Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
-
-        // Check user exists
-        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
-
-        // Check user exists
-        Assert.assertNotNull(card, ErrorEnum.CARD_NOT_FOUND);
-
-        // Get the game from this room
-        Game game = gameService.getByRoom(room);
-
-        // Check if the game exists
-        if (game == null) throw new GameDoesntExistsException();
-
-	    // Check the status of the game
-	    if (game.getStatus() == GameStatusEnum.STARTED)
-		    throw new GameAlreadyStartedException();
-
-	    // Get the player
-	    Player player = playerService.findPlayerByGameAndUser(game, user);
-
-	    // Check if player has been created successfully
-	    if (player == null) throw new PlayerDoesntExistsException();
-
-		// Vote card
-		roundService.voteCard(game.getCurrentRound(), player, card);
-
-	    // Check if everyone have voted a card
-	    if (roundService.checkIfEveryoneHaveVotedACard(game.getCurrentRound())) {
-	        endRound(game);
-	    }
-
-	    return gameService.update(game);
-    }
-
-	private void startRound(Game game) {
+    private void startRound(Game game) {
         logger.debug("Starting round on game {}", game);
 
         // Check if there is already a round and delete it
@@ -452,22 +395,22 @@ public class CAHServiceImpl implements CAHService {
         // Create next round
         Round round = roundService.createRound(game, gameService.getNextRoundNumber(game));
 
-		// Set the next round
+        // Set the next round
         gameService.setCurrentRound(game, round);
 
         // Fill player hands
         transferWhiteCardsFromGameDeckToPlayersHands(game);
     }
 
-	private void endRound(Game game) {
-		roundService.setStatus(game.getCurrentRound(), RoundStatusEnum.ENDING);
+    private void endRound(Game game) {
+        roundService.setStatus(game.getCurrentRound(), RoundStatusEnum.ENDING);
 
-		// Check if game is ended
-		if (checkIfGameEnded(game)) {
-			// Set the ended status
-			game.setStatus(GameStatusEnum.ENDING);
-		}
-	}
+        // Check if game is ended
+        if (checkIfGameEnded(game)) {
+            // Set the ended status
+            game.setStatus(GameStatusEnum.ENDING);
+        }
+    }
 
     private void transferWhiteCardsFromGameDeckToPlayersHands(Game game) {
         logger.debug("Transerir cartas blancas del mazo del juego a los jugadores en el juego: {}", game);
@@ -487,7 +430,7 @@ public class CAHServiceImpl implements CAHService {
 
     private boolean checkIfGameEnded(Game game) {
         if (game.getPunctuationMode().equals(PunctuationModeEnum.ROUNDS)) {
-            return Objects.equals(game.getCurrentRound().getRoundNumber(), game.getNumberOfRounds());
+            return Objects.equals(game.getCurrentRound().getRoundNumber(), game.getNumberOfRoundsToEnd());
         } else if (game.getPunctuationMode().equals(PunctuationModeEnum.POINTS)) {
             for (Player player : game.getPlayers()) {
                 if (Objects.equals(player.getPoints(), game.getNumberOfPointsToWin()))

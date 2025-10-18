@@ -205,7 +205,7 @@ class GameServiceTest extends BaseTest {
         getCurrentSession().flush();
 
         Assertions.assertEquals(PunctuationModeEnum.ROUNDS, game.getPunctuationMode());
-        Assertions.assertEquals(5, game.getNumberOfRounds());
+        Assertions.assertEquals(5, game.getNumberOfRoundsToEnd());
     }
 
     @Test

@@ -10,17 +10,17 @@ public interface RoundService {
 
     void deleteRound(Round round);
 
-	Round setStatus(Round round, RoundStatusEnum status);
+    Round setStatus(Round round, RoundStatusEnum status);
 
     Round addCardToPlayedCards(Round round, Player player, Card card);
 
     Round voteCard(Round round, Player player, Card card);
 
-	Round setNextBlackCard(Round round, Card nextBlackCard);
+    Round setNextBlackCard(Round round, Card nextBlackCard);
 
-	VotedCard getMostVotedCard(Round round);
+    VotedCard getMostVotedCard(Round round);
 
-	PlayedCard getPlayedCardByCard(Round round, Card card);
+    PlayedCard getPlayedCardByCard(Round round, Card card);
 
     boolean checkIfEveryoneHavePlayedACard(Round round);
 

@@ -74,7 +74,7 @@ public class GameServiceImpl implements GameService {
         game.setVotationMode(getDefaultGameMode());
         game.setPunctuationMode(getDefaultGamePunctuationType());
         game.setNumberOfPointsToWin(getDefaultGameLength());
-        game.setNumberOfRounds(getDefaultGameLength());
+        game.setNumberOfRoundsToEnd(getDefaultGameLength());
         game.setMaxNumberOfPlayers(getDefaultMaxNumberOfPlayers());
         game.setDictionary(dictionaryService.getDefaultDictionary());
         game.setCreationDate(new Date());
@@ -200,7 +200,7 @@ public class GameServiceImpl implements GameService {
         game.setPunctuationMode(PunctuationModeEnum.ROUNDS);
 
         // Set the number of cards to win
-        game.setNumberOfRounds(numberOfRoundsToEnd);
+        game.setNumberOfRoundsToEnd(numberOfRoundsToEnd);
 
         return gameDao.createOrUpdate(game);
     }
@@ -259,12 +259,12 @@ public class GameServiceImpl implements GameService {
         // Check game exists
         Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
-        // Check the status of the game
-        if (game.getStatus() == GameStatusEnum.STARTED)
-            throw new GameAlreadyStartedException();
-
         // Check player exists
         Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+
+        // Check the status of the game
+        if (game.getStatus() != GameStatusEnum.CREATED)
+            throw new GameAlreadyStartedException();
 
         // Game creator cannor leave
         if (Objects.equals(game.getCreator().getId(), player.getUser().getId()))
@@ -363,8 +363,12 @@ public class GameServiceImpl implements GameService {
         Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
 
         // Check if game is started
-        if (game.getStatus() != GameStatusEnum.STARTED)
+        if (game.getStatus() == GameStatusEnum.CREATED)
             throw new GameNotStartedException();
+
+		// Check if the player trying to delete is the creator
+		if (game.getCreator().getId().equals(player.getUser().getId()))
+			throw new GameCreatorCannotLeaveException();
 
         // Check user not voted already
         if (game.getDeletionVotes().stream().anyMatch(a -> a.getId().equals(player.getUser().getId())))
@@ -374,7 +378,7 @@ public class GameServiceImpl implements GameService {
         game.getDeletionVotes().add(player.getUser());
 
         // If more than half of the game players vote to delete the game...
-        if (game.getStatus().equals(GameStatusEnum.STARTED) && game.getDeletionVotes().size() >= ((game.getPlayers().size() / 2) + 1)) {
+        if (game.getDeletionVotes().size() >= ((game.getPlayers().size() / 2) + 1)) {
             game.setStatus(GameStatusEnum.DELETING);
         }
 

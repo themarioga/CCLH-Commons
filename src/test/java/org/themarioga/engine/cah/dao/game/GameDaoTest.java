@@ -56,7 +56,7 @@ class GameDaoTest extends BaseTest {
         game.setDictionary(dictionary);
         game.setMaxNumberOfPlayers(1);
         game.setNumberOfPointsToWin(1);
-        game.setNumberOfRounds(1);
+        game.setNumberOfRoundsToEnd(1);
         game.setPunctuationMode(PunctuationModeEnum.POINTS);
         game.setVotationMode(VotationModeEnum.DEMOCRACY);
         game.setCreationDate(new Date());

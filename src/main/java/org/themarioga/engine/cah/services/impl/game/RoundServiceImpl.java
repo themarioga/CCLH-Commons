@@ -85,21 +85,21 @@ public class RoundServiceImpl implements RoundService {
         roundDao.delete(round);
     }
 
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-	public Round setStatus(Round round, RoundStatusEnum status) {
-		logger.debug("Setting round {} to status {}", round, status);
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public Round setStatus(Round round, RoundStatusEnum status) {
+        logger.debug("Setting round {} to status {}", round, status);
 
-		// Check round exists
-		Assert.assertNotNull(round, ErrorEnum.GAME_NOT_FOUND);
+        // Check round exists
+        Assert.assertNotNull(round, ErrorEnum.GAME_NOT_FOUND);
 
-		// Set status
-		round.setStatus(status);
+        // Set status
+        round.setStatus(status);
 
-		return roundDao.createOrUpdate(round);
-	}
+        return roundDao.createOrUpdate(round);
+    }
 
-	@Override
+    @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Round addCardToPlayedCards(Round round, Player player, Card card) {
         logger.debug("Player {} playing card {} for the round {}", player, card, round);
@@ -168,14 +168,14 @@ public class RoundServiceImpl implements RoundService {
     public Round setNextBlackCard(Round round, Card nextBlackCard) {
         logger.debug("Setting next black card to round {}", round);
 
-		// Check the card type is black
-		if (nextBlackCard.getType() != CardTypeEnum.BLACK)
-			throw new CardDoesntExistsException();
+        // Check the card type is black
+        if (nextBlackCard.getType() != CardTypeEnum.BLACK)
+            throw new CardDoesntExistsException();
 
-		// Set the round black card
+        // Set the round black card
         round.setRoundBlackCard(nextBlackCard);
 
-		return roundDao.createOrUpdate(round);
+        return roundDao.createOrUpdate(round);
     }
 
     @Override
@@ -186,13 +186,13 @@ public class RoundServiceImpl implements RoundService {
         return roundDao.getMostVotedCard(round);
     }
 
-	@Override
-	@Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-	public PlayedCard getPlayedCardByCard(Round round, Card card) {
-		logger.debug("Getting played card from round {} and card {}", round, card);
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    public PlayedCard getPlayedCardByCard(Round round, Card card) {
+        logger.debug("Getting played card from round {} and card {}", round, card);
 
-		return roundDao.getPlayedCardByCard(round, card);
-	}
+        return roundDao.getPlayedCardByCard(round, card);
+    }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)

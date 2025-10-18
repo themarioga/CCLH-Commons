@@ -24,12 +24,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- GLOBAL DEPENDENCIES -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-
         <!-- TEST DEPENDENCIES -->
         <dependency>
             <groupId>com.h2database</groupId>

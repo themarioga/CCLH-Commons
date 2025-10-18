@@ -10,9 +10,9 @@ public interface RoundDao extends InterfaceHibernateDao<Round> {
 
     VotedCard getMostVotedCard(Round round);
 
-	PlayedCard getPlayedCardByCard(Round round, Card card);
+    PlayedCard getPlayedCardByCard(Round round, Card card);
 
-	long countPlayedCards(Round round);
+    long countPlayedCards(Round round);
 
     long countVotedCards(Round round);
 

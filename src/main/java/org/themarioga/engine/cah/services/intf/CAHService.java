@@ -9,7 +9,7 @@ import org.themarioga.engine.commons.models.User;
 
 public interface CAHService {
 
-    Game createGame(String roomName, User creator);
+    Game createGame(String roomName);
 
     Game setVotationMode(Room room, VotationModeEnum type);
 
@@ -21,20 +21,20 @@ public interface CAHService {
 
     Game setDictionary(Room room, Dictionary dictionary);
 
-    Game deleteGameByCreator(Room room, User creator);
+    Game deleteGameByCreator(Room room);
 
-    Game addPlayer(Room room, User user);
+    Game addPlayer(Room room);
 
-	Game kickPlayer(Room room, User userWhoKicks, User userKicked);
+    Game kickPlayer(Room room, User userKicked);
 
-	Game leavePlayer(Room room, User user);
+    Game leavePlayer(Room room);
 
-	Game voteForDeletion(Room room, User user);
+    Game voteForDeletion(Room room);
 
-	Game startGame(Room room);
+    Game startGame(Room room);
 
-    Game playCard(Room room, User user, Card card);
+    Game playCard(Room room, Card card);
 
-    Game voteCard(Room room, User user, Card card);
+    Game voteCard(Room room, Card card);
 
 }

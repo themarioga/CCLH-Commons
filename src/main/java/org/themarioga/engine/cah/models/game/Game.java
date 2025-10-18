@@ -20,7 +20,7 @@ public class Game extends org.themarioga.engine.commons.models.Game implements S
     @Column(nullable = false)
     private Integer numberOfPointsToWin;
     @Column(nullable = false)
-    private Integer numberOfRounds;
+    private Integer numberOfRoundsToEnd;
     @Column(nullable = false)
     private Integer maxNumberOfPlayers;
 
@@ -66,12 +66,12 @@ public class Game extends org.themarioga.engine.commons.models.Game implements S
         this.numberOfPointsToWin = numberOfCardsToWin;
     }
 
-    public Integer getNumberOfRounds() {
-        return numberOfRounds;
+    public Integer getNumberOfRoundsToEnd() {
+        return numberOfRoundsToEnd;
     }
 
-    public void setNumberOfRounds(Integer numberOfRounds) {
-        this.numberOfRounds = numberOfRounds;
+    public void setNumberOfRoundsToEnd(Integer numberOfRounds) {
+        this.numberOfRoundsToEnd = numberOfRounds;
     }
 
     public Integer getMaxNumberOfPlayers() {
@@ -124,7 +124,7 @@ public class Game extends org.themarioga.engine.commons.models.Game implements S
 
     @Override
     public String toString() {
-        return "Game{" + super.toString() + "currentRound=" + currentRound + ", votationMode=" + votationMode + ", punctuationMode=" + punctuationMode + ", numberOfCardsToWin=" + numberOfPointsToWin + ", numberOfRounds=" + numberOfRounds + ", maxNumberOfPlayers=" + maxNumberOfPlayers + ", dictionary=" + dictionary + '}';
+        return "Game{" + super.toString() + "currentRound=" + currentRound + ", votationMode=" + votationMode + ", punctuationMode=" + punctuationMode + ", numberOfCardsToWin=" + numberOfPointsToWin + ", numberOfRounds=" + numberOfRoundsToEnd + ", maxNumberOfPlayers=" + maxNumberOfPlayers + ", dictionary=" + dictionary + '}';
     }
 
 }
