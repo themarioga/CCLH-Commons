@@ -40,7 +40,7 @@ public class BaseTest {
         entityManager.createNativeQuery("INSERT INTO t_configuration(conf_key, conf_value) VALUES ('game_min_number_of_players', '3')").executeUpdate();
         entityManager.createNativeQuery("INSERT INTO t_configuration(conf_key, conf_value) VALUES ('game_max_number_of_players', '9')").executeUpdate();
         entityManager.createNativeQuery("INSERT INTO t_configuration(conf_key, conf_value) VALUES ('game_default_dictionary_id', '00000000-0000-0000-0000-000000000000')").executeUpdate();
-        entityManager.createNativeQuery("INSERT INTO t_configuration(conf_key, conf_value) VALUES ('game_default_number_cards_in_hand', '5')").executeUpdate();
+        entityManager.createNativeQuery("INSERT INTO t_configuration(conf_key, conf_value) VALUES ('game_default_number_cards_in_hand', '3')").executeUpdate();
         entityManager.createNativeQuery("INSERT INTO t_configuration(conf_key, conf_value) VALUES ('dictionaries_max_unfinished_number', '3')").executeUpdate();
         entityManager.createNativeQuery("INSERT INTO t_configuration(conf_key, conf_value) VALUES ('dictionaries_min_whitecards', '1')").executeUpdate();
         entityManager.createNativeQuery("INSERT INTO t_configuration(conf_key, conf_value) VALUES ('dictionaries_min_blackcards', '1')").executeUpdate();

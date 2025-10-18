@@ -270,7 +270,6 @@ class RoundServiceTest extends BaseTest {
 
     @Test
     @DatabaseSetup("classpath:dbunit/service/setup/game/playedcard.xml")
-    @DatabaseSetup("classpath:dbunit/service/setup/game/votedcard.xml")
     void testGetCheckIfEveryoneHavePlayedACard() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
 

@@ -275,9 +275,11 @@ class GameServiceTest extends BaseTest {
 
     @Test
     void testRemovePlayer_GameAlreadyStarted() {
-        Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
-        User user = userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+	    Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+	    User user = userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111"));
         Player player = playerService.findPlayerByGameAndUser(game, user);
+
+		gameService.setStatus(game, GameStatusEnum.STARTED);
 
         Assertions.assertThrows(GameAlreadyStartedException.class, () -> gameService.removePlayer(game, player));
     }
@@ -340,7 +342,7 @@ class GameServiceTest extends BaseTest {
 
         game = gameService.voteForDeletion(game, player);
 
-        user = userService.getById(UUID.fromString("88888888-8888-8888-8888-888888888888"));
+        user = userService.getById(UUID.fromString("99999999-9999-9999-9999-999999999999"));
         player = playerService.findPlayerByGameAndUser(game, user);
 
         game = gameService.voteForDeletion(game, player);
@@ -348,7 +350,7 @@ class GameServiceTest extends BaseTest {
         Assertions.assertNotNull(game);
         Assertions.assertNotNull(game.getDeletionVotes().get(0));
         Assertions.assertEquals(UUID.fromString("77777777-7777-7777-7777-777777777777"), game.getDeletionVotes().get(0).getId());
-        Assertions.assertEquals(UUID.fromString("88888888-8888-8888-8888-888888888888"), game.getDeletionVotes().get(1).getId());
+        Assertions.assertEquals(UUID.fromString("99999999-9999-9999-9999-999999999999"), game.getDeletionVotes().get(1).getId());
         Assertions.assertEquals(GameStatusEnum.DELETING, game.getStatus());
     }
 
@@ -361,12 +363,23 @@ class GameServiceTest extends BaseTest {
         Assertions.assertThrows(GameNotStartedException.class, () -> gameService.voteForDeletion(game, player));
     }
 
+	@Test
+	void testVoteForDeletion_GameCreatorCannotLeaveException() {
+		Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+		User user = userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+		Player player = playerService.findPlayerByGameAndUser(game, user);
+
+		gameService.setStatus(game, GameStatusEnum.STARTED);
+
+		Assertions.assertThrows(GameCreatorCannotLeaveException.class, () -> gameService.voteForDeletion(game, player));
+	}
+
     @Test
     @DatabaseSetup("classpath:dbunit/service/setup/game/player2.xml")
     @DatabaseSetup("classpath:dbunit/service/setup/game/gamedeletionvotes.xml")
     void testVoteDeletion_PlayerAlreadyVoted() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-        User user = userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        User user = userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111"));
         Player player = playerService.findPlayerByGameAndUser(game, user);
 
         game.setStatus(GameStatusEnum.STARTED);

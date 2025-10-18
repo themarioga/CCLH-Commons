@@ -298,11 +298,12 @@ public class GameServiceImpl implements GameService {
 
         // Change game status
         game.setStatus(GameStatusEnum.STARTED);
+	    game = gameDao.createOrUpdate(game);
 
         // Transfer cards to deck
         gameDao.transferCardsFromDictionaryToDeck(game);
 
-        return gameDao.createOrUpdate(game);
+        return game;
     }
 
     @Override

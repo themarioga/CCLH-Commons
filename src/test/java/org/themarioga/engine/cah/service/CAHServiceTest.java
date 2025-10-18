@@ -213,12 +213,14 @@ class CAHServiceTest extends BaseTest {
 
     @Test
     void testAddPlayer() {
-        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+		cahService.setMaxNumberOfPlayers(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), 4);
+
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
 
         Game game = cahService.addPlayer(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
         Assertions.assertNotNull(game);
-        Assertions.assertEquals(3, game.getPlayers().size());
+        Assertions.assertEquals(4, game.getPlayers().size());
     }
 
     @Test
@@ -231,7 +233,7 @@ class CAHServiceTest extends BaseTest {
         Game game = cahService.kickPlayer(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
 
         Assertions.assertNotNull(game);
-        Assertions.assertEquals(1, game.getPlayers().size());
+        Assertions.assertEquals(2, game.getPlayers().size());
     }
 
     @Test
@@ -263,7 +265,7 @@ class CAHServiceTest extends BaseTest {
 		Game game = cahService.leavePlayer(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
 	    Assertions.assertNotNull(game);
-	    Assertions.assertEquals(1, game.getPlayers().size());
+	    Assertions.assertEquals(2, game.getPlayers().size());
     }
 
 	@Test
@@ -292,17 +294,13 @@ class CAHServiceTest extends BaseTest {
 		Game game = cahService.voteForDeletion(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
 		Assertions.assertNotNull(game);
-		Assertions.assertEquals(2, game.getPlayers().size());
+		Assertions.assertEquals(3, game.getPlayers().size());
 		Assertions.assertEquals(1, game.getDeletionVotes().size());
 		Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
 	}
 
 	@Test
 	void testVoteForDeletion_Ending() {
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
-
-		cahService.addPlayer(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-
 		gameService.setStatus(gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))), GameStatusEnum.STARTED);
 
 		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
@@ -326,9 +324,32 @@ class CAHServiceTest extends BaseTest {
 
 	@Test
 	void testVoteForDeletion_PlayerDoesntExistsException() {
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
 
 		Assertions.assertThrows(PlayerDoesntExistsException.class, () -> cahService.voteForDeletion(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+	}
+
+	@Test
+	void testStartGame() {
+		Game game = cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+		Assertions.assertNotNull(game);
+		Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
+		Assertions.assertEquals(2, game.getBlackCardsDeck().size());
+		Assertions.assertEquals(6, game.getWhiteCardsDeck().size());
+		Assertions.assertEquals(3, game.getPlayers().get(0).getHand().size());
+	}
+
+	@Test
+	void testStartGame_GameDoesntExistsException() {
+		Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.startGame(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111"))));
+	}
+
+	@Test
+	void testStartGame_GameOnlyCreatorCanPerformActionException() {
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+
+		Assertions.assertThrows(GameOnlyCreatorCanPerformActionException.class, () -> cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
 	}
 
     @Test
