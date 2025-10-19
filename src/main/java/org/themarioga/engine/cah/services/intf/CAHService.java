@@ -37,4 +37,6 @@ public interface CAHService {
 
     Game voteCard(Room room, Card card);
 
+    Game nextRound(Game game);
+
 }

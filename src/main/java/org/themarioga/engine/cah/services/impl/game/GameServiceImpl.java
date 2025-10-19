@@ -298,7 +298,7 @@ public class GameServiceImpl implements GameService {
 
         // Change game status
         game.setStatus(GameStatusEnum.STARTED);
-	    game = gameDao.createOrUpdate(game);
+        game = gameDao.createOrUpdate(game);
 
         // Transfer cards to deck
         gameDao.transferCardsFromDictionaryToDeck(game);
@@ -341,19 +341,6 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-    public int getNextRoundNumber(Game game) {
-        logger.debug("Getting next round number from game {}", game);
-
-        // Determine and return the next round number
-        if (game.getCurrentRound() == null) {
-            return 0;
-        } else {
-            return game.getCurrentRound().getRoundNumber() + 1;
-        }
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game voteForDeletion(Game game, Player player) {
         logger.debug("Player {} vote for the deletion of the game {}", player, game);
 
@@ -367,9 +354,9 @@ public class GameServiceImpl implements GameService {
         if (game.getStatus() == GameStatusEnum.CREATED)
             throw new GameNotStartedException();
 
-		// Check if the player trying to delete is the creator
-		if (game.getCreator().getId().equals(player.getUser().getId()))
-			throw new GameCreatorCannotLeaveException();
+        // Check if the player trying to delete is the creator
+        if (game.getCreator().getId().equals(player.getUser().getId()))
+            throw new GameCreatorCannotLeaveException();
 
         // Check user not voted already
         if (game.getDeletionVotes().stream().anyMatch(a -> a.getId().equals(player.getUser().getId())))

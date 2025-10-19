@@ -20,6 +20,4 @@ public interface GameService extends org.themarioga.engine.commons.services.intf
 
     Game setCurrentRound(Game game, Round round);
 
-    int getNextRoundNumber(Game game);
-
 }

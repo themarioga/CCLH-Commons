@@ -11,6 +11,7 @@ import org.themarioga.engine.cah.enums.RoundStatusEnum;
 import org.themarioga.engine.cah.enums.VotationModeEnum;
 import org.themarioga.engine.cah.exceptions.player.PlayerCannotDrawCardException;
 import org.themarioga.engine.cah.exceptions.round.RoundPresidentCannotPlayCardException;
+import org.themarioga.engine.cah.exceptions.round.RoundWrongStatusException;
 import org.themarioga.engine.cah.models.dictionaries.Card;
 import org.themarioga.engine.cah.models.dictionaries.Dictionary;
 import org.themarioga.engine.cah.models.game.Game;
@@ -276,7 +277,7 @@ public class CAHServiceImpl implements CAHService {
         game = gameService.startGame(game);
 
         // Start the first round
-        startRound(game);
+        startRound(game, getNextRoundNumber(null));
 
         return gameService.update(game);
     }
@@ -299,10 +300,9 @@ public class CAHServiceImpl implements CAHService {
         // Get the player
         Player player = getPlayerBySessionUserAndGame(game);
 
-		// If the game is Classic or dictatorship the creator cant
-		if ((game.getVotationMode() == VotationModeEnum.CLASSIC || game.getVotationMode() == VotationModeEnum.DICTATORSHIP)
-				&& game.getCurrentRound().getRoundPresident().getId().equals(player.getId()))
-					throw new RoundPresidentCannotPlayCardException();
+        // If the game is Classic or dictatorship the creator cant
+        if ((game.getVotationMode() == VotationModeEnum.CLASSIC || game.getVotationMode() == VotationModeEnum.DICTATORSHIP) && game.getCurrentRound().getRoundPresident().getId().equals(player.getId()))
+            throw new RoundPresidentCannotPlayCardException();
 
         // Add card to round
         roundService.addCardToPlayedCards(game.getCurrentRound(), player, card);
@@ -319,6 +319,7 @@ public class CAHServiceImpl implements CAHService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
     public Game voteCard(Room room, Card card) {
         logger.debug("User voting card {} on room {}", card, room);
 
@@ -340,10 +341,98 @@ public class CAHServiceImpl implements CAHService {
 
         // Check if everyone have voted a card
         if (roundService.checkIfEveryoneHaveVotedACard(game.getCurrentRound())) {
-            endRound(game);
+            roundService.setStatus(game.getCurrentRound(), RoundStatusEnum.ENDING);
+
+            // Check if game is ended
+            if (checkIfGameEnded(game)) {
+                // Set the ended status
+                game.setStatus(GameStatusEnum.ENDING);
+            }
         }
 
         return gameService.update(game);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public Game nextRound(Game game) {
+        logger.debug("Starting next round on game {}", game);
+
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+        // Check the game have already started
+        if (game.getStatus() != GameStatusEnum.STARTED)
+            throw new GameNotStartedException();
+
+        // Check the user performing the action is the creator
+        checkSessionUserIsCreator(game);
+
+        // Check if there is already a round and is in the correct state
+        if (game.getCurrentRound() == null || !game.getCurrentRound().getStatus().equals(RoundStatusEnum.ENDING))
+            throw new RoundWrongStatusException();
+
+        // Get the current round
+        Round round = game.getCurrentRound();
+
+        // Unset the current round
+        gameService.setCurrentRound(game, null);
+
+        // Delete the current round
+        roundService.deleteRound(round);
+
+        // Start the next round
+        startRound(game, getNextRoundNumber(round));
+
+        return gameService.update(game);
+    }
+
+    private void startRound(Game game, int roundNumber) {
+        logger.debug("Starting round on game {}", game);
+
+        // Create next round
+        Round round = roundService.createRound(game, roundNumber);
+
+        // Set the next round
+        gameService.setCurrentRound(game, round);
+
+        // Fill player hands
+        for (Player player : game.getPlayers()) {
+            int numberCardsNeedToFillHand = getDefaultMaxNumberOfCardsInHand() - player.getHand().size();
+
+            if (numberCardsNeedToFillHand < 0 || numberCardsNeedToFillHand > getDefaultMaxNumberOfCardsInHand())
+                throw new PlayerCannotDrawCardException();
+
+            List<Card> cardsToTransfer = game.getWhiteCardsDeck().subList(0, numberCardsNeedToFillHand);
+            playerService.insertWhiteCardsIntoPlayerHand(player, cardsToTransfer);
+
+            game.getWhiteCardsDeck().removeAll(cardsToTransfer);
+        }
+    }
+
+    private boolean checkIfGameEnded(Game game) {
+        if (game.getPunctuationMode().equals(PunctuationModeEnum.ROUNDS)) {
+            return Objects.equals(game.getCurrentRound().getRoundNumber(), game.getNumberOfRoundsToEnd());
+        } else if (game.getPunctuationMode().equals(PunctuationModeEnum.POINTS)) {
+            for (Player player : game.getPlayers()) {
+                if (Objects.equals(player.getPoints(), game.getNumberOfPointsToWin()))
+                    return true;
+            }
+
+            return false;
+        }
+
+        throw new GameNotEndingException();
+    }
+
+    private int getNextRoundNumber(Round round) {
+        logger.debug("Getting next round number from round {}", round);
+
+        // Determine and return the next round number
+        if (round == null) {
+            return 0;
+        } else {
+            return round.getRoundNumber() + 1;
+        }
     }
 
     // ///////////// Helpers //////////////////
@@ -388,65 +477,6 @@ public class CAHServiceImpl implements CAHService {
         if (player == null) throw new PlayerDoesntExistsException();
 
         return player;
-    }
-
-    private void startRound(Game game) {
-        logger.debug("Starting round on game {}", game);
-
-        // Check if there is already a round and delete it
-        if (game.getCurrentRound() != null) {
-            roundService.deleteRound(game.getCurrentRound());
-        }
-
-        // Create next round
-        Round round = roundService.createRound(game, gameService.getNextRoundNumber(game));
-
-        // Set the next round
-        gameService.setCurrentRound(game, round);
-
-        // Fill player hands
-        transferWhiteCardsFromGameDeckToPlayersHands(game);
-    }
-
-    private void endRound(Game game) {
-        roundService.setStatus(game.getCurrentRound(), RoundStatusEnum.ENDING);
-
-        // Check if game is ended
-        if (checkIfGameEnded(game)) {
-            // Set the ended status
-            game.setStatus(GameStatusEnum.ENDING);
-        }
-    }
-
-    private void transferWhiteCardsFromGameDeckToPlayersHands(Game game) {
-        logger.debug("Transerir cartas blancas del mazo del juego a los jugadores en el juego: {}", game);
-
-        for (Player player : game.getPlayers()) {
-            int numberCardsNeedToFillHand = getDefaultMaxNumberOfCardsInHand() - player.getHand().size();
-
-            if (numberCardsNeedToFillHand < 0 || numberCardsNeedToFillHand > getDefaultMaxNumberOfCardsInHand())
-                throw new PlayerCannotDrawCardException();
-
-            List<Card> cardsToTransfer = game.getWhiteCardsDeck().subList(0, numberCardsNeedToFillHand);
-            playerService.insertWhiteCardsIntoPlayerHand(player, cardsToTransfer);
-
-            game.getWhiteCardsDeck().removeAll(cardsToTransfer);
-        }
-    }
-
-    private boolean checkIfGameEnded(Game game) {
-        if (game.getPunctuationMode().equals(PunctuationModeEnum.ROUNDS)) {
-            return Objects.equals(game.getCurrentRound().getRoundNumber(), game.getNumberOfRoundsToEnd());
-        } else if (game.getPunctuationMode().equals(PunctuationModeEnum.POINTS)) {
-            for (Player player : game.getPlayers()) {
-                if (Objects.equals(player.getPoints(), game.getNumberOfPointsToWin()))
-                    return true;
-            }
-
-            return false;
-        }
-
-        throw new GameNotEndingException();
     }
 
     private int getDefaultMaxNumberOfCardsInHand() {

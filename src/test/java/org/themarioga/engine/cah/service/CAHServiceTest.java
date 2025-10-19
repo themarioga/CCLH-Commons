@@ -10,6 +10,7 @@ import org.themarioga.engine.cah.BaseTest;
 import org.themarioga.engine.cah.enums.RoundStatusEnum;
 import org.themarioga.engine.cah.enums.VotationModeEnum;
 import org.themarioga.engine.cah.exceptions.round.RoundPresidentCannotPlayCardException;
+import org.themarioga.engine.cah.exceptions.round.RoundWrongStatusException;
 import org.themarioga.engine.cah.models.dictionaries.Dictionary;
 import org.themarioga.engine.cah.models.game.Game;
 import org.themarioga.engine.cah.services.intf.CAHService;
@@ -45,15 +46,15 @@ class CAHServiceTest extends BaseTest {
     UserService userService;
     @Autowired
     DictionaryService dictionaryService;
-	@Autowired
-	GameService gameService;
-	@Autowired
-	CardService cardService;
+    @Autowired
+    GameService gameService;
+    @Autowired
+    CardService cardService;
 
-	@BeforeEach
-	void setUpUser() {
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-	}
+    @BeforeEach
+    void setUpUser() {
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+    }
 
     @Test
     void testCreateGame_NewRoom() {
@@ -108,12 +109,12 @@ class CAHServiceTest extends BaseTest {
         Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.setVotationMode(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")), VotationModeEnum.DICTATORSHIP));
     }
 
-	@Test
-	void testSetVotationMode_GameOnlyCreatorCanPerformActionException() {
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+    @Test
+    void testSetVotationMode_GameOnlyCreatorCanPerformActionException() {
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
 
-		Assertions.assertThrows(GameOnlyCreatorCanPerformActionException.class, () -> cahService.setVotationMode(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), VotationModeEnum.DICTATORSHIP));
-	}
+        Assertions.assertThrows(GameOnlyCreatorCanPerformActionException.class, () -> cahService.setVotationMode(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), VotationModeEnum.DICTATORSHIP));
+    }
 
     @Test
     void testSetMaxNumberOfPlayers() {
@@ -127,12 +128,12 @@ class CAHServiceTest extends BaseTest {
         Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.setMaxNumberOfPlayers(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")), 6));
     }
 
-	@Test
-	void testSetMaxNumberOfPlayers_GameOnlyCreatorCanPerformActionException() {
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+    @Test
+    void testSetMaxNumberOfPlayers_GameOnlyCreatorCanPerformActionException() {
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
 
-		Assertions.assertThrows(GameOnlyCreatorCanPerformActionException.class, () -> cahService.setMaxNumberOfPlayers(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), 6));
-	}
+        Assertions.assertThrows(GameOnlyCreatorCanPerformActionException.class, () -> cahService.setMaxNumberOfPlayers(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), 6));
+    }
 
     @Test
     void testSetNumberOfPointsToWin() {
@@ -146,12 +147,12 @@ class CAHServiceTest extends BaseTest {
         Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.setNumberOfPointsToWin(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")), 6));
     }
 
-	@Test
-	void testSetNumberOfPointsToWin_GameOnlyCreatorCanPerformActionException() {
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+    @Test
+    void testSetNumberOfPointsToWin_GameOnlyCreatorCanPerformActionException() {
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
 
-		Assertions.assertThrows(GameOnlyCreatorCanPerformActionException.class, () -> cahService.setNumberOfPointsToWin(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), 6));
-	}
+        Assertions.assertThrows(GameOnlyCreatorCanPerformActionException.class, () -> cahService.setNumberOfPointsToWin(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), 6));
+    }
 
     @Test
     void testSetNumberOfRoundsToEnd() {
@@ -165,12 +166,12 @@ class CAHServiceTest extends BaseTest {
         Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.setNumberOfRoundsToEnd(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")), 6));
     }
 
-	@Test
-	void testSetNumberOfRoundsToEnd_GameOnlyCreatorCanPerformActionException() {
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+    @Test
+    void testSetNumberOfRoundsToEnd_GameOnlyCreatorCanPerformActionException() {
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
 
-		Assertions.assertThrows(GameOnlyCreatorCanPerformActionException.class, () -> cahService.setNumberOfRoundsToEnd(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), 6));
-	}
+        Assertions.assertThrows(GameOnlyCreatorCanPerformActionException.class, () -> cahService.setNumberOfRoundsToEnd(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), 6));
+    }
 
     @Test
     void testSetDictionary() {
@@ -187,14 +188,14 @@ class CAHServiceTest extends BaseTest {
         Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.setDictionary(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")), dictionary));
     }
 
-	@Test
-	void testSetDictionary_GameOnlyCreatorCanPerformActionException() {
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+    @Test
+    void testSetDictionary_GameOnlyCreatorCanPerformActionException() {
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
 
-		Dictionary dictionary = dictionaryService.getDictionaryById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        Dictionary dictionary = dictionaryService.getDictionaryById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
-		Assertions.assertThrows(GameOnlyCreatorCanPerformActionException.class, () -> cahService.setDictionary(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), dictionary));
-	}
+        Assertions.assertThrows(GameOnlyCreatorCanPerformActionException.class, () -> cahService.setDictionary(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), dictionary));
+    }
 
     @Test
     void testDeleteGameByCreator() {
@@ -219,7 +220,7 @@ class CAHServiceTest extends BaseTest {
 
     @Test
     void testAddPlayer() {
-		cahService.setMaxNumberOfPlayers(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), 4);
+        cahService.setMaxNumberOfPlayers(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), 4);
 
         SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
 
@@ -266,229 +267,273 @@ class CAHServiceTest extends BaseTest {
 
     @Test
     void testLeavePlayer() {
-	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
 
-		Game game = cahService.leavePlayer(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+        Game game = cahService.leavePlayer(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
-	    Assertions.assertNotNull(game);
-	    Assertions.assertEquals(2, game.getPlayers().size());
+        Assertions.assertNotNull(game);
+        Assertions.assertEquals(2, game.getPlayers().size());
+    }
+
+    @Test
+    void testLeavePlayer_GameDoesntExistsException() {
+        Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.leavePlayer(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111"))));
+    }
+
+    @Test
+    void testLeavePlayer_GameCreatorCannotLeaveException() {
+        Assertions.assertThrows(GameCreatorCannotLeaveException.class, () -> cahService.leavePlayer(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+    }
+
+    @Test
+    void testLeavePlayer_PlayerDoesntExistsException() {
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
+
+        Assertions.assertThrows(PlayerDoesntExistsException.class, () -> cahService.leavePlayer(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+    }
+
+    @Test
+    void testVoteForDeletion() {
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+
+        gameService.setStatus(gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))), GameStatusEnum.STARTED);
+
+        Game game = cahService.voteForDeletion(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+        Assertions.assertNotNull(game);
+        Assertions.assertEquals(3, game.getPlayers().size());
+        Assertions.assertEquals(1, game.getDeletionVotes().size());
+        Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
+    }
+
+    @Test
+    void testVoteForDeletion_Ending() {
+        gameService.setStatus(gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))), GameStatusEnum.STARTED);
+
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+
+        cahService.voteForDeletion(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+        Game game = cahService.voteForDeletion(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+        Assertions.assertNotNull(game);
+        Assertions.assertEquals(3, game.getPlayers().size());
+        Assertions.assertEquals(2, game.getDeletionVotes().size());
+        Assertions.assertEquals(GameStatusEnum.DELETING, game.getStatus());
+    }
+
+    @Test
+    void testVoteForDeletion_GameDoesntExistsException() {
+        Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.voteForDeletion(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111"))));
+    }
+
+    @Test
+    void testVoteForDeletion_PlayerDoesntExistsException() {
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
+
+        Assertions.assertThrows(PlayerDoesntExistsException.class, () -> cahService.voteForDeletion(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+    }
+
+    @Test
+    void testStartGame() {
+        Game game = cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+        Assertions.assertNotNull(game);
+        Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
+        Assertions.assertEquals(2, game.getBlackCardsDeck().size());
+        Assertions.assertEquals(6, game.getWhiteCardsDeck().size());
+        Assertions.assertEquals(3, game.getPlayers().get(0).getHand().size());
+    }
+
+    @Test
+    void testStartGame_GameDoesntExistsException() {
+        Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.startGame(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111"))));
+    }
+
+    @Test
+    void testStartGame_GameOnlyCreatorCanPerformActionException() {
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+
+        Assertions.assertThrows(GameOnlyCreatorCanPerformActionException.class, () -> cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+    }
+
+    @Test
+    void testPlayCard() {
+        Game game = cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+
+        game = cahService.playCard(game.getRoom(), game.getPlayers().get(1).getHand().get(0).getCard());
+
+        Assertions.assertNotNull(game);
+        Assertions.assertEquals(1, game.getCurrentRound().getPlayedCards().size());
+        Assertions.assertEquals(2, game.getPlayers().get(1).getHand().size());
+    }
+
+    @Test
+    void testPlayCard_Voting() {
+        Game game = cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+
+        game = cahService.playCard(game.getRoom(), game.getPlayers().get(1).getHand().get(0).getCard());
+
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+        game = cahService.playCard(game.getRoom(), game.getPlayers().get(2).getHand().get(0).getCard());
+
+        Assertions.assertNotNull(game);
+        Assertions.assertEquals(2, game.getCurrentRound().getPlayedCards().size());
+        Assertions.assertEquals(2, game.getPlayers().get(1).getHand().size());
+        Assertions.assertEquals(2, game.getPlayers().get(2).getHand().size());
+        Assertions.assertEquals(RoundStatusEnum.VOTING, game.getCurrentRound().getStatus());
+    }
+
+    @Test
+    void testPlayCard_GameDoesntExistsException() {
+        Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.playCard(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+    }
+
+    @Test
+    void testPlayCard_GameNotStartedException() {
+        Assertions.assertThrows(GameNotStartedException.class, () -> cahService.playCard(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+    }
+
+    @Test
+    void testPlayCard_PlayerDoesntExistsException() {
+        cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("99999999-9999-9999-9999-999999999999")));
+
+        Assertions.assertThrows(PlayerDoesntExistsException.class, () -> cahService.playCard(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+    }
+
+    @Test
+    void testPlayCard_RoundPresidentCannotPlayCardException() {
+        cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+        Assertions.assertThrows(RoundPresidentCannotPlayCardException.class, () -> cahService.playCard(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+    }
+
+    @Test
+    void testVoteCard() {
+        Game game = cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+
+        cahService.playCard(game.getRoom(), game.getPlayers().get(1).getHand().get(0).getCard());
+
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+        cahService.playCard(game.getRoom(), game.getPlayers().get(2).getHand().get(0).getCard());
+
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+        cahService.voteCard(game.getRoom(), game.getCurrentRound().getPlayedCards().get(1).getCard());
+
+        Assertions.assertEquals(1, game.getCurrentRound().getVotedCards().size());
+        Assertions.assertEquals(RoundStatusEnum.ENDING, game.getCurrentRound().getStatus());
+    }
+
+    @Test
+    void testVoteCard_GameDoesntExistsException() {
+        Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.voteCard(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+    }
+
+    @Test
+    void testVoteCard_GameNotStartedException() {
+        Assertions.assertThrows(GameNotStartedException.class, () -> cahService.voteCard(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+    }
+
+    @Test
+    void testVoteCard_PlayerDoesntExistsException() {
+        cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("99999999-9999-9999-9999-999999999999")));
+
+        Assertions.assertThrows(PlayerDoesntExistsException.class, () -> cahService.voteCard(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+    }
+
+    @Test
+    void testNextRound() {
+        Game game = cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+
+        cahService.playCard(game.getRoom(), game.getPlayers().get(1).getHand().get(0).getCard());
+
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+        cahService.playCard(game.getRoom(), game.getPlayers().get(2).getHand().get(0).getCard());
+
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+        cahService.voteCard(game.getRoom(), game.getCurrentRound().getPlayedCards().get(1).getCard());
+
+	    Assertions.assertEquals(0, game.getCurrentRound().getRoundNumber());
+
+        cahService.nextRound(game);
+
+        Assertions.assertEquals(1, game.getCurrentRound().getRoundNumber());
     }
 
 	@Test
-	void testLeavePlayer_GameDoesntExistsException() {
-		Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.leavePlayer(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111"))));
+	void testNextRound_GameNotStarted() {
+		Assertions.assertThrows(GameNotStartedException.class, () -> cahService.nextRound(gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")))));
 	}
 
 	@Test
-	void testLeavePlayer_GameCreatorCannotLeaveException() {
-		Assertions.assertThrows(GameCreatorCannotLeaveException.class, () -> cahService.leavePlayer(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
-	}
-
-	@Test
-	void testLeavePlayer_PlayerDoesntExistsException() {
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
-
-		Assertions.assertThrows(PlayerDoesntExistsException.class, () -> cahService.leavePlayer(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
-	}
-
-	@Test
-	void testVoteForDeletion() {
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
-
-		gameService.setStatus(gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))), GameStatusEnum.STARTED);
-
-		Game game = cahService.voteForDeletion(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-
-		Assertions.assertNotNull(game);
-		Assertions.assertEquals(3, game.getPlayers().size());
-		Assertions.assertEquals(1, game.getDeletionVotes().size());
-		Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
-	}
-
-	@Test
-	void testVoteForDeletion_Ending() {
-		gameService.setStatus(gameService.getByRoom(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))), GameStatusEnum.STARTED);
-
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
-
-		cahService.voteForDeletion(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
-
-		Game game = cahService.voteForDeletion(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-
-		Assertions.assertNotNull(game);
-		Assertions.assertEquals(3, game.getPlayers().size());
-		Assertions.assertEquals(2, game.getDeletionVotes().size());
-		Assertions.assertEquals(GameStatusEnum.DELETING, game.getStatus());
-	}
-
-	@Test
-	void testVoteForDeletion_GameDoesntExistsException() {
-		Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.voteForDeletion(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111"))));
-	}
-
-	@Test
-	void testVoteForDeletion_PlayerDoesntExistsException() {
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
-
-		Assertions.assertThrows(PlayerDoesntExistsException.class, () -> cahService.voteForDeletion(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
-	}
-
-	@Test
-	void testStartGame() {
-		Game game = cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-
-		Assertions.assertNotNull(game);
-		Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
-		Assertions.assertEquals(2, game.getBlackCardsDeck().size());
-		Assertions.assertEquals(6, game.getWhiteCardsDeck().size());
-		Assertions.assertEquals(3, game.getPlayers().get(0).getHand().size());
-	}
-
-	@Test
-	void testStartGame_GameDoesntExistsException() {
-		Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.startGame(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111"))));
-	}
-
-	@Test
-	void testStartGame_GameOnlyCreatorCanPerformActionException() {
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
-
-		Assertions.assertThrows(GameOnlyCreatorCanPerformActionException.class, () -> cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
-	}
-
-	@Test
-	void testPlayCard() {
+	void testNextRound_GameOnlyCreatorCanPerformActionException() {
 		Game game = cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
 		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
 
-		game = cahService.playCard(game.getRoom(), game.getPlayers().get(1).getHand().get(0).getCard());
-
-		Assertions.assertNotNull(game);
-		Assertions.assertEquals(1, game.getCurrentRound().getPlayedCards().size());
-		Assertions.assertEquals(2, game.getPlayers().get(1).getHand().size());
+		Assertions.assertThrows(GameOnlyCreatorCanPerformActionException.class, () -> cahService.nextRound(game));
 	}
 
 	@Test
-	void testPlayCard_Voting() {
+	void testNextRound_RoundWrongStatusException() {
 		Game game = cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
-
-		game = cahService.playCard(game.getRoom(), game.getPlayers().get(1).getHand().get(0).getCard());
-
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
-
-		game = cahService.playCard(game.getRoom(), game.getPlayers().get(2).getHand().get(0).getCard());
-
-		Assertions.assertNotNull(game);
-		Assertions.assertEquals(2, game.getCurrentRound().getPlayedCards().size());
-		Assertions.assertEquals(2, game.getPlayers().get(1).getHand().size());
-		Assertions.assertEquals(2, game.getPlayers().get(2).getHand().size());
-		Assertions.assertEquals(RoundStatusEnum.VOTING, game.getCurrentRound().getStatus());
-	}
-
-	@Test
-	void testPlayCard_GameDoesntExistsException() {
-		Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.playCard(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
-	}
-
-	@Test
-	void testPlayCard_GameNotStartedException() {
-		Assertions.assertThrows(GameNotStartedException.class, () -> cahService.playCard(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
-	}
-
-	@Test
-	void testPlayCard_PlayerDoesntExistsException() {
-		cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("99999999-9999-9999-9999-999999999999")));
-
-		Assertions.assertThrows(PlayerDoesntExistsException.class, () -> cahService.playCard(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
-	}
-
-	@Test
-	void testPlayCard_RoundPresidentCannotPlayCardException() {
-		cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-
-		Assertions.assertThrows(RoundPresidentCannotPlayCardException.class, () -> cahService.playCard(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
-	}
-
-	@Test
-	void testVoteCard() {
-		Game game = cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
-
-		cahService.playCard(game.getRoom(), game.getPlayers().get(1).getHand().get(0).getCard());
-
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
-
-		cahService.playCard(game.getRoom(), game.getPlayers().get(2).getHand().get(0).getCard());
-
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-
-		cahService.voteCard(game.getRoom(), game.getCurrentRound().getPlayedCards().get(1).getCard());
-
-		Assertions.assertEquals(1, game.getCurrentRound().getVotedCards().size());
-		Assertions.assertEquals(RoundStatusEnum.ENDING, game.getCurrentRound().getStatus());
-	}
-
-	@Test
-	void testVoteCard_GameDoesntExistsException() {
-		Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.voteCard(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
-	}
-
-	@Test
-	void testVoteCard_GameNotStartedException() {
-		Assertions.assertThrows(GameNotStartedException.class, () -> cahService.voteCard(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
-	}
-
-	@Test
-	void testVoteCard_PlayerDoesntExistsException() {
-		cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("99999999-9999-9999-9999-999999999999")));
-
-		Assertions.assertThrows(PlayerDoesntExistsException.class, () -> cahService.voteCard(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+		Assertions.assertThrows(RoundWrongStatusException.class, () -> cahService.nextRound(game));
 	}
 
     @Test
     @Disabled
     void completeClassicGameTest() {
-	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
 
-		Game game = cahService.createGame("Classic Game");
+        Game game = cahService.createGame("Classic Game");
 
-	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("55555555-5555-5555-5555-555555555555")));
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("55555555-5555-5555-5555-555555555555")));
 
-		cahService.addPlayer(game.getRoom());
+        cahService.addPlayer(game.getRoom());
 
-	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("66666666-6666-6666-6666-666666666666")));
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("66666666-6666-6666-6666-666666666666")));
 
-	    cahService.addPlayer(game.getRoom());
+        cahService.addPlayer(game.getRoom());
 
-		Assertions.assertEquals(3, game.getPlayers().size());
+        Assertions.assertEquals(3, game.getPlayers().size());
 
-	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
 
-		cahService.startGame(game.getRoom());
+        cahService.startGame(game.getRoom());
 
-		Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
+        Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
 
-	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("55555555-5555-5555-5555-555555555555")));
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("55555555-5555-5555-5555-555555555555")));
 
-		cahService.playCard(game.getRoom(), game.getPlayers().get(1).getHand().get(0).getCard());
+        cahService.playCard(game.getRoom(), game.getPlayers().get(1).getHand().get(0).getCard());
 
-	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("66666666-6666-6666-6666-666666666666")));
+        SessionUtil.setCurrentUser(userService.getById(UUID.fromString("66666666-6666-6666-6666-666666666666")));
 
-	    cahService.playCard(game.getRoom(), game.getPlayers().get(2).getHand().get(0).getCard());
+        cahService.playCard(game.getRoom(), game.getPlayers().get(2).getHand().get(0).getCard());
 
-		Assertions.assertEquals(2, game.getCurrentRound().getPlayedCards().size());
-	    Assertions.assertEquals(3, game.getCurrentRound().getPlayedCards().size());
-		Assertions.assertEquals(RoundStatusEnum.VOTING, game.getCurrentRound().getStatus());
+        Assertions.assertEquals(2, game.getCurrentRound().getPlayedCards().size());
+        Assertions.assertEquals(3, game.getCurrentRound().getPlayedCards().size());
+        Assertions.assertEquals(RoundStatusEnum.VOTING, game.getCurrentRound().getStatus());
     }
 
 }

@@ -96,9 +96,14 @@ class RoundServiceTest extends BaseTest {
     void testDeleteRound() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
 
-        Assertions.assertNotNull(game.getCurrentRound());
+        Round round = game.getCurrentRound();
 
-        roundService.deleteRound(game.getCurrentRound());
+        Assertions.assertNotNull(round);
+
+        game.setCurrentRound(null);
+        gameService.update(game);
+
+        roundService.deleteRound(round);
         getCurrentSession().flush();
     }
 

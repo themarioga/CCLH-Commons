@@ -78,14 +78,14 @@ public class RoundServiceImpl implements RoundService {
         logger.debug("Deleting round {}", round);
 
         // Check round exists
-        Assert.assertNotNull(round, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(round, ErrorEnum.ROUND_NOT_FOUND);
 
         // Check if the round is ready to end
         if (round.getStatus() != RoundStatusEnum.ENDING)
             throw new RoundWrongStatusException();
 
-        round.getGame().setCurrentRound(null);
         roundDao.delete(round);
+        roundDao.getCurrentSession().flush();
     }
 
     @Override
@@ -228,9 +228,9 @@ public class RoundServiceImpl implements RoundService {
 
     private Player getPresidentForNextRound(Round round) {
         List<Player> players = new ArrayList<>(round.getGame().getPlayers());
-	    players.sort(Comparator.comparing(org.themarioga.engine.commons.models.Player::getJoinOrder));
+        players.sort(Comparator.comparing(org.themarioga.engine.commons.models.Player::getJoinOrder));
 
-		return players.get(round.getRoundNumber() % players.size());
+        return players.get(round.getRoundNumber() % players.size());
     }
 
 }

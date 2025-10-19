@@ -38,7 +38,7 @@ public class GameDaoImpl extends AbstractHibernateDao<Game> implements GameDao {
     public void transferCardsFromDictionaryToDeck(Game game) {
         getCurrentSession().createNativeMutationQuery("INSERT INTO game_black_cards_deck(game_id, card_id) SELECT :game AS game_id, id FROM card WHERE dictionary_id=:dictionary and type=0").setParameter("game", game.getId()).setParameter("dictionary", game.getDictionary().getId()).executeUpdate();
         getCurrentSession().createNativeMutationQuery("INSERT INTO game_white_cards_deck(game_id, card_id) SELECT :game AS game_id, id FROM card WHERE dictionary_id=:dictionary and type=1").setParameter("game", game.getId()).setParameter("dictionary", game.getDictionary().getId()).executeUpdate();
-	    getCurrentSession().refresh(game);
-	}
+        getCurrentSession().refresh(game);
+    }
 
 }

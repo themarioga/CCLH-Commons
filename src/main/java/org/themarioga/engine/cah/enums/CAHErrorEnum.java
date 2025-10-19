@@ -21,7 +21,7 @@ public enum CAHErrorEnum {
     PLAYER_ALREADY_PLAYED_CARD(42L, "El jugador no puede jugar esa carta"),
     PLAYER_ALREADY_VOTED_CARD(43L, "El jugador no puede votar"),
     ROUND_WRONG_STATUS(44L, "Mesa en estado incorrecto"),
-	ROUND_PRESIDENT_CANNOT_PLAY_CARD(45L, "El presidente de la ronda no puede jugar una carta");
+    ROUND_PRESIDENT_CANNOT_PLAY_CARD(45L, "El presidente de la ronda no puede jugar una carta");
 
     final Long errorCode;
     final String errorDesc;
