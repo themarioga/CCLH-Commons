@@ -10,6 +10,7 @@ import org.themarioga.engine.cah.enums.PunctuationModeEnum;
 import org.themarioga.engine.cah.enums.RoundStatusEnum;
 import org.themarioga.engine.cah.enums.VotationModeEnum;
 import org.themarioga.engine.cah.exceptions.player.PlayerCannotDrawCardException;
+import org.themarioga.engine.cah.exceptions.round.RoundPresidentCannotPlayCardException;
 import org.themarioga.engine.cah.models.dictionaries.Card;
 import org.themarioga.engine.cah.models.dictionaries.Dictionary;
 import org.themarioga.engine.cah.models.game.Game;
@@ -297,6 +298,11 @@ public class CAHServiceImpl implements CAHService {
 
         // Get the player
         Player player = getPlayerBySessionUserAndGame(game);
+
+		// If the game is Classic or dictatorship the creator cant
+		if ((game.getVotationMode() == VotationModeEnum.CLASSIC || game.getVotationMode() == VotationModeEnum.DICTATORSHIP)
+				&& game.getCurrentRound().getRoundPresident().getId().equals(player.getId()))
+					throw new RoundPresidentCannotPlayCardException();
 
         // Add card to round
         roundService.addCardToPlayedCards(game.getCurrentRound(), player, card);

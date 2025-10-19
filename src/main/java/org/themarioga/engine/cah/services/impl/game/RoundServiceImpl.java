@@ -25,7 +25,10 @@ import org.themarioga.engine.commons.enums.ErrorEnum;
 import org.themarioga.engine.commons.exceptions.ApplicationException;
 import org.themarioga.engine.commons.util.Assert;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class RoundServiceImpl implements RoundService {
@@ -224,20 +227,10 @@ public class RoundServiceImpl implements RoundService {
     }
 
     private Player getPresidentForNextRound(Round round) {
-        int playerIndex = 0;
+        List<Player> players = new ArrayList<>(round.getGame().getPlayers());
+	    players.sort(Comparator.comparing(org.themarioga.engine.commons.models.Player::getJoinOrder));
 
-        for (int i = 0; i < round.getGame().getPlayers().size(); i++) {
-            if (round.getGame().getPlayers().get(i).equals(round.getRoundPresident()))
-                playerIndex = i;
-        }
-
-        if (playerIndex + 1 < round.getGame().getPlayers().size()) {
-            playerIndex += 1;
-        } else {
-            playerIndex = 0;
-        }
-
-        return round.getGame().getPlayers().get(playerIndex);
+		return players.get(round.getRoundNumber() % players.size());
     }
 
 }
