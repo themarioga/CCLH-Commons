@@ -48,7 +48,7 @@ class CAHServiceTest extends BaseTest {
 	@Autowired
 	GameService gameService;
 	@Autowired
-	private CardService cardService;
+	CardService cardService;
 
 	@BeforeEach
 	void setUpUser() {
@@ -416,35 +416,79 @@ class CAHServiceTest extends BaseTest {
 		Assertions.assertThrows(RoundPresidentCannotPlayCardException.class, () -> cahService.playCard(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
 	}
 
+	@Test
+	void testVoteCard() {
+		Game game = cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
+
+		cahService.playCard(game.getRoom(), game.getPlayers().get(1).getHand().get(0).getCard());
+
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
+
+		cahService.playCard(game.getRoom(), game.getPlayers().get(2).getHand().get(0).getCard());
+
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+		cahService.voteCard(game.getRoom(), game.getCurrentRound().getPlayedCards().get(1).getCard());
+
+		Assertions.assertEquals(1, game.getCurrentRound().getVotedCards().size());
+		Assertions.assertEquals(RoundStatusEnum.ENDING, game.getCurrentRound().getStatus());
+	}
+
+	@Test
+	void testVoteCard_GameDoesntExistsException() {
+		Assertions.assertThrows(GameDoesntExistsException.class, () -> cahService.voteCard(roomService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+	}
+
+	@Test
+	void testVoteCard_GameNotStartedException() {
+		Assertions.assertThrows(GameNotStartedException.class, () -> cahService.voteCard(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+	}
+
+	@Test
+	void testVoteCard_PlayerDoesntExistsException() {
+		cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("99999999-9999-9999-9999-999999999999")));
+
+		Assertions.assertThrows(PlayerDoesntExistsException.class, () -> cahService.voteCard(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")), cardService.getCardById(UUID.fromString("00000000-0000-0000-0000-000000000000"))));
+	}
+
     @Test
     @Disabled
-    void completeGameTest() {
-//        Game game = gameService.create(0L, "Habitación", 0L);
-//        gameService.setVotationMode(game, VotationModeEnum.DEMOCRACY);
-//        gameService.setNumberOfPointsToWin(game, 3);
-//        gameService.setDictionary(game, 0L);
-//        tableService.addPlayer(table, playerService.create(table, 0L));
-//        tableService.addPlayer(table, playerService.create(table, 1L));
-//        tableService.addPlayer(table, playerService.create(table, 3L));
-//        tableService.startGame(table);
-//        getCurrentSession().flush();
-//        getCurrentSession().refresh(game);
-//        gameService.startRound(game);
-//        tableService.playCard(table, 0L, table.getGame().getPlayers().get(0).getHand().get(0).getCard().getId());
-//        tableService.playCard(table, 1L, table.getGame().getPlayers().get(1).getHand().get(0).getCard().getId());
-//        tableService.playCard(table, 3L, table.getGame().getPlayers().get(2).getHand().get(0).getCard().getId());
-//        tableService.voteForCard(table, 0L, table.getPlayedCards().get(0).getCard().getId());
-//        tableService.voteForCard(table, 1L, table.getPlayedCards().get(0).getCard().getId());
-//        tableService.voteForCard(table, 3L, table.getPlayedCards().get(0).getCard().getId());
-//        gameService.endRound(game);
-//        gameService.startRound(game);
-//        tableService.playCard(table, 0L, table.getGame().getPlayers().get(0).getHand().get(0).getCard().getId());
-//        tableService.playCard(table, 1L, table.getGame().getPlayers().get(1).getHand().get(0).getCard().getId());
-//        tableService.playCard(table, 3L, table.getGame().getPlayers().get(2).getHand().get(0).getCard().getId());
-//        tableService.voteForCard(table, 0L, table.getPlayedCards().get(0).getCard().getId());
-//        tableService.voteForCard(table, 1L, table.getPlayedCards().get(0).getCard().getId());
-//        tableService.voteForCard(table, 3L, table.getPlayedCards().get(0).getCard().getId());
-//        gameService.endRound(game);
+    void completeClassicGameTest() {
+	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
+
+		Game game = cahService.createGame("Classic Game");
+
+	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("55555555-5555-5555-5555-555555555555")));
+
+		cahService.addPlayer(game.getRoom());
+
+	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("66666666-6666-6666-6666-666666666666")));
+
+	    cahService.addPlayer(game.getRoom());
+
+		Assertions.assertEquals(3, game.getPlayers().size());
+
+	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
+
+		cahService.startGame(game.getRoom());
+
+		Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
+
+	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("55555555-5555-5555-5555-555555555555")));
+
+		cahService.playCard(game.getRoom(), game.getPlayers().get(1).getHand().get(0).getCard());
+
+	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("66666666-6666-6666-6666-666666666666")));
+
+	    cahService.playCard(game.getRoom(), game.getPlayers().get(2).getHand().get(0).getCard());
+
+		Assertions.assertEquals(2, game.getCurrentRound().getPlayedCards().size());
+	    Assertions.assertEquals(3, game.getCurrentRound().getPlayedCards().size());
+		Assertions.assertEquals(RoundStatusEnum.VOTING, game.getCurrentRound().getStatus());
     }
 
 }
