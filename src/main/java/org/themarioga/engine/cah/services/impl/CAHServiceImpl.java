@@ -29,10 +29,10 @@ import org.themarioga.engine.commons.exceptions.room.RoomAlreadyExistsException;
 import org.themarioga.engine.commons.exceptions.user.UserDoesntExistsException;
 import org.themarioga.engine.commons.models.Room;
 import org.themarioga.engine.commons.models.User;
+import org.themarioga.engine.commons.security.SecurityUtils;
 import org.themarioga.engine.commons.services.intf.ConfigurationService;
 import org.themarioga.engine.commons.services.intf.RoomService;
 import org.themarioga.engine.commons.util.Assert;
-import org.themarioga.engine.commons.util.SessionUtil;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -463,7 +463,7 @@ public class CAHServiceImpl implements CAHService {
     // ///////////// Helpers //////////////////
 
     private User getSessionUser() {
-        User user = SessionUtil.getCurrentUser();
+        User user = SecurityUtils.getUser();
         if (user == null)
             throw new UserDoesntExistsException();
         return user;
