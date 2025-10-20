@@ -14,9 +14,7 @@ import org.themarioga.engine.cah.exceptions.round.RoundPresidentCannotPlayCardEx
 import org.themarioga.engine.cah.exceptions.round.RoundWrongStatusException;
 import org.themarioga.engine.cah.models.dictionaries.Card;
 import org.themarioga.engine.cah.models.dictionaries.Dictionary;
-import org.themarioga.engine.cah.models.game.Game;
-import org.themarioga.engine.cah.models.game.Player;
-import org.themarioga.engine.cah.models.game.Round;
+import org.themarioga.engine.cah.models.game.*;
 import org.themarioga.engine.cah.services.intf.CAHService;
 import org.themarioga.engine.cah.services.intf.game.GameService;
 import org.themarioga.engine.cah.services.intf.game.PlayerService;
@@ -35,6 +33,8 @@ import org.themarioga.engine.commons.services.intf.RoomService;
 import org.themarioga.engine.commons.util.Assert;
 import org.themarioga.engine.commons.util.SessionUtil;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -341,6 +341,15 @@ public class CAHServiceImpl implements CAHService {
 
         // Check if everyone have voted a card
         if (roundService.checkIfEveryoneHaveVotedACard(game.getCurrentRound())) {
+			// Get the most voted card
+	        PlayedCard mostVotedCard = roundService.getPlayedCardByCard(game.getCurrentRound(), roundService.getMostVotedCard(game.getCurrentRound()).getCard());
+			if (mostVotedCard == null)
+				throw new RoundWrongStatusException();
+
+			// Give 1 point to the player who played the most voted card
+			playerService.incrementPoints(mostVotedCard.getPlayer());
+
+			// Set the round status to ending
             roundService.setStatus(game.getCurrentRound(), RoundStatusEnum.ENDING);
 
             // Check if game is ended
@@ -364,9 +373,6 @@ public class CAHServiceImpl implements CAHService {
         if (game.getStatus() != GameStatusEnum.STARTED)
             throw new GameNotStartedException();
 
-        // Check the user performing the action is the creator
-        checkSessionUserIsCreator(game);
-
         // Check if there is already a round and is in the correct state
         if (game.getCurrentRound() == null || !game.getCurrentRound().getStatus().equals(RoundStatusEnum.ENDING))
             throw new RoundWrongStatusException();
@@ -385,6 +391,20 @@ public class CAHServiceImpl implements CAHService {
 
         return gameService.update(game);
     }
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+	public Player getWinner(Game game) {
+		logger.debug("Getting the winner of the game {}", game);
+
+		Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+
+		List<Player> players = new ArrayList<>(game.getPlayers());
+
+		players.sort(Comparator.comparing(Player::getPoints).reversed());
+
+		return players.get(0);
+	}
 
     private void startRound(Game game, int roundNumber) {
         logger.debug("Starting round on game {}", game);
@@ -411,7 +431,7 @@ public class CAHServiceImpl implements CAHService {
 
     private boolean checkIfGameEnded(Game game) {
         if (game.getPunctuationMode().equals(PunctuationModeEnum.ROUNDS)) {
-            return Objects.equals(game.getCurrentRound().getRoundNumber(), game.getNumberOfRoundsToEnd());
+            return Objects.equals(game.getCurrentRound().getRoundNumber() + 1, game.getNumberOfRoundsToEnd());
         } else if (game.getPunctuationMode().equals(PunctuationModeEnum.POINTS)) {
             for (Player player : game.getPlayers()) {
                 if (Objects.equals(player.getPoints(), game.getNumberOfPointsToWin()))

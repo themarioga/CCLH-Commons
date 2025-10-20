@@ -3,7 +3,6 @@ package org.themarioga.engine.cah.service;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.themarioga.engine.cah.BaseTest;
@@ -13,6 +12,7 @@ import org.themarioga.engine.cah.exceptions.round.RoundPresidentCannotPlayCardEx
 import org.themarioga.engine.cah.exceptions.round.RoundWrongStatusException;
 import org.themarioga.engine.cah.models.dictionaries.Dictionary;
 import org.themarioga.engine.cah.models.game.Game;
+import org.themarioga.engine.cah.models.game.Player;
 import org.themarioga.engine.cah.services.intf.CAHService;
 import org.themarioga.engine.cah.services.intf.dictionaries.CardService;
 import org.themarioga.engine.cah.services.intf.dictionaries.DictionaryService;
@@ -485,15 +485,6 @@ class CAHServiceTest extends BaseTest {
 	}
 
 	@Test
-	void testNextRound_GameOnlyCreatorCanPerformActionException() {
-		Game game = cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-
-		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("11111111-1111-1111-1111-111111111111")));
-
-		Assertions.assertThrows(GameOnlyCreatorCanPerformActionException.class, () -> cahService.nextRound(game));
-	}
-
-	@Test
 	void testNextRound_RoundWrongStatusException() {
 		Game game = cahService.startGame(roomService.getById(UUID.fromString("00000000-0000-0000-0000-000000000000")));
 
@@ -501,11 +492,12 @@ class CAHServiceTest extends BaseTest {
 	}
 
     @Test
-    @Disabled
     void completeClassicGameTest() {
         SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
 
         Game game = cahService.createGame("Classic Game");
+
+		cahService.setNumberOfRoundsToEnd(game.getRoom(), 2);
 
         SessionUtil.setCurrentUser(userService.getById(UUID.fromString("55555555-5555-5555-5555-555555555555")));
 
@@ -522,6 +514,7 @@ class CAHServiceTest extends BaseTest {
         cahService.startGame(game.getRoom());
 
         Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
+	    Assertions.assertEquals(0, game.getCurrentRound().getRoundNumber());
 
         SessionUtil.setCurrentUser(userService.getById(UUID.fromString("55555555-5555-5555-5555-555555555555")));
 
@@ -532,8 +525,131 @@ class CAHServiceTest extends BaseTest {
         cahService.playCard(game.getRoom(), game.getPlayers().get(2).getHand().get(0).getCard());
 
         Assertions.assertEquals(2, game.getCurrentRound().getPlayedCards().size());
-        Assertions.assertEquals(3, game.getCurrentRound().getPlayedCards().size());
         Assertions.assertEquals(RoundStatusEnum.VOTING, game.getCurrentRound().getStatus());
+
+	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
+
+	    cahService.voteCard(game.getRoom(), game.getCurrentRound().getPlayedCards().get(1).getCard());
+
+	    Assertions.assertEquals(1, game.getCurrentRound().getVotedCards().size());
+	    Assertions.assertEquals(2, game.getPlayers().get(1).getHand().size());
+	    Assertions.assertEquals(2, game.getPlayers().get(2).getHand().size());
+	    Assertions.assertEquals(RoundStatusEnum.ENDING, game.getCurrentRound().getStatus());
+		Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
+
+	    cahService.nextRound(game);
+
+	    Assertions.assertEquals(1, game.getCurrentRound().getRoundNumber());
+		Assertions.assertEquals(3, game.getPlayers().get(1).getHand().size());
+	    Assertions.assertEquals(3, game.getPlayers().get(2).getHand().size());
+	    Assertions.assertEquals(RoundStatusEnum.PLAYING, game.getCurrentRound().getStatus());
+
+	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
+
+	    cahService.playCard(game.getRoom(), game.getPlayers().get(0).getHand().get(0).getCard());
+
+	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("66666666-6666-6666-6666-666666666666")));
+
+	    cahService.playCard(game.getRoom(), game.getPlayers().get(2).getHand().get(0).getCard());
+
+	    Assertions.assertEquals(2, game.getCurrentRound().getPlayedCards().size());
+	    Assertions.assertEquals(RoundStatusEnum.VOTING, game.getCurrentRound().getStatus());
+
+	    SessionUtil.setCurrentUser(userService.getById(UUID.fromString("55555555-5555-5555-5555-555555555555")));
+
+	    cahService.voteCard(game.getRoom(), game.getCurrentRound().getPlayedCards().get(1).getCard());
+
+	    Assertions.assertEquals(1, game.getCurrentRound().getVotedCards().size());
+	    Assertions.assertEquals(2, game.getPlayers().get(0).getHand().size());
+	    Assertions.assertEquals(2, game.getPlayers().get(2).getHand().size());
+	    Assertions.assertEquals(RoundStatusEnum.ENDING, game.getCurrentRound().getStatus());
+	    Assertions.assertEquals(GameStatusEnum.ENDING, game.getStatus());
+
+		Player winner = cahService.getWinner(game);
+
+	    Assertions.assertNotNull(winner);
+		Assertions.assertEquals(UUID.fromString("66666666-6666-6666-6666-666666666666"), winner.getUser().getId());
     }
+
+	@Test
+	void completeDictatorshipGameTest() {
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
+
+		Game game = cahService.createGame("Classic Game");
+
+		cahService.setVotationMode(game.getRoom(), VotationModeEnum.DICTATORSHIP);
+		cahService.setNumberOfRoundsToEnd(game.getRoom(), 2);
+
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("55555555-5555-5555-5555-555555555555")));
+
+		cahService.addPlayer(game.getRoom());
+
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("66666666-6666-6666-6666-666666666666")));
+
+		cahService.addPlayer(game.getRoom());
+
+		Assertions.assertEquals(3, game.getPlayers().size());
+
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
+
+		cahService.startGame(game.getRoom());
+
+		Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
+		Assertions.assertEquals(0, game.getCurrentRound().getRoundNumber());
+
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("55555555-5555-5555-5555-555555555555")));
+
+		cahService.playCard(game.getRoom(), game.getPlayers().get(1).getHand().get(0).getCard());
+
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("66666666-6666-6666-6666-666666666666")));
+
+		cahService.playCard(game.getRoom(), game.getPlayers().get(2).getHand().get(0).getCard());
+
+		Assertions.assertEquals(2, game.getCurrentRound().getPlayedCards().size());
+		Assertions.assertEquals(RoundStatusEnum.VOTING, game.getCurrentRound().getStatus());
+
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
+
+		cahService.voteCard(game.getRoom(), game.getCurrentRound().getPlayedCards().get(1).getCard());
+
+		Assertions.assertEquals(1, game.getCurrentRound().getVotedCards().size());
+		Assertions.assertEquals(2, game.getPlayers().get(1).getHand().size());
+		Assertions.assertEquals(2, game.getPlayers().get(2).getHand().size());
+		Assertions.assertEquals(RoundStatusEnum.ENDING, game.getCurrentRound().getStatus());
+		Assertions.assertEquals(GameStatusEnum.STARTED, game.getStatus());
+
+		cahService.nextRound(game);
+
+		Assertions.assertEquals(1, game.getCurrentRound().getRoundNumber());
+		Assertions.assertEquals(3, game.getPlayers().get(1).getHand().size());
+		Assertions.assertEquals(3, game.getPlayers().get(2).getHand().size());
+		Assertions.assertEquals(RoundStatusEnum.PLAYING, game.getCurrentRound().getStatus());
+
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("55555555-5555-5555-5555-555555555555")));
+
+		cahService.playCard(game.getRoom(), game.getPlayers().get(1).getHand().get(0).getCard());
+
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("66666666-6666-6666-6666-666666666666")));
+
+		cahService.playCard(game.getRoom(), game.getPlayers().get(2).getHand().get(0).getCard());
+
+		Assertions.assertEquals(2, game.getCurrentRound().getPlayedCards().size());
+		Assertions.assertEquals(RoundStatusEnum.VOTING, game.getCurrentRound().getStatus());
+
+		SessionUtil.setCurrentUser(userService.getById(UUID.fromString("44444444-4444-4444-4444-444444444444")));
+
+		cahService.voteCard(game.getRoom(), game.getCurrentRound().getPlayedCards().get(1).getCard());
+
+		Assertions.assertEquals(1, game.getCurrentRound().getVotedCards().size());
+		Assertions.assertEquals(2, game.getPlayers().get(1).getHand().size());
+		Assertions.assertEquals(2, game.getPlayers().get(2).getHand().size());
+		Assertions.assertEquals(RoundStatusEnum.ENDING, game.getCurrentRound().getStatus());
+		Assertions.assertEquals(GameStatusEnum.ENDING, game.getStatus());
+
+		Player winner = cahService.getWinner(game);
+
+		Assertions.assertNotNull(winner);
+		Assertions.assertEquals(UUID.fromString("66666666-6666-6666-6666-666666666666"), winner.getUser().getId());
+	}
 
 }

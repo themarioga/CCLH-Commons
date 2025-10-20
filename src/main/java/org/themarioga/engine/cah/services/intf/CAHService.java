@@ -1,9 +1,13 @@
 package org.themarioga.engine.cah.services.intf;
 
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.engine.cah.enums.VotationModeEnum;
 import org.themarioga.engine.cah.models.dictionaries.Card;
 import org.themarioga.engine.cah.models.dictionaries.Dictionary;
 import org.themarioga.engine.cah.models.game.Game;
+import org.themarioga.engine.cah.models.game.Player;
+import org.themarioga.engine.commons.exceptions.ApplicationException;
 import org.themarioga.engine.commons.models.Room;
 import org.themarioga.engine.commons.models.User;
 
@@ -39,4 +43,6 @@ public interface CAHService {
 
     Game nextRound(Game game);
 
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+	Player getWinner(Game game);
 }
