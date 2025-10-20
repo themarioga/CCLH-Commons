@@ -255,9 +255,9 @@ class RoundServiceTest extends BaseTest {
     void testGetMostVotedCard() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
 
-        VotedCard votedCard = roundService.getMostVotedCard(game.getCurrentRound());
+        Card mostVotedCard = roundService.getMostVotedCard(game.getCurrentRound());
 
-        Assertions.assertNotNull(votedCard);
+        Assertions.assertNotNull(mostVotedCard);
     }
 
     @Test
@@ -266,9 +266,9 @@ class RoundServiceTest extends BaseTest {
     void testGetPlayedCardByCard() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
 
-        VotedCard votedCard = roundService.getMostVotedCard(game.getCurrentRound());
+	    Card mostVotedCard = roundService.getMostVotedCard(game.getCurrentRound());
 
-        PlayedCard playedCard = roundService.getPlayedCardByCard(game.getCurrentRound(), votedCard.getCard());
+        PlayedCard playedCard = roundService.getPlayedCardByCard(game.getCurrentRound(), mostVotedCard);
 
         Assertions.assertNotNull(playedCard);
     }

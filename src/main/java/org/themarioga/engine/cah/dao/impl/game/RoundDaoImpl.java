@@ -5,7 +5,6 @@ import org.themarioga.engine.cah.dao.intf.game.RoundDao;
 import org.themarioga.engine.cah.models.dictionaries.Card;
 import org.themarioga.engine.cah.models.game.PlayedCard;
 import org.themarioga.engine.cah.models.game.Round;
-import org.themarioga.engine.cah.models.game.VotedCard;
 import org.themarioga.engine.commons.dao.AbstractHibernateDao;
 
 @Repository
@@ -16,8 +15,8 @@ public class RoundDaoImpl extends AbstractHibernateDao<Round> implements RoundDa
     }
 
     @Override
-    public VotedCard getMostVotedCard(Round round) {
-        return getCurrentSession().createQuery("SELECT v FROM VotedCard v WHERE v.round = :round GROUP BY v.card ORDER BY COUNT(v) DESC", VotedCard.class).setParameter("round", round).setMaxResults(1).getSingleResultOrNull();
+    public Card getMostVotedCard(Round round) {
+        return getCurrentSession().createQuery("SELECT v.card FROM VotedCard v WHERE v.round = :round GROUP BY v.card ORDER BY COUNT(v) DESC", Card.class).setParameter("round", round).setMaxResults(1).getSingleResultOrNull();
     }
 
     @Override

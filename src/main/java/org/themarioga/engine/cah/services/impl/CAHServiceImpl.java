@@ -10,6 +10,7 @@ import org.themarioga.engine.cah.enums.PunctuationModeEnum;
 import org.themarioga.engine.cah.enums.RoundStatusEnum;
 import org.themarioga.engine.cah.enums.VotationModeEnum;
 import org.themarioga.engine.cah.exceptions.player.PlayerCannotDrawCardException;
+import org.themarioga.engine.cah.exceptions.player.PlayerCannotVoteCardException;
 import org.themarioga.engine.cah.exceptions.round.RoundPresidentCannotPlayCardException;
 import org.themarioga.engine.cah.exceptions.round.RoundWrongStatusException;
 import org.themarioga.engine.cah.models.dictionaries.Card;
@@ -336,13 +337,17 @@ public class CAHServiceImpl implements CAHService {
         // Get the player
         Player player = getPlayerBySessionUserAndGame(game);
 
+		// Check you didn't vote for your own card
+	    if (roundService.getPlayedCardByCard(game.getCurrentRound(), card).getPlayer().getId().equals(player.getId()))
+			throw new PlayerCannotVoteCardException();
+
         // Vote card
         roundService.voteCard(game.getCurrentRound(), player, card);
 
         // Check if everyone have voted a card
         if (roundService.checkIfEveryoneHaveVotedACard(game.getCurrentRound())) {
 			// Get the most voted card
-	        PlayedCard mostVotedCard = roundService.getPlayedCardByCard(game.getCurrentRound(), roundService.getMostVotedCard(game.getCurrentRound()).getCard());
+	        PlayedCard mostVotedCard = roundService.getPlayedCardByCard(game.getCurrentRound(), roundService.getMostVotedCard(game.getCurrentRound()));
 			if (mostVotedCard == null)
 				throw new RoundWrongStatusException();
 

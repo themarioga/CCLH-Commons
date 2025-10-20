@@ -183,7 +183,7 @@ public class RoundServiceImpl implements RoundService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public VotedCard getMostVotedCard(Round round) {
+    public Card getMostVotedCard(Round round) {
         logger.debug("Getting most voted card of the game of the round {}", round);
 
         return roundDao.getMostVotedCard(round);
