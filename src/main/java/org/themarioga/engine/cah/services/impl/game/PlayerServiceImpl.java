@@ -131,7 +131,7 @@ public class PlayerServiceImpl implements PlayerService {
     public Player findByUser(User user) {
         logger.debug("Getting player with user: {}", user);
 
-        return playerDao.findPlayerByUser(user);
+        return (Player) playerDao.findPlayerByUser(user);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class PlayerServiceImpl implements PlayerService {
     public Player findByUserId(UUID userId) {
         logger.debug("Getting player with user ID: {}", userId);
 
-        return playerDao.findPlayerByUser(userService.getById(userId));
+        return (Player) playerDao.findPlayerByUser(userService.getById(userId));
     }
 
     @Override
@@ -147,7 +147,7 @@ public class PlayerServiceImpl implements PlayerService {
     public Player findPlayerByGameAndUser(Game game, User user) {
         logger.debug("Checking user's playing game {}", user);
 
-        return playerDao.findPlayerByUserAndGame(user, game);
+        return (Player) playerDao.findPlayerByUserAndGame(user, game);
     }
 
 }

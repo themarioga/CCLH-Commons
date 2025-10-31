@@ -43,6 +43,6 @@ public interface CAHService {
 
     Game nextRound(Game game);
 
-	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-	Player getWinner(Game game);
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    Player getWinner(Game game);
 }

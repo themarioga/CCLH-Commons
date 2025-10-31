@@ -337,24 +337,24 @@ public class CAHServiceImpl implements CAHService {
         // Get the player
         Player player = getPlayerBySessionUserAndGame(game);
 
-		// Check you didn't vote for your own card
-	    if (roundService.getPlayedCardByCard(game.getCurrentRound(), card).getPlayer().getId().equals(player.getId()))
-			throw new PlayerCannotVoteCardException();
+        // Check you didn't vote for your own card
+        if (roundService.getPlayedCardByCard(game.getCurrentRound(), card).getPlayer().getId().equals(player.getId()))
+            throw new PlayerCannotVoteCardException();
 
         // Vote card
         roundService.voteCard(game.getCurrentRound(), player, card);
 
         // Check if everyone have voted a card
         if (roundService.checkIfEveryoneHaveVotedACard(game.getCurrentRound())) {
-			// Get the most voted card
-	        PlayedCard mostVotedCard = roundService.getPlayedCardByCard(game.getCurrentRound(), roundService.getMostVotedCard(game.getCurrentRound()));
-			if (mostVotedCard == null)
-				throw new RoundWrongStatusException();
+            // Get the most voted card
+            PlayedCard mostVotedCard = roundService.getPlayedCardByCard(game.getCurrentRound(), roundService.getMostVotedCard(game.getCurrentRound()));
+            if (mostVotedCard == null)
+                throw new RoundWrongStatusException();
 
-			// Give 1 point to the player who played the most voted card
-			playerService.incrementPoints(mostVotedCard.getPlayer());
+            // Give 1 point to the player who played the most voted card
+            playerService.incrementPoints(mostVotedCard.getPlayer());
 
-			// Set the round status to ending
+            // Set the round status to ending
             roundService.setStatus(game.getCurrentRound(), RoundStatusEnum.ENDING);
 
             // Check if game is ended
@@ -397,19 +397,19 @@ public class CAHServiceImpl implements CAHService {
         return gameService.update(game);
     }
 
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
-	public Player getWinner(Game game) {
-		logger.debug("Getting the winner of the game {}", game);
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ApplicationException.class)
+    public Player getWinner(Game game) {
+        logger.debug("Getting the winner of the game {}", game);
 
-		Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
 
-		List<Player> players = new ArrayList<>(game.getPlayers());
+        List<Player> players = new ArrayList<>(game.getPlayers());
 
-		players.sort(Comparator.comparing(Player::getPoints).reversed());
+        players.sort(Comparator.comparing(Player::getPoints).reversed());
 
-		return players.get(0);
-	}
+        return players.get(0);
+    }
 
     private void startRound(Game game, int roundNumber) {
         logger.debug("Starting round on game {}", game);

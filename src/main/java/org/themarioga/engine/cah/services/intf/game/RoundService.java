@@ -18,7 +18,7 @@ public interface RoundService {
 
     Round setNextBlackCard(Round round, Card nextBlackCard);
 
-	Card getMostVotedCard(Round round);
+    Card getMostVotedCard(Round round);
 
     PlayedCard getPlayedCardByCard(Round round, Card card);
 

@@ -266,7 +266,7 @@ class RoundServiceTest extends BaseTest {
     void testGetPlayedCardByCard() {
         Game game = gameService.getByRoom(roomService.getById(UUID.fromString("33333333-3333-3333-3333-333333333333")));
 
-	    Card mostVotedCard = roundService.getMostVotedCard(game.getCurrentRound());
+        Card mostVotedCard = roundService.getMostVotedCard(game.getCurrentRound());
 
         PlayedCard playedCard = roundService.getPlayedCardByCard(game.getCurrentRound(), mostVotedCard);
 
