@@ -72,7 +72,7 @@ public class GameServiceImpl implements GameService {
         game.setVotationMode(GameConfig.DEFAULT_VOTATION_MODE);
         game.setPunctuationMode(GameConfig.DEFAULT_PUNCTUATION_MODE);
         game.setNumberOfPointsToWin(GameConfig.DEFAULT_NUMBER_OF_POINTS_TO_WIN);
-        game.setNumberOfRoundsToEnd(GameConfig.DEFAULT_NUMBER_OF_ROUNDS);
+        game.setNumberOfRoundsToEnd(GameConfig.DEFAULT_NUMBER_OF_ROUNDS_TO_END);
         game.setMaxNumberOfPlayers(GameConfig.DEFAULT_MAX_NUMBER_OF_PLAYERS);
         game.setDictionary(dictionaryService.getDefaultDictionary());
         game.setCreationDate(new Date());
