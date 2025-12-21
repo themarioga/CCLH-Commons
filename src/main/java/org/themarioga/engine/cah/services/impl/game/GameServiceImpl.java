@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.themarioga.engine.cah.config.GameConfig;
 import org.themarioga.engine.cah.dao.intf.game.GameDao;
 import org.themarioga.engine.cah.enums.PunctuationModeEnum;
 import org.themarioga.engine.cah.enums.VotationModeEnum;
@@ -24,7 +25,6 @@ import org.themarioga.engine.commons.exceptions.game.*;
 import org.themarioga.engine.commons.exceptions.player.PlayerAlreadyVotedDeleteException;
 import org.themarioga.engine.commons.models.Room;
 import org.themarioga.engine.commons.models.User;
-import org.themarioga.engine.commons.services.intf.ConfigurationService;
 import org.themarioga.engine.commons.util.Assert;
 
 import java.util.Date;
@@ -37,13 +37,11 @@ public class GameServiceImpl implements GameService {
 
     private final GameDao gameDao;
     private final DictionaryService dictionaryService;
-    private final ConfigurationService configurationService;
 
     @Autowired
-    public GameServiceImpl(GameDao gameDao, DictionaryService dictionaryService, ConfigurationService configurationService) {
+    public GameServiceImpl(GameDao gameDao, DictionaryService dictionaryService) {
         this.gameDao = gameDao;
         this.dictionaryService = dictionaryService;
-        this.configurationService = configurationService;
     }
 
     @Override
@@ -71,14 +69,13 @@ public class GameServiceImpl implements GameService {
         game.setCreator(creator);
         game.setStatus(GameStatusEnum.CREATED);
         game.setCreationDate(new Date());
-        game.setVotationMode(getDefaultGameMode());
-        game.setPunctuationMode(getDefaultGamePunctuationType());
-        game.setNumberOfPointsToWin(getDefaultGameLength());
-        game.setNumberOfRoundsToEnd(getDefaultGameLength());
-        game.setMaxNumberOfPlayers(getDefaultMaxNumberOfPlayers());
+        game.setVotationMode(GameConfig.DEFAULT_VOTATION_MODE);
+        game.setPunctuationMode(GameConfig.DEFAULT_PUNCTUATION_MODE);
+        game.setNumberOfPointsToWin(GameConfig.DEFAULT_NUMBER_OF_POINTS_TO_WIN);
+        game.setNumberOfRoundsToEnd(GameConfig.DEFAULT_NUMBER_OF_ROUNDS);
+        game.setMaxNumberOfPlayers(GameConfig.DEFAULT_MAX_NUMBER_OF_PLAYERS);
         game.setDictionary(dictionaryService.getDefaultDictionary());
         game.setCreationDate(new Date());
-        game.setMaxNumberOfPlayers(getDefaultMaxNumberOfPlayers());
 
         return gameDao.createOrUpdate(game);
     }
@@ -154,7 +151,7 @@ public class GameServiceImpl implements GameService {
             throw new GameAlreadyFilledException();
 
         // Check if max number of players is less than min
-        if (maxNumberOfPlayers < getMinNumberOfPlayers())
+        if (maxNumberOfPlayers < GameConfig.DEFAULT_MIN_NUMBER_OF_PLAYERS)
             throw new GameAlreadyFilledException();
 
         // Set the max number of players
@@ -289,7 +286,7 @@ public class GameServiceImpl implements GameService {
             throw new GameAlreadyStartedException();
 
         // Check the players are more than min
-        if (game.getPlayers().size() < getMinNumberOfPlayers())
+        if (game.getPlayers().size() < GameConfig.DEFAULT_MIN_NUMBER_OF_PLAYERS)
             throw new GameNotFilledException();
 
         // Check the players are less than max
@@ -378,27 +375,7 @@ public class GameServiceImpl implements GameService {
     public Game getByRoom(Room room) {
         logger.debug("Getting game with room: {}", room);
 
-        return (Game) gameDao.getByRoom(room);
-    }
-
-    private VotationModeEnum getDefaultGameMode() {
-        return VotationModeEnum.getEnum(Integer.parseInt(configurationService.getConfiguration("game_default_game_type")));
-    }
-
-    private PunctuationModeEnum getDefaultGamePunctuationType() {
-        return PunctuationModeEnum.getEnum(Integer.parseInt(configurationService.getConfiguration("game_default_game_punctuation_type")));
-    }
-
-    private int getDefaultGameLength() {
-        return Integer.parseInt(configurationService.getConfiguration("game_default_game_length"));
-    }
-
-    private int getMinNumberOfPlayers() {
-        return Integer.parseInt(configurationService.getConfiguration("game_min_number_of_players"));
-    }
-
-    private int getDefaultMaxNumberOfPlayers() {
-        return Integer.parseInt(configurationService.getConfiguration("game_max_number_of_players"));
+        return gameDao.getByRoom(room);
     }
 
 }

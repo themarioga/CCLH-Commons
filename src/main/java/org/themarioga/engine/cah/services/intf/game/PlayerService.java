@@ -8,19 +8,7 @@ import org.themarioga.engine.commons.models.User;
 import java.util.List;
 import java.util.UUID;
 
-public interface PlayerService {
-
-    Player create(Game game, User user);
-
-    void delete(Player player);
-
-    Player findById(UUID id);
-
-    Player findByUser(User user);
-
-    Player findByUserId(UUID userId);
-
-    Player findPlayerByGameAndUser(Game game, User user);
+public interface PlayerService extends org.themarioga.engine.commons.services.intf.PlayerService<Player, Game> {
 
     void insertWhiteCardsIntoPlayerHand(Player player, List<Card> cardsToTransfer);
 

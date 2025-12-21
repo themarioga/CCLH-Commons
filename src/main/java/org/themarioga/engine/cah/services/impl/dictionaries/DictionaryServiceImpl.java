@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.themarioga.engine.cah.config.DictionariesConfig;
 import org.themarioga.engine.cah.exceptions.dictionary.*;
 import org.themarioga.engine.commons.models.Lang;
 import org.themarioga.engine.commons.models.User;
@@ -25,14 +26,14 @@ public class DictionaryServiceImpl implements DictionaryService {
     private final Logger logger = LoggerFactory.getLogger(DictionaryServiceImpl.class);
 
     private final DictionaryDao dictionaryDao;
-    private final ConfigurationService configurationService;
     private final CardService cardService;
+	private final ConfigurationService configurationService;
 
     @Autowired
-    public DictionaryServiceImpl(DictionaryDao dictionaryDao, ConfigurationService configurationService, CardService cardService) {
+    public DictionaryServiceImpl(DictionaryDao dictionaryDao, CardService cardService, ConfigurationService configurationService) {
         this.dictionaryDao = dictionaryDao;
-        this.configurationService = configurationService;
         this.cardService = cardService;
+	    this.configurationService = configurationService;
     }
 
     @Override
@@ -45,7 +46,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             throw new DictionaryAlreadyExistsException();
 
         // Don't allow creating a dictionary if max number have already been exceeded
-        if (dictionaryDao.countUnpublishedDictionariesByCreator(creator) >= getDictionaryMaxNumberOfUnfinishedDictionaries())
+        if (dictionaryDao.countUnpublishedDictionariesByCreator(creator) >= DictionariesConfig.MAX_NUMBER_OF_UNFINISHED_DICTIONARIES)
             throw new DictionaryAlreadyFilledException();
 
         // Create dictionary
@@ -182,7 +183,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         logger.debug("Add dictionary collaborator: {} {}", dictionary, user);
 
         // Check if dictionary have reached the max number of collaborators
-        if (dictionary.getCollaborators().size() >= getDictionaryMaxCollaborators())
+        if (dictionary.getCollaborators().size() >= DictionariesConfig.MAX_NUMBER_OF_COLLABORATORS)
             throw new DictionaryMaxCollaboratorsReached();
 
         // Check if the collaborator is already present
@@ -289,14 +290,6 @@ public class DictionaryServiceImpl implements DictionaryService {
         logger.debug("Getting dictionaries with user/collaborator: {}", creator);
 
         return dictionaryDao.getDictionariesByCollaborator(creator);
-    }
-
-    private int getDictionaryMaxCollaborators() {
-        return Integer.parseInt(configurationService.getConfiguration("dictionaries_max_collaborators"));
-    }
-
-    private int getDictionaryMaxNumberOfUnfinishedDictionaries() {
-        return Integer.parseInt(configurationService.getConfiguration("dictionaries_max_unfinished_number"));
     }
 
 }

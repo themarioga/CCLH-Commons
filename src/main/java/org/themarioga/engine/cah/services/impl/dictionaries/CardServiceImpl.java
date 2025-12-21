@@ -6,10 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.themarioga.engine.cah.config.DictionariesConfig;
 import org.themarioga.engine.cah.exceptions.dictionary.DictionaryAlreadyFilledException;
 import org.themarioga.engine.cah.models.dictionaries.Card;
 import org.themarioga.engine.cah.models.dictionaries.Dictionary;
-import org.themarioga.engine.commons.services.intf.ConfigurationService;
 import org.themarioga.engine.cah.dao.intf.dictionaries.CardDao;
 import org.themarioga.engine.cah.enums.CardTypeEnum;
 import org.themarioga.engine.commons.exceptions.ApplicationException;
@@ -27,12 +27,10 @@ public class CardServiceImpl implements CardService {
     private final Logger logger = LoggerFactory.getLogger(CardServiceImpl.class);
 
     private final CardDao cardDao;
-    private final ConfigurationService configurationService;
 
     @Autowired
-    public CardServiceImpl(CardDao cardDao, ConfigurationService configurationService) {
+    public CardServiceImpl(CardDao cardDao) {
         this.cardDao = cardDao;
-        this.configurationService = configurationService;
     }
 
     @Override
@@ -49,7 +47,7 @@ public class CardServiceImpl implements CardService {
             throw new DictionaryAlreadyFilledException();
 
         // Check if text limits are exceeded
-        if (checkCardTextExcededLength(type, text))
+        if (checkCardTextBadLength(type, text))
             throw new CardTextExcededLength();
 
         // Create the card
@@ -72,7 +70,7 @@ public class CardServiceImpl implements CardService {
             throw new CardAlreadyExistsException();
 
         // Check if text limits are exceeded
-        if (checkCardTextExcededLength(card.getType(), newText))
+        if (checkCardTextBadLength(card.getType(), newText))
             throw new CardTextExcededLength();
 
         // Change card text
@@ -116,51 +114,28 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public boolean checkDictionaryCanBePublished(Dictionary dictionary) {
-        if (cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.WHITE) < getDictionaryMinWhiteCards())
+        if (cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.WHITE) < DictionariesConfig.MIN_NUMBER_OF_WHITE_CARDS)
             return false;
 
-        if (cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK) < getDictionaryMinBlackCards())
+        if (cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK) < DictionariesConfig.MIN_NUMBER_OF_BLACK_CARDS)
             return false;
 
         return true;
     }
 
-    private int getDictionaryMinWhiteCards() {
-        return Integer.parseInt(configurationService.getConfiguration("dictionaries_min_whitecards"));
-    }
-
-    private int getDictionaryMaxWhiteCards() {
-        return Integer.parseInt(configurationService.getConfiguration("dictionaries_max_whitecards"));
-    }
-
-    private int getDictionaryWhiteCardMaxLength() {
-        return Integer.parseInt(configurationService.getConfiguration("dictionaries_max_whitecard_length"));
-    }
-
-    private int getDictionaryMinBlackCards() {
-        return Integer.parseInt(configurationService.getConfiguration("dictionaries_min_blackcards"));
-    }
-
-    private int getDictionaryMaxBlackCards() {
-        return Integer.parseInt(configurationService.getConfiguration("dictionaries_max_blackcards"));
-    }
-
-    private int getDictionaryBlackCardMaxLength() {
-        return Integer.parseInt(configurationService.getConfiguration("dictionaries_max_blackcard_length"));
-    }
-
     private boolean checkDictionaryAlreadyFilled(Dictionary dictionary, CardTypeEnum type) {
         if (type == CardTypeEnum.WHITE) {
-            return cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.WHITE) >= getDictionaryMaxWhiteCards();
+            return cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.WHITE) >= DictionariesConfig.MAX_NUMBER_OF_WHITE_CARDS;
         } else if (type == CardTypeEnum.BLACK) {
-            return cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK) >= getDictionaryMaxBlackCards();
+            return cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK) >= DictionariesConfig.MAX_NUMBER_OF_BLACK_CARDS;
         }
 
         throw new ApplicationException("Error desconocido");
     }
 
-    private boolean checkCardTextExcededLength(CardTypeEnum type, String text) {
-        return (type == CardTypeEnum.WHITE && text.length() > getDictionaryWhiteCardMaxLength()) || (type == CardTypeEnum.BLACK && text.length() > getDictionaryBlackCardMaxLength());
+    private boolean checkCardTextBadLength(CardTypeEnum type, String text) {
+        return (type == CardTypeEnum.WHITE && (text.length() < DictionariesConfig.MIN_WHITE_CARD_LENGTH || text.length() > DictionariesConfig.MAX_WHITE_CARD_LENGTH))
+		        || (type == CardTypeEnum.BLACK && (text.length() < DictionariesConfig.MIN_BLACK_CARD_LENGTH || text.length() > DictionariesConfig.MAX_BLACK_CARD_LENGTH));
     }
 
 }

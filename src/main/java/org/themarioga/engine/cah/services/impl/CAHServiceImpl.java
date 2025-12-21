@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.themarioga.engine.cah.config.GameConfig;
 import org.themarioga.engine.cah.enums.PunctuationModeEnum;
 import org.themarioga.engine.cah.enums.RoundStatusEnum;
 import org.themarioga.engine.cah.enums.VotationModeEnum;
@@ -30,7 +31,6 @@ import org.themarioga.engine.commons.exceptions.user.UserDoesntExistsException;
 import org.themarioga.engine.commons.models.Room;
 import org.themarioga.engine.commons.models.User;
 import org.themarioga.engine.commons.security.SecurityUtils;
-import org.themarioga.engine.commons.services.intf.ConfigurationService;
 import org.themarioga.engine.commons.services.intf.RoomService;
 import org.themarioga.engine.commons.util.Assert;
 
@@ -48,15 +48,13 @@ public class CAHServiceImpl implements CAHService {
     private final GameService gameService;
     private final PlayerService playerService;
     private final RoundService roundService;
-    private final ConfigurationService configurationService;
 
     @Autowired
-    public CAHServiceImpl(RoomService roomService, GameService gameService, PlayerService playerService, RoundService roundService, ConfigurationService configurationService) {
+    public CAHServiceImpl(RoomService roomService, GameService gameService, PlayerService playerService, RoundService roundService) {
         this.roomService = roomService;
         this.gameService = gameService;
         this.playerService = playerService;
         this.roundService = roundService;
-        this.configurationService = configurationService;
     }
 
     @Override
@@ -422,9 +420,9 @@ public class CAHServiceImpl implements CAHService {
 
         // Fill player hands
         for (Player player : game.getPlayers()) {
-            int numberCardsNeedToFillHand = getDefaultMaxNumberOfCardsInHand() - player.getHand().size();
+            int numberCardsNeedToFillHand = GameConfig.NUMBER_OF_CARDS_IN_HAND - player.getHand().size();
 
-            if (numberCardsNeedToFillHand < 0 || numberCardsNeedToFillHand > getDefaultMaxNumberOfCardsInHand())
+            if (numberCardsNeedToFillHand < 0 || numberCardsNeedToFillHand > GameConfig.NUMBER_OF_CARDS_IN_HAND)
                 throw new PlayerCannotDrawCardException();
 
             List<Card> cardsToTransfer = game.getWhiteCardsDeck().subList(0, numberCardsNeedToFillHand);
@@ -502,10 +500,6 @@ public class CAHServiceImpl implements CAHService {
         if (player == null) throw new PlayerDoesntExistsException();
 
         return player;
-    }
-
-    private int getDefaultMaxNumberOfCardsInHand() {
-        return Integer.parseInt(configurationService.getConfiguration("game_default_number_cards_in_hand"));
     }
 
 }
