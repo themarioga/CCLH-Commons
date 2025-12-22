@@ -27,10 +27,12 @@ public class CardServiceImpl implements CardService {
     private final Logger logger = LoggerFactory.getLogger(CardServiceImpl.class);
 
     private final CardDao cardDao;
+    private final DictionariesConfig dictionariesConfig;
 
     @Autowired
-    public CardServiceImpl(CardDao cardDao) {
+    public CardServiceImpl(CardDao cardDao, DictionariesConfig dictionariesConfig) {
         this.cardDao = cardDao;
+        this.dictionariesConfig = dictionariesConfig;
     }
 
     @Override
@@ -114,28 +116,21 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
     public boolean checkDictionaryCanBePublished(Dictionary dictionary) {
-        if (cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.WHITE) < DictionariesConfig.MIN_NUMBER_OF_WHITE_CARDS)
-            return false;
-
-        if (cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK) < DictionariesConfig.MIN_NUMBER_OF_BLACK_CARDS)
-            return false;
-
-        return true;
+        return (cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.WHITE) >= dictionariesConfig.getMinNumberOfWhiteCards()) && (cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK) >= dictionariesConfig.getMinNumberOfBlackCards());
     }
 
     private boolean checkDictionaryAlreadyFilled(Dictionary dictionary, CardTypeEnum type) {
         if (type == CardTypeEnum.WHITE) {
-            return cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.WHITE) >= DictionariesConfig.MAX_NUMBER_OF_WHITE_CARDS;
+            return cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.WHITE) >= dictionariesConfig.getMaxNumberOfWhiteCards();
         } else if (type == CardTypeEnum.BLACK) {
-            return cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK) >= DictionariesConfig.MAX_NUMBER_OF_BLACK_CARDS;
+            return cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK) >= dictionariesConfig.getMaxNumberOfBlackCards();
         }
 
         throw new ApplicationException("Error desconocido");
     }
 
     private boolean checkCardTextBadLength(CardTypeEnum type, String text) {
-        return (type == CardTypeEnum.WHITE && (text.length() < DictionariesConfig.MIN_WHITE_CARD_LENGTH || text.length() > DictionariesConfig.MAX_WHITE_CARD_LENGTH))
-		        || (type == CardTypeEnum.BLACK && (text.length() < DictionariesConfig.MIN_BLACK_CARD_LENGTH || text.length() > DictionariesConfig.MAX_BLACK_CARD_LENGTH));
+        return (type == CardTypeEnum.WHITE && (text.length() < dictionariesConfig.getMinWhiteCardLength() || text.length() > dictionariesConfig.getMaxWhiteCardLength())) || (type == CardTypeEnum.BLACK && (text.length() < dictionariesConfig.getMinBlackCardLength() || text.length() > dictionariesConfig.getMaxBlackCardLength()));
     }
 
 }

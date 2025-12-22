@@ -48,13 +48,15 @@ public class CAHServiceImpl implements CAHService {
     private final GameService gameService;
     private final PlayerService playerService;
     private final RoundService roundService;
+    private final GameConfig gameConfig;
 
     @Autowired
-    public CAHServiceImpl(RoomService roomService, GameService gameService, PlayerService playerService, RoundService roundService) {
+    public CAHServiceImpl(RoomService roomService, GameService gameService, PlayerService playerService, RoundService roundService, GameConfig gameConfig) {
         this.roomService = roomService;
         this.gameService = gameService;
         this.playerService = playerService;
         this.roundService = roundService;
+        this.gameConfig = gameConfig;
     }
 
     @Override
@@ -420,9 +422,9 @@ public class CAHServiceImpl implements CAHService {
 
         // Fill player hands
         for (Player player : game.getPlayers()) {
-            int numberCardsNeedToFillHand = GameConfig.NUMBER_OF_CARDS_IN_HAND - player.getHand().size();
+            int numberCardsNeedToFillHand = gameConfig.getNumberOfCardsInHand() - player.getHand().size();
 
-            if (numberCardsNeedToFillHand < 0 || numberCardsNeedToFillHand > GameConfig.NUMBER_OF_CARDS_IN_HAND)
+            if (numberCardsNeedToFillHand < 0 || numberCardsNeedToFillHand > gameConfig.getNumberOfCardsInHand())
                 throw new PlayerCannotDrawCardException();
 
             List<Card> cardsToTransfer = game.getWhiteCardsDeck().subList(0, numberCardsNeedToFillHand);

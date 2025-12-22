@@ -1,33 +1,103 @@
 package org.themarioga.engine.cah.config;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.themarioga.engine.commons.services.intf.ConfigurationService;
+import org.springframework.validation.annotation.Validated;
 
 @Configuration
+@ConfigurationProperties(prefix = "cah.dictionaries")
+@Validated
 public class DictionariesConfig {
 
-	public static int MIN_NUMBER_OF_WHITE_CARDS = 405;
-	public static int MAX_NUMBER_OF_WHITE_CARDS = 600;
-	public static int MIN_NUMBER_OF_BLACK_CARDS = 50;
-	public static int MAX_NUMBER_OF_BLACK_CARDS = 200;
-	public static int MIN_WHITE_CARD_LENGTH = 2;
-	public static int MAX_WHITE_CARD_LENGTH = 90;
-	public static int MIN_BLACK_CARD_LENGTH = 2;
-	public static int MAX_BLACK_CARD_LENGTH = 130;
-	public static int MAX_NUMBER_OF_COLLABORATORS = 10;
-	public static int MAX_NUMBER_OF_UNFINISHED_DICTIONARIES = 10;
+    private Integer minNumberOfWhiteCards;
+    private Integer maxNumberOfWhiteCards;
+    private Integer minNumberOfBlackCards;
+    private Integer maxNumberOfBlackCards;
+    private Integer minWhiteCardLength;
+    private Integer maxWhiteCardLength;
+    private Integer minBlackCardLength;
+    private Integer maxBlackCardLength;
+    private Integer maxNumberOfCollaborators;
+    private Integer maxNumberOfUnfinishedDictionaries;
 
-	public DictionariesConfig(ConfigurationService configurationService) {
-		MIN_NUMBER_OF_WHITE_CARDS = Integer.parseInt(configurationService.getConfiguration("dictionaries_min_whitecards"));
-		MAX_NUMBER_OF_WHITE_CARDS = Integer.parseInt(configurationService.getConfiguration("dictionaries_max_whitecards"));
-		MIN_NUMBER_OF_BLACK_CARDS = Integer.parseInt(configurationService.getConfiguration("dictionaries_min_blackcards"));
-		MAX_NUMBER_OF_BLACK_CARDS = Integer.parseInt(configurationService.getConfiguration("dictionaries_max_blackcards"));
-		MIN_WHITE_CARD_LENGTH = Integer.parseInt(configurationService.getConfiguration("dictionaries_min_whitecard_length"));
-		MAX_WHITE_CARD_LENGTH = Integer.parseInt(configurationService.getConfiguration("dictionaries_max_whitecard_length"));
-		MIN_BLACK_CARD_LENGTH = Integer.parseInt(configurationService.getConfiguration("dictionaries_min_blackcard_length"));
-		MAX_BLACK_CARD_LENGTH = Integer.parseInt(configurationService.getConfiguration("dictionaries_max_blackcard_length"));
-		MAX_NUMBER_OF_COLLABORATORS = Integer.parseInt(configurationService.getConfiguration("dictionaries_max_collaborators"));
-		MAX_NUMBER_OF_UNFINISHED_DICTIONARIES = Integer.parseInt(configurationService.getConfiguration("dictionaries_max_unfinished_number"));
-	}
+    public Integer getMaxBlackCardLength() {
+        return maxBlackCardLength;
+    }
+
+    public void setMaxBlackCardLength(Integer maxBlackCardLength) {
+        this.maxBlackCardLength = maxBlackCardLength;
+    }
+
+    public Integer getMaxNumberOfBlackCards() {
+        return maxNumberOfBlackCards;
+    }
+
+    public void setMaxNumberOfBlackCards(Integer maxNumberOfBlackCards) {
+        this.maxNumberOfBlackCards = maxNumberOfBlackCards;
+    }
+
+    public Integer getMaxNumberOfCollaborators() {
+        return maxNumberOfCollaborators;
+    }
+
+    public void setMaxNumberOfCollaborators(Integer maxNumberOfCollaborators) {
+        this.maxNumberOfCollaborators = maxNumberOfCollaborators;
+    }
+
+    public Integer getMaxNumberOfUnfinishedDictionaries() {
+        return maxNumberOfUnfinishedDictionaries;
+    }
+
+    public void setMaxNumberOfUnfinishedDictionaries(Integer maxNumberOfUnfinishedDictionaries) {
+        this.maxNumberOfUnfinishedDictionaries = maxNumberOfUnfinishedDictionaries;
+    }
+
+    public Integer getMaxNumberOfWhiteCards() {
+        return maxNumberOfWhiteCards;
+    }
+
+    public void setMaxNumberOfWhiteCards(Integer maxNumberOfWhiteCards) {
+        this.maxNumberOfWhiteCards = maxNumberOfWhiteCards;
+    }
+
+    public Integer getMaxWhiteCardLength() {
+        return maxWhiteCardLength;
+    }
+
+    public void setMaxWhiteCardLength(Integer maxWhiteCardLength) {
+        this.maxWhiteCardLength = maxWhiteCardLength;
+    }
+
+    public Integer getMinBlackCardLength() {
+        return minBlackCardLength;
+    }
+
+    public void setMinBlackCardLength(Integer minBlackCardLength) {
+        this.minBlackCardLength = minBlackCardLength;
+    }
+
+    public Integer getMinNumberOfBlackCards() {
+        return minNumberOfBlackCards;
+    }
+
+    public void setMinNumberOfBlackCards(Integer minNumberOfBlackCards) {
+        this.minNumberOfBlackCards = minNumberOfBlackCards;
+    }
+
+    public Integer getMinNumberOfWhiteCards() {
+        return minNumberOfWhiteCards;
+    }
+
+    public void setMinNumberOfWhiteCards(Integer minNumberOfWhiteCards) {
+        this.minNumberOfWhiteCards = minNumberOfWhiteCards;
+    }
+
+    public Integer getMinWhiteCardLength() {
+        return minWhiteCardLength;
+    }
+
+    public void setMinWhiteCardLength(Integer minWhiteCardLength) {
+        this.minWhiteCardLength = minWhiteCardLength;
+    }
 
 }

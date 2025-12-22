@@ -37,11 +37,13 @@ public class GameServiceImpl implements GameService {
 
     private final GameDao gameDao;
     private final DictionaryService dictionaryService;
+    private final GameConfig gameConfig;
 
     @Autowired
-    public GameServiceImpl(GameDao gameDao, DictionaryService dictionaryService) {
+    public GameServiceImpl(GameDao gameDao, DictionaryService dictionaryService, GameConfig gameConfig) {
         this.gameDao = gameDao;
         this.dictionaryService = dictionaryService;
+        this.gameConfig = gameConfig;
     }
 
     @Override
@@ -69,12 +71,12 @@ public class GameServiceImpl implements GameService {
         game.setCreator(creator);
         game.setStatus(GameStatusEnum.CREATED);
         game.setCreationDate(new Date());
-        game.setVotationMode(GameConfig.DEFAULT_VOTATION_MODE);
-        game.setPunctuationMode(GameConfig.DEFAULT_PUNCTUATION_MODE);
-        game.setNumberOfPointsToWin(GameConfig.DEFAULT_NUMBER_OF_POINTS_TO_WIN);
-        game.setNumberOfRoundsToEnd(GameConfig.DEFAULT_NUMBER_OF_ROUNDS_TO_END);
-        game.setMaxNumberOfPlayers(GameConfig.DEFAULT_MAX_NUMBER_OF_PLAYERS);
-        game.setDictionary(dictionaryService.getDefaultDictionary());
+        game.setVotationMode(gameConfig.getDefaultVotationMode());
+        game.setPunctuationMode(gameConfig.getDefaultPunctuationMode());
+        game.setNumberOfPointsToWin(gameConfig.getDefaultNumberOfPointsToWin());
+        game.setNumberOfRoundsToEnd(gameConfig.getDefaultNumberOfRoundsToEnd());
+        game.setMaxNumberOfPlayers(gameConfig.getDefaultMaxNumberOfPlayers());
+        game.setDictionary(getDefaultDictionary());
         game.setCreationDate(new Date());
 
         return gameDao.createOrUpdate(game);
@@ -151,7 +153,7 @@ public class GameServiceImpl implements GameService {
             throw new GameAlreadyFilledException();
 
         // Check if max number of players is less than min
-        if (maxNumberOfPlayers < GameConfig.DEFAULT_MIN_NUMBER_OF_PLAYERS)
+        if (maxNumberOfPlayers < gameConfig.getDefaultMinNumberOfPlayers())
             throw new GameAlreadyFilledException();
 
         // Set the max number of players
@@ -286,7 +288,7 @@ public class GameServiceImpl implements GameService {
             throw new GameAlreadyStartedException();
 
         // Check the players are more than min
-        if (game.getPlayers().size() < GameConfig.DEFAULT_MIN_NUMBER_OF_PLAYERS)
+        if (game.getPlayers().size() < gameConfig.getDefaultMinNumberOfPlayers())
             throw new GameNotFilledException();
 
         // Check the players are less than max
@@ -368,6 +370,10 @@ public class GameServiceImpl implements GameService {
         }
 
         return gameDao.createOrUpdate(game);
+    }
+
+    private Dictionary getDefaultDictionary() {
+        return dictionaryService.getDictionaryById(gameConfig.getDefaultDictionaryId());
     }
 
     @Override

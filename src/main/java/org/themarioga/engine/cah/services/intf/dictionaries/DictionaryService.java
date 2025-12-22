@@ -43,6 +43,4 @@ public interface DictionaryService {
     boolean isDictionaryCollaborator(Dictionary dictionary, User user);
 
     boolean isDictionaryEditor(Dictionary dictionary, User user);
-
-    Dictionary getDefaultDictionary();
 }

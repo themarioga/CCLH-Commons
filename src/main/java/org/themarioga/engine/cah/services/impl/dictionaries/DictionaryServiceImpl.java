@@ -10,7 +10,6 @@ import org.themarioga.engine.cah.config.DictionariesConfig;
 import org.themarioga.engine.cah.exceptions.dictionary.*;
 import org.themarioga.engine.commons.models.Lang;
 import org.themarioga.engine.commons.models.User;
-import org.themarioga.engine.commons.services.intf.ConfigurationService;
 import org.themarioga.engine.cah.dao.intf.dictionaries.DictionaryDao;
 import org.themarioga.engine.commons.exceptions.ApplicationException;
 import org.themarioga.engine.cah.models.dictionaries.Dictionary;
@@ -27,13 +26,13 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     private final DictionaryDao dictionaryDao;
     private final CardService cardService;
-	private final ConfigurationService configurationService;
+    private final DictionariesConfig dictionariesConfig;
 
     @Autowired
-    public DictionaryServiceImpl(DictionaryDao dictionaryDao, CardService cardService, ConfigurationService configurationService) {
+    public DictionaryServiceImpl(DictionaryDao dictionaryDao, CardService cardService, DictionariesConfig dictionariesConfig) {
         this.dictionaryDao = dictionaryDao;
         this.cardService = cardService;
-	    this.configurationService = configurationService;
+        this.dictionariesConfig = dictionariesConfig;
     }
 
     @Override
@@ -46,7 +45,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             throw new DictionaryAlreadyExistsException();
 
         // Don't allow creating a dictionary if max number have already been exceeded
-        if (dictionaryDao.countUnpublishedDictionariesByCreator(creator) >= DictionariesConfig.MAX_NUMBER_OF_UNFINISHED_DICTIONARIES)
+        if (dictionaryDao.countUnpublishedDictionariesByCreator(creator) >= dictionariesConfig.getMaxNumberOfUnfinishedDictionaries())
             throw new DictionaryAlreadyFilledException();
 
         // Create dictionary
@@ -169,12 +168,6 @@ public class DictionaryServiceImpl implements DictionaryService {
         return dictionaryDao.getDictionaryCountForTable(creator);
     }
 
-    @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
-    public Dictionary getDefaultDictionary() {
-        return dictionaryDao.findOne(UUID.fromString(configurationService.getConfiguration("game_default_dictionary_id")));
-    }
-
     // //////// COLLABORATORS //////////
 
     @Override
@@ -183,7 +176,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         logger.debug("Add dictionary collaborator: {} {}", dictionary, user);
 
         // Check if dictionary have reached the max number of collaborators
-        if (dictionary.getCollaborators().size() >= DictionariesConfig.MAX_NUMBER_OF_COLLABORATORS)
+        if (dictionary.getCollaborators().size() >= dictionariesConfig.getMaxNumberOfCollaborators())
             throw new DictionaryMaxCollaboratorsReached();
 
         // Check if the collaborator is already present

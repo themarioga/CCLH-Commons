@@ -5,7 +5,7 @@ import org.themarioga.engine.cah.models.game.PlayedCard;
 import org.themarioga.engine.cah.models.game.VotedCard;
 import org.themarioga.engine.commons.dao.InterfaceHibernateDao;
 
-public interface PlayerDao extends org.themarioga.engine.commons.dao.intf.PlayerDao, InterfaceHibernateDao<Player> {
+public interface PlayerDao extends org.themarioga.engine.commons.dao.intf.PlayerDao<Player>, InterfaceHibernateDao<Player> {
 
     PlayedCard findCardByPlayer(Long playerId);
 
