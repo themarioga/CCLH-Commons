@@ -137,7 +137,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Dictionary getDictionaryById(UUID id) {
         logger.debug("Getting dictionary with ID: {}", id);
 
@@ -145,7 +145,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public List<Dictionary> getDictionariesByCreator(User creator) {
         logger.debug("Getting dictionaries with user: {}", creator);
 
@@ -153,7 +153,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public List<Dictionary> getDictionariesPaginatedForTable(User creator, int firstResult, int maxResults) {
         logger.debug("Getting dictionary from {} to {}", firstResult, maxResults);
 
@@ -161,7 +161,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Long getDictionaryCountForTable(User creator) {
         logger.debug("Get dictionary count {}", creator);
 
@@ -262,7 +262,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public boolean isDictionaryCollaborator(Dictionary dictionary, User user) {
         logger.debug("isDictionaryCollaborator {}", user);
 
@@ -270,7 +270,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public boolean isDictionaryEditor(Dictionary dictionary, User user) {
         logger.debug("isDictionaryEditor {}", user);
 
@@ -278,7 +278,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public List<Dictionary> getDictionariesByCollaborator(User creator) {
         logger.debug("Getting dictionaries with user/collaborator: {}", creator);
 

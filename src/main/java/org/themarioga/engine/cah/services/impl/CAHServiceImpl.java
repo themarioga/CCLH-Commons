@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.engine.cah.config.GameConfig;
+import org.themarioga.engine.cah.enums.CAHErrorEnum;
 import org.themarioga.engine.cah.enums.PunctuationModeEnum;
 import org.themarioga.engine.cah.enums.RoundStatusEnum;
 import org.themarioga.engine.cah.enums.VotationModeEnum;
@@ -21,7 +22,7 @@ import org.themarioga.engine.cah.services.intf.CAHService;
 import org.themarioga.engine.cah.services.intf.game.GameService;
 import org.themarioga.engine.cah.services.intf.game.PlayerService;
 import org.themarioga.engine.cah.services.intf.game.RoundService;
-import org.themarioga.engine.commons.enums.ErrorEnum;
+import org.themarioga.engine.commons.enums.CommonErrorEnum;
 import org.themarioga.engine.commons.enums.GameStatusEnum;
 import org.themarioga.engine.commons.exceptions.ApplicationException;
 import org.themarioga.engine.commons.exceptions.game.*;
@@ -65,7 +66,7 @@ public class CAHServiceImpl implements CAHService {
         logger.debug("Creating game for room {}", roomName);
 
         // Check roomName exists
-        Assert.assertNotNull(roomName, ErrorEnum.ROOM_NOT_FOUND);
+        Assert.assertNotNull(roomName, CommonErrorEnum.ROOM_NOT_FOUND);
 
         // Obtenemos el usuario de la sesión y comprobamos que existe
         User creator = getSessionUser();
@@ -150,7 +151,7 @@ public class CAHServiceImpl implements CAHService {
         logger.debug("Setting Dictionary {} to room {}", dictionary, room);
 
         // Check dictionary exists
-        Assert.assertNotNull(dictionary, ErrorEnum.DICTIONARY_NOT_FOUND);
+        Assert.assertNotNull(dictionary, CAHErrorEnum.DICTIONARY_NOT_FOUND);
 
         // Get the game
         Game game = getGameByRoom(room);
@@ -202,7 +203,7 @@ public class CAHServiceImpl implements CAHService {
         logger.debug("Kicking player {} from game in room {}", userKicked, room);
 
         // Check userKicked exists
-        Assert.assertNotNull(userKicked, ErrorEnum.USER_NOT_FOUND);
+        Assert.assertNotNull(userKicked, CommonErrorEnum.USER_NOT_FOUND);
 
         // Get the game
         Game game = getGameByRoom(room);
@@ -289,7 +290,7 @@ public class CAHServiceImpl implements CAHService {
         logger.debug("User playing card {} on room {}", card, room);
 
         // Check user exists
-        Assert.assertNotNull(card, ErrorEnum.CARD_NOT_FOUND);
+        Assert.assertNotNull(card, CAHErrorEnum.CARD_NOT_FOUND);
 
         // Get the game
         Game game = getGameByRoom(room);
@@ -325,7 +326,7 @@ public class CAHServiceImpl implements CAHService {
         logger.debug("User voting card {} on room {}", card, room);
 
         // Check user exists
-        Assert.assertNotNull(card, ErrorEnum.CARD_NOT_FOUND);
+        Assert.assertNotNull(card, CAHErrorEnum.CARD_NOT_FOUND);
 
         // Get the game
         Game game = getGameByRoom(room);
@@ -372,7 +373,7 @@ public class CAHServiceImpl implements CAHService {
     public Game nextRound(Game game) {
         logger.debug("Starting next round on game {}", game);
 
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Check the game have already started
         if (game.getStatus() != GameStatusEnum.STARTED)
@@ -402,7 +403,7 @@ public class CAHServiceImpl implements CAHService {
     public Player getWinner(Game game) {
         logger.debug("Getting the winner of the game {}", game);
 
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         List<Player> players = new ArrayList<>(game.getPlayers());
 
@@ -471,7 +472,7 @@ public class CAHServiceImpl implements CAHService {
 
     private Game getGameByRoom(Room room) {
         // Check room exists
-        Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
+        Assert.assertNotNull(room, CommonErrorEnum.ROOM_NOT_FOUND);
 
         // Get the game from this room
         Game game = gameService.getByRoom(room);

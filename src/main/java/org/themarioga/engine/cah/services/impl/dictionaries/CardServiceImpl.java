@@ -90,7 +90,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Card getCardById(UUID id) {
         logger.debug("Getting card with ID: {}", id);
 
@@ -98,7 +98,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public List<Card> findCardsByDictionaryAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
         logger.debug("Getting cards by dictionary {} and type {}", dictionary, cardTypeEnum);
 
@@ -106,7 +106,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public int countCardsByDictionaryAndType(Dictionary dictionary, CardTypeEnum cardTypeEnum) {
         logger.debug("Counting cards by dictionary {} and type {}", dictionary, cardTypeEnum);
 
@@ -114,7 +114,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public boolean checkDictionaryCanBePublished(Dictionary dictionary) {
         return (cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.WHITE) >= dictionariesConfig.getMinNumberOfWhiteCards()) && (cardDao.countCardsByDictionaryAndType(dictionary, CardTypeEnum.BLACK) >= dictionariesConfig.getMinNumberOfBlackCards());
     }

@@ -13,7 +13,7 @@ import org.themarioga.engine.cah.models.game.Game;
 import org.themarioga.engine.cah.models.game.Player;
 import org.themarioga.engine.cah.models.game.PlayerHandCard;
 import org.themarioga.engine.cah.services.intf.game.PlayerService;
-import org.themarioga.engine.commons.enums.ErrorEnum;
+import org.themarioga.engine.commons.enums.CommonErrorEnum;
 import org.themarioga.engine.commons.exceptions.ApplicationException;
 import org.themarioga.engine.commons.exceptions.player.PlayerAlreadyExistsException;
 import org.themarioga.engine.commons.models.User;
@@ -45,10 +45,10 @@ public class PlayerServiceImpl implements PlayerService {
         logger.debug("Creating player from user {} in game {}", user, game);
 
         // Check game is not null
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Check user is not null
-        Assert.assertNotNull(user, ErrorEnum.USER_NOT_FOUND);
+        Assert.assertNotNull(user, CommonErrorEnum.USER_NOT_FOUND);
 
         // Check if the user is already playing
         if (playerDao.findPlayerByUser(user) != null)
@@ -76,7 +76,7 @@ public class PlayerServiceImpl implements PlayerService {
     public void insertWhiteCardsIntoPlayerHand(Player player, List<Card> cardsToTransfer) {
         logger.debug("Transferring white cards to hand of player {}", player);
 
-        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+        Assert.assertNotNull(player, CommonErrorEnum.PLAYER_NOT_FOUND);
 
         for (Card card : cardsToTransfer) {
             PlayerHandCard playerHandCard = new PlayerHandCard();
@@ -94,7 +94,7 @@ public class PlayerServiceImpl implements PlayerService {
     public Player incrementPoints(Player player) {
         logger.debug("Incrementing player's ({}) points", player);
 
-        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+        Assert.assertNotNull(player, CommonErrorEnum.PLAYER_NOT_FOUND);
 
         player.setPoints(player.getPoints() + 1);
 
@@ -106,7 +106,7 @@ public class PlayerServiceImpl implements PlayerService {
     public Player removeCardFromHand(Player player, Card card) {
         logger.debug("Removing card {} from the hand of the player {}", card, player);
 
-        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+        Assert.assertNotNull(player, CommonErrorEnum.PLAYER_NOT_FOUND);
 
         Optional<PlayerHandCard> cards = player.getHand().stream().filter(playerHandCard -> playerHandCard.getCard().getId().equals(card.getId())).findFirst();
 
@@ -119,7 +119,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Player findById(UUID id) {
         logger.debug("Getting player with ID: {}", id);
 
@@ -127,7 +127,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Player findByUser(User user) {
         logger.debug("Getting player with user: {}", user);
 
@@ -135,7 +135,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Player findByUserId(UUID userId) {
         logger.debug("Getting player with user ID: {}", userId);
 
@@ -143,7 +143,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Player findPlayerByGameAndUser(Game game, User user) {
         logger.debug("Checking user's playing game {}", user);
 

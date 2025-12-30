@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.engine.cah.config.GameConfig;
 import org.themarioga.engine.cah.dao.intf.game.GameDao;
+import org.themarioga.engine.cah.enums.CAHErrorEnum;
 import org.themarioga.engine.cah.enums.PunctuationModeEnum;
 import org.themarioga.engine.cah.enums.VotationModeEnum;
 import org.themarioga.engine.cah.exceptions.game.GameAlreadyFilledException;
@@ -18,7 +19,7 @@ import org.themarioga.engine.cah.models.game.Player;
 import org.themarioga.engine.cah.models.game.Round;
 import org.themarioga.engine.cah.services.intf.dictionaries.DictionaryService;
 import org.themarioga.engine.cah.services.intf.game.GameService;
-import org.themarioga.engine.commons.enums.ErrorEnum;
+import org.themarioga.engine.commons.enums.CommonErrorEnum;
 import org.themarioga.engine.commons.enums.GameStatusEnum;
 import org.themarioga.engine.commons.exceptions.ApplicationException;
 import org.themarioga.engine.commons.exceptions.game.*;
@@ -52,7 +53,7 @@ public class GameServiceImpl implements GameService {
         logger.debug("Creating game for room {} by user {}", room, creator);
 
         // Check if the room exists
-        Assert.assertNotNull(room, ErrorEnum.ROOM_NOT_FOUND);
+        Assert.assertNotNull(room, CommonErrorEnum.ROOM_NOT_FOUND);
 
         // Check if a game already exists in this room
         if (gameDao.countByRoom(room) > 0)
@@ -63,7 +64,7 @@ public class GameServiceImpl implements GameService {
             throw new GameCreatorAlreadyExistsException();
 
         // Check if the creator exists
-        Assert.assertNotNull(creator, ErrorEnum.USER_NOT_FOUND);
+        Assert.assertNotNull(creator, CommonErrorEnum.USER_NOT_FOUND);
 
         // Create game
         Game game = new Game();
@@ -88,7 +89,7 @@ public class GameServiceImpl implements GameService {
         logger.debug("Updating game: {}", game);
 
         // Check game exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         return gameDao.createOrUpdate(game);
     }
@@ -99,7 +100,7 @@ public class GameServiceImpl implements GameService {
         logger.debug("Deleting game: {}", game);
 
         // Check game exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         gameDao.delete(game);
     }
@@ -110,7 +111,7 @@ public class GameServiceImpl implements GameService {
         logger.debug("Setting status {} to game: {}", gameStatusEnum, game);
 
         // Check game exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Set the status
         game.setStatus(gameStatusEnum);
@@ -124,7 +125,7 @@ public class GameServiceImpl implements GameService {
         logger.debug("Setting votation mode {} to game {}", type, game);
 
         // Check game exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Check if the game has already started
         if (game.getStatus() == GameStatusEnum.STARTED)
@@ -142,7 +143,7 @@ public class GameServiceImpl implements GameService {
         logger.debug("Setting max number of players {} to game {}", maxNumberOfPlayers, game);
 
         // Check game exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Check if the game has already started
         if (game.getStatus() == GameStatusEnum.STARTED)
@@ -168,7 +169,7 @@ public class GameServiceImpl implements GameService {
         logger.debug("Setting number of cards {} to game {}", numberOfCards, game);
 
         // Check game exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Check if the game has already started
         if (game.getStatus() == GameStatusEnum.STARTED)
@@ -189,7 +190,7 @@ public class GameServiceImpl implements GameService {
         logger.debug("Setting number of rounds {} to game {}", numberOfRoundsToEnd, game);
 
         // Check game exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Check if the game has already started
         if (game.getStatus() == GameStatusEnum.STARTED)
@@ -210,10 +211,10 @@ public class GameServiceImpl implements GameService {
         logger.debug("Setting dictionary {} to game {}", dictionary, game);
 
         // Check game exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Check game exists
-        Assert.assertNotNull(dictionary, ErrorEnum.DICTIONARY_NOT_FOUND);
+        Assert.assertNotNull(dictionary, CAHErrorEnum.DICTIONARY_NOT_FOUND);
 
         // Check if the game has already started
         if (game.getStatus() == GameStatusEnum.STARTED)
@@ -231,10 +232,10 @@ public class GameServiceImpl implements GameService {
         logger.debug("Adding player {} to game {}", player, game);
 
         // Check game exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Check player exists
-        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+        Assert.assertNotNull(player, CommonErrorEnum.PLAYER_NOT_FOUND);
 
         // Check if the game has not started
         if (game.getStatus() != GameStatusEnum.CREATED)
@@ -256,10 +257,10 @@ public class GameServiceImpl implements GameService {
         logger.debug("Removing player from player {} in game {}", player, game);
 
         // Check game exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Check player exists
-        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+        Assert.assertNotNull(player, CommonErrorEnum.PLAYER_NOT_FOUND);
 
         // Check the status of the game
         if (game.getStatus() != GameStatusEnum.CREATED)
@@ -281,7 +282,7 @@ public class GameServiceImpl implements GameService {
         logger.debug("Starting game in room {}", game);
 
         // Check game exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Check the status of the game
         if (game.getStatus() == GameStatusEnum.STARTED)
@@ -311,7 +312,7 @@ public class GameServiceImpl implements GameService {
         logger.debug("Ending game {}", game);
 
         // Check game exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Only started games can end
         if (game.getStatus() != GameStatusEnum.ENDING)
@@ -326,7 +327,7 @@ public class GameServiceImpl implements GameService {
         logger.debug("Setting current round {} to game {}", round, game);
 
         // Check game exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Check the number of players in the game
         if (game.getStatus() != GameStatusEnum.STARTED)
@@ -344,10 +345,10 @@ public class GameServiceImpl implements GameService {
         logger.debug("Player {} vote for the deletion of the game {}", player, game);
 
         // Check game exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Check player exists
-        Assert.assertNotNull(player, ErrorEnum.PLAYER_NOT_FOUND);
+        Assert.assertNotNull(player, CommonErrorEnum.PLAYER_NOT_FOUND);
 
         // Check if game is started
         if (game.getStatus() == GameStatusEnum.CREATED)
@@ -377,7 +378,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Game getByRoom(Room room) {
         logger.debug("Getting game with room: {}", room);
 

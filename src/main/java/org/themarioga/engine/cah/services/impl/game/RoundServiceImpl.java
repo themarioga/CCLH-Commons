@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.themarioga.engine.cah.dao.intf.game.RoundDao;
+import org.themarioga.engine.cah.enums.CAHErrorEnum;
 import org.themarioga.engine.cah.enums.CardTypeEnum;
 import org.themarioga.engine.cah.enums.RoundStatusEnum;
 import org.themarioga.engine.cah.enums.VotationModeEnum;
@@ -21,7 +22,7 @@ import org.themarioga.engine.cah.models.dictionaries.Card;
 import org.themarioga.engine.cah.models.game.*;
 import org.themarioga.engine.cah.services.intf.game.PlayerService;
 import org.themarioga.engine.cah.services.intf.game.RoundService;
-import org.themarioga.engine.commons.enums.ErrorEnum;
+import org.themarioga.engine.commons.enums.CommonErrorEnum;
 import org.themarioga.engine.commons.exceptions.ApplicationException;
 import org.themarioga.engine.commons.util.Assert;
 
@@ -50,7 +51,7 @@ public class RoundServiceImpl implements RoundService {
         logger.debug("Creating round for game {}", game);
 
         // Check round exists
-        Assert.assertNotNull(game, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(game, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Create the round object
         Round round = new Round();
@@ -78,7 +79,7 @@ public class RoundServiceImpl implements RoundService {
         logger.debug("Deleting round {}", round);
 
         // Check round exists
-        Assert.assertNotNull(round, ErrorEnum.ROUND_NOT_FOUND);
+        Assert.assertNotNull(round, CAHErrorEnum.ROUND_NOT_FOUND);
 
         // Check if the round is ready to end
         if (round.getStatus() != RoundStatusEnum.ENDING)
@@ -94,7 +95,7 @@ public class RoundServiceImpl implements RoundService {
         logger.debug("Setting round {} to status {}", round, status);
 
         // Check round exists
-        Assert.assertNotNull(round, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(round, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Set status
         round.setStatus(status);
@@ -108,7 +109,7 @@ public class RoundServiceImpl implements RoundService {
         logger.debug("Player {} playing card {} for the round {}", player, card, round);
 
         // Check round exists
-        Assert.assertNotNull(round, ErrorEnum.ROUND_NOT_STARTED);
+        Assert.assertNotNull(round, CAHErrorEnum.ROUND_NOT_STARTED);
 
         // Check if the round is ready to start
         if (round.getStatus() != RoundStatusEnum.PLAYING)
@@ -138,7 +139,7 @@ public class RoundServiceImpl implements RoundService {
         logger.debug("Player {} voting card {} for the round {}", player, card, round);
 
         // Check round exists
-        Assert.assertNotNull(round, ErrorEnum.GAME_NOT_FOUND);
+        Assert.assertNotNull(round, CommonErrorEnum.GAME_NOT_FOUND);
 
         // Check if the round is ready to start
         if (round.getStatus() != RoundStatusEnum.VOTING)
@@ -182,7 +183,7 @@ public class RoundServiceImpl implements RoundService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Card getMostVotedCard(Round round) {
         logger.debug("Getting most voted card of the game of the round {}", round);
 
@@ -190,7 +191,7 @@ public class RoundServiceImpl implements RoundService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public PlayedCard getPlayedCardByCard(Round round, Card card) {
         logger.debug("Getting played card from round {} and card {}", round, card);
 
@@ -198,7 +199,7 @@ public class RoundServiceImpl implements RoundService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public boolean checkIfEveryoneHavePlayedACard(Round round) {
         int cardsNeededToVote = round.getGame().getPlayers().size();
         if (round.getGame().getVotationMode() == VotationModeEnum.DICTATORSHIP || round.getGame().getVotationMode() == VotationModeEnum.CLASSIC)
@@ -208,7 +209,7 @@ public class RoundServiceImpl implements RoundService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = ApplicationException.class)
+    @Transactional(propagation = Propagation.SUPPORTS)
     public boolean checkIfEveryoneHaveVotedACard(Round round) {
         int votesNeededToEnd = round.getGame().getPlayers().size();
         if (round.getGame().getVotationMode() == VotationModeEnum.DICTATORSHIP || round.getGame().getVotationMode() == VotationModeEnum.CLASSIC)

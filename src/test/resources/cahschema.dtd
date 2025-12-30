@@ -1,5 +1,4 @@
 <!ELEMENT dataset (
-        Configuration*,
         Game*,
         Lang*,
         Player*,
@@ -14,12 +13,6 @@
         Player_Hand_Card*,
         Played_card*,
         Voted_card*)>
-
-        <!ELEMENT Configuration EMPTY>
-        <!ATTLIST Configuration
-                CONF_KEY CDATA #REQUIRED
-                CONF_VALUE CDATA #REQUIRED
-                >
 
         <!ELEMENT Game EMPTY>
         <!ATTLIST Game
